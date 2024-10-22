@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('experiment_id')->constrained()->onDelete('cascade');
             $table->string('participant_name');
-            $table->string('participant_email')->unique();
+            $table->string('participant_email');
             $table->json('group_data')->nullable();
             $table->json('actions_log')->nullable();
             $table->integer('duration')->nullable();
