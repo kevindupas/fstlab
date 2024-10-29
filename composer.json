@@ -2,16 +2,22 @@
     "name": "laravel/laravel",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "keywords": [
+        "laravel",
+        "framework"
+    ],
     "license": "MIT",
     "require": {
         "php": "^8.2",
         "althinect/filament-spatie-roles-permissions": "^2.2",
+        "awcodes/filament-tiptap-editor": "^3.0",
         "filament/filament": "^3.2",
         "kenepa/resource-lock": "^2.1",
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",
-        "laravel/tinker": "^2.9"
+        "laravel/tinker": "^2.9",
+        "ralphjsmit/laravel-filament-media-library": "^3.8",
+        "spatie/laravel-medialibrary": "^11.9"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -21,6 +27,12 @@
         "nunomaduro/collision": "^8.0",
         "phpunit/phpunit": "^11.0.1"
     },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://satis.ralphjsmit.com"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "App\\": "app/",
@@ -62,7 +74,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "ralphjsmit/packages": true
         }
     },
     "minimum-stability": "stable",

@@ -6,6 +6,7 @@ use App\Filament\Resources\ExperimentResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class CreateExperiment extends CreateRecord
@@ -14,7 +15,7 @@ class CreateExperiment extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        $data['created_by'] = auth()->id();  // Définir le créateur
+        $data['created_by'] = Auth::user()->id;  // Définir le créateur
         $experiment = parent::handleRecordCreation($data);  // Créer l'expérimentation
 
         // Vérifiez si user_ids est présent et synchronisez les utilisateurs

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Pages\ExperimentSessions;
 use App\Filament\Resources\ExperimentResource\Pages;
 use App\Filament\Resources\ExperimentResource\RelationManagers\UsersRelationManager;
 use App\Models\Experiment;
@@ -24,6 +25,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Kenepa\ResourceLock\Resources\Pages\Concerns\UsesResourceLock;
 use Illuminate\Support\Str;
+use RalphJSmit\Filament\MediaLibrary\Forms\Components\MediaPicker;
 
 class ExperimentResource extends Resource
 {
@@ -41,7 +43,7 @@ class ExperimentResource extends Resource
                 ->schema([
                     Forms\Components\TextInput::make('name')
                         ->required()
-                        ->unique(ignorable: fn ($record) => $record),
+                        ->unique(ignorable: fn($record) => $record),
                     Forms\Components\Select::make('type')
                         ->options([
                             'image' => 'Image',
@@ -50,9 +52,9 @@ class ExperimentResource extends Resource
                         ->reactive()
                         ->required(),
                     Forms\Components\TextInput::make('button_size')
-                        ->visible(fn ($get) => $get('type') === 'sound'),
+                        ->visible(fn($get) => $get('type') === 'sound'),
                     Forms\Components\ColorPicker::make('button_color')
-                        ->visible(fn ($get) => $get('type') === 'sound'),
+                        ->visible(fn($get) => $get('type') === 'sound'),
                 ])
                 ->columnSpan([
                     'sm' => 2,
@@ -88,9 +90,9 @@ class ExperimentResource extends Resource
                                     $set('link', $state);
                                 })
                         )
-                        ->visible(fn ($get) => $get('link') !== null && $get('status') !== 'none')
+                        ->visible(fn($get) => $get('link') !== null && $get('status') !== 'none')
                         ->default(function ($livewire) {
-                            return $livewire->record && $livewire->record->link ? url("/experiment/session/" . $livewire->record->link) : 'No active session';
+                            return $livewire->record && $livewire->record->link ? url("/experiment/" . $livewire->record->link) : 'No active session';
                         })
                         ->disabled(true)
                         ->columnSpan('full'),
@@ -98,6 +100,12 @@ class ExperimentResource extends Resource
                         ->multiple()
                         ->acceptedFileTypes(['image/*', 'audio/*'])
                         ->columnSpan('full'),
+                    // MediaPicker::make('media')
+                    //     ->label('Choose media(s)')
+                    //     ->required()
+                    //     ->multiple()
+                    //     ->acceptedFileTypes(['image/*', 'audio/*'])
+                    //     ->columnSpan('full'),
                 ])
                 ->columnSpan('full'),
         ]);
@@ -111,13 +119,13 @@ class ExperimentResource extends Resource
             Tables\Columns\TextColumn::make('name'),
             Tables\Columns\TextColumn::make('type')
                 ->badge()
-                ->color(fn (string $state): string => match ($state) {
+                ->color(fn(string $state): string => match ($state) {
                     'sound' => 'success',
                     'image' => 'info',
                 }),
             Tables\Columns\TextColumn::make('status')
                 ->badge()
-                ->color(fn (string $state): string => match ($state) {
+                ->color(fn(string $state): string => match ($state) {
                     'none' => 'info',
                     'start' => 'success',
                     'pause' => 'warning',
@@ -135,10 +143,10 @@ class ExperimentResource extends Resource
 
                 if ($user->hasRole('supervisor')) {
                 } else if ($user->hasRole('principal_experimenter')) {
-                    $query->where('created_by', auth()->id());
+                    $query->where('created_by', Auth::user()->id);
                 } else {
                     $query->whereHas('users', function ($q) {
-                        $q->where('users.id', auth()->id());
+                        $q->where('users.id', Auth::user()->id);
                     });
                 }
             })
@@ -151,9 +159,9 @@ class ExperimentResource extends Resource
                         Forms\Components\TextInput::make('link')
                             ->label('Experiment Link')
                             ->disabled(true)
-                            ->visible(fn ($get) => $get('status') !== 'none')
+                            ->visible(fn($get) => $get('status') !== 'none')
                             ->reactive()  // S'assure que ce champ est réactif
-                            ->default(fn ($record) => $record->link ? url("/experiment/session/{$record->link}") : 'No active session'),
+                            ->default(fn($record) => $record->link ? url("/experiment/{$record->link}") : 'No active session'),
 
                         Forms\Components\ToggleButtons::make('experimentStatus')
                             ->options([
@@ -171,12 +179,12 @@ class ExperimentResource extends Resource
                                 'pause' => 'heroicon-o-pause',
                                 'stop' => 'heroicon-o-stop',
                             ])
-                            ->default(fn ($record) => $record->status)
+                            ->default(fn($record) => $record->status)
                             ->reactive()  // Rend le ToggleButtons réactif
                             ->afterStateUpdated(function ($state, $set, $record) {
                                 if ($state === 'start' && !$record->link) {
                                     $record->link = Str::random(40);
-                                    $set('link', url("/experiment/session/{$record->link}"));
+                                    $set('link', url("/experiment/{$record->link}"));
                                 } elseif ($state === 'stop') {
                                     $record->link = null;
                                     $set('link', 'No active session');
@@ -205,8 +213,8 @@ class ExperimentResource extends Resource
                     ->color('info')
                     ->icon('heroicon-o-cloud-arrow-down')
                     ->visible(function ($record) {
-                        $isCreator = $record->created_by == auth()->id();
-                        $canConfigure = $record->users()->where('user_id', auth()->id())->first()?->pivot?->can_configure ?? false;
+                        $isCreator = $record->created_by == Auth::user()->id;
+                        $canConfigure = $record->users()->where('user_id', Auth::user()->id)->first()?->pivot?->can_configure ?? false;
                         return $isCreator || $canConfigure;
                     })
                     ->form([
@@ -227,11 +235,11 @@ class ExperimentResource extends Resource
                             ]),
                         Forms\Components\Placeholder::make('media_export_info')
                             ->content(new HtmlString('<div>Including media will add all associated media files to the export. This option will create a zip folder containing your configuration and the media files.</div>'))
-                            ->visible(fn ($get) => $get('export_json') || $get('export_xml'))
+                            ->visible(fn($get) => $get('export_json') || $get('export_xml'))
                             ->columnSpan('full'),
                         Forms\Components\Toggle::make('include_media')
                             ->label('Include Media')
-                            ->visible(fn ($get) => $get('export_json') || $get('export_xml'))
+                            ->visible(fn($get) => $get('export_json') || $get('export_xml'))
                             ->columnSpan('full'),
                     ])
                     ->modalWidth('xl')
@@ -258,12 +266,12 @@ class ExperimentResource extends Resource
             'index' => Pages\ListExperiments::route('/'),
             'create' => Pages\CreateExperiment::route('/create'),
             'edit' => Pages\EditExperiment::route('/{record}/edit'),
+            'sessions' => Pages\ExperimentSessions::route('/{record}/sessions'),
+            'session-details' => Pages\ExperimentSessionDetails::route('/session/{record}'),
         ];
     }
 
-    protected function beforeCreate(): void
-    {
-    }
+    protected function beforeCreate(): void {}
 
     public static function getRelations(): array
     {

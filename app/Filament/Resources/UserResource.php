@@ -54,14 +54,14 @@ class UserResource extends Resource
                     ->maxLength(255),
                 TextInput::make('password')
                     ->password()
-                    ->required(fn ($livewire) => $livewire instanceof Pages\CreateUser)
-                    ->dehydrateStateUsing(fn ($state) => Hash::make($state))
+                    ->required(fn($livewire) => $livewire instanceof Pages\CreateUser)
+                    ->dehydrateStateUsing(fn($state) => Hash::make($state))
                     ->maxLength(255),
                 Select::make('role')
                     ->options($roleOptions)
                     ->required()
-                    ->hidden(fn ($livewire) => empty($roleOptions))
-                    ->default(fn ($record) => $record ? $record->roles->first()->name : null),
+                    ->hidden(fn($livewire) => empty($roleOptions))
+                    ->default(fn($record) => $record ? $record->roles->first()->name : null),
             ]);
     }
 
@@ -84,7 +84,7 @@ class UserResource extends Resource
                     $query->where('created_by', $user->id);
                 } elseif ($user->hasRole('supervisor')) {
                     $query->whereHas('roles', function ($q) {
-                        dd($q->where('name', 'principal_experimenter'));
+                        // dd($q->where('name', 'principal_experimenter'));
                         $q->where('name', 'principal_experimenter');
                     });
                 } else {
