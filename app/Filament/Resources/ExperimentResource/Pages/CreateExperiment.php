@@ -15,10 +15,9 @@ class CreateExperiment extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        $data['created_by'] = Auth::user()->id;  // Définir le créateur
-        $experiment = parent::handleRecordCreation($data);  // Créer l'expérimentation
+        $data['created_by'] = Auth::user()->id;
+        $experiment = parent::handleRecordCreation($data);
 
-        // Vérifiez si user_ids est présent et synchronisez les utilisateurs
         if (!empty($data['user_ids'])) {
             $experiment->users()->sync($data['user_ids']);
         }
@@ -30,7 +29,7 @@ class CreateExperiment extends CreateRecord
     {
         $experiment = $this->record;
 
-        $experiment->link = Str::random(40);
+        $experiment->link = Str::random(6);
         $experiment->save();
     }
 }

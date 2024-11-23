@@ -2,12 +2,10 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Pages\ExperimentSessions;
 use App\Filament\Resources\ExperimentResource\Pages;
 use App\Filament\Resources\ExperimentResource\RelationManagers\UsersRelationManager;
 use App\Models\Experiment;
 use App\Services\ExperimentExportHandler;
-use Filament\Actions\CreateAction;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
@@ -15,8 +13,10 @@ use Filament\Resources\Resource;
 use Filament\Forms;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
+use Filament\Resources\Concerns\Translatable;
 use Filament\Tables;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Table;
@@ -25,12 +25,12 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Kenepa\ResourceLock\Resources\Pages\Concerns\UsesResourceLock;
 use Illuminate\Support\Str;
-use RalphJSmit\Filament\MediaLibrary\Forms\Components\MediaPicker;
 
 class ExperimentResource extends Resource
 {
 
     use UsesResourceLock;
+    use Translatable;
 
     protected static ?string $model = Experiment::class;
 
@@ -39,6 +39,26 @@ class ExperimentResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
+            Forms\Components\Radio::make('status')
+                ->options([
+                    'none' => 'No',
+                    'start' => 'Yes',
+                ])
+                ->label('Start Experiment ?')->inlineLabel(true)->default('none')->inline(),
+            Forms\Components\TextInput::make('link')
+                ->suffixAction(
+                    Forms\Components\Actions\Action::make('copyCostToPrice')
+                        ->icon('heroicon-m-clipboard')
+                        ->action(function (Set $set, $state) {
+                            $set('link', $state);
+                        })
+                )
+                ->visible(fn($get) => $get('link') !== null && $get('status') !== 'none')
+                ->default(function ($livewire) {
+                    return $livewire->record && $livewire->record->link ? url("/experiment/" . $livewire->record->link) : 'No active session';
+                })
+                ->disabled(true)
+                ->columnSpan('full'),
             Forms\Components\Grid::make()
                 ->schema([
                     Forms\Components\TextInput::make('name')
@@ -48,13 +68,18 @@ class ExperimentResource extends Resource
                         ->options([
                             'image' => 'Image',
                             'sound' => 'Sound',
+                            'image_sound' => 'Image and Sound',
                         ])
                         ->reactive()
                         ->required(),
                     Forms\Components\TextInput::make('button_size')
-                        ->visible(fn($get) => $get('type') === 'sound'),
-                    Forms\Components\ColorPicker::make('button_color')
-                        ->visible(fn($get) => $get('type') === 'sound'),
+                        ->placeholder('Button size in px')
+                        ->numeric()
+                        ->extraAttributes(["step" => "0.01"])
+                        ->minValue(1)
+                        ->maxValue(100)
+                        ->suffix('px'),
+                    Forms\Components\ColorPicker::make('button_color')->placeholder('Button color')->default('#ff1414'),
                 ])
                 ->columnSpan([
                     'sm' => 2,
@@ -76,36 +101,33 @@ class ExperimentResource extends Resource
                             'table',
                             'undo',
                         ])->columnSpan('full'),
-                    Forms\Components\Radio::make('status')
-                        ->options([
-                            'none' => 'No',
-                            'start' => 'Yes',
-                        ])
-                        ->label('Start Experiment ?')->inlineLabel(true)->default('none')->inline(),
-                    Forms\Components\TextInput::make('link')
-                        ->suffixAction(
-                            Forms\Components\Actions\Action::make('copyCostToPrice')
-                                ->icon('heroicon-m-clipboard')
-                                ->action(function (Set $set, $state) {
-                                    $set('link', $state);
-                                })
-                        )
-                        ->visible(fn($get) => $get('link') !== null && $get('status') !== 'none')
-                        ->default(function ($livewire) {
-                            return $livewire->record && $livewire->record->link ? url("/experiment/" . $livewire->record->link) : 'No active session';
-                        })
-                        ->disabled(true)
-                        ->columnSpan('full'),
+                    Forms\Components\FileUpload::make('media')
+                        ->multiple()
+                        ->acceptedFileTypes(['audio/*'])
+                        ->minFiles(2)
+                        ->maxFiles(30)
+                        ->columnSpan('full')
+                        ->visible(fn($get) => $get('type') === 'sound'),
+                    Forms\Components\FileUpload::make('media')
+                        ->multiple()
+                        ->acceptedFileTypes(['image/*'])
+                        ->imagePreviewHeight('250')
+                        ->imageEditor()
+                        ->imageEditorMode(2)
+                        ->minFiles(2)
+                        ->maxFiles(30)
+                        ->columnSpan('full')
+                        ->visible(fn($get) => $get('type') === 'image'),
                     Forms\Components\FileUpload::make('media')
                         ->multiple()
                         ->acceptedFileTypes(['image/*', 'audio/*'])
-                        ->columnSpan('full'),
-                    // MediaPicker::make('media')
-                    //     ->label('Choose media(s)')
-                    //     ->required()
-                    //     ->multiple()
-                    //     ->acceptedFileTypes(['image/*', 'audio/*'])
-                    //     ->columnSpan('full'),
+                        ->imagePreviewHeight('250')
+                        ->imageEditor()
+                        ->imageEditorMode(2)
+                        ->minFiles(2)
+                        ->maxFiles(30)
+                        ->columnSpan('full')
+                        ->visible(fn($get) => $get('type') === 'image_sound'),
                 ])
                 ->columnSpan('full'),
         ]);
@@ -122,6 +144,7 @@ class ExperimentResource extends Resource
                 ->color(fn(string $state): string => match ($state) {
                     'sound' => 'success',
                     'image' => 'info',
+                    'image_sound' => 'warning',
                 }),
             Tables\Columns\TextColumn::make('status')
                 ->badge()
@@ -267,6 +290,7 @@ class ExperimentResource extends Resource
             'create' => Pages\CreateExperiment::route('/create'),
             'edit' => Pages\EditExperiment::route('/{record}/edit'),
             'sessions' => Pages\ExperimentSessions::route('/{record}/sessions'),
+            'statistics' => Pages\ExperimentStatistics::route('/{record}/statistics'),
             'session-details' => Pages\ExperimentSessionDetails::route('/session/{record}'),
         ];
     }

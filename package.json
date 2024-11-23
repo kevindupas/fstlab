@@ -17,11 +17,15 @@
         "vite": "^5.0"
     },
     "dependencies": {
+        "@headlessui/react": "^2.2.0",
+        "@heroicons/react": "^2.1.5",
         "@vitejs/plugin-react": "^4.3.3",
         "konva": "^9.3.15",
+        "lucide-react": "^0.456.0",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
         "react-konva": "^18.2.10",
-        "react-router-dom": "^6.27.0"
+        "react-router-dom": "^6.27.0",
+        "ua-parser-js": "^1.0.39"
     }
 }

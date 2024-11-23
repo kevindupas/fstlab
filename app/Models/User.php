@@ -57,4 +57,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Experiment::class)->withPivot('can_configure', 'can_pass');
     }
+
+    public function createdExperiments()
+    {
+        return $this->hasMany(Experiment::class, 'created_by');
+    }
 }

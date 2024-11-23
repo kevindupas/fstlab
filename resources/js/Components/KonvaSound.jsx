@@ -8,7 +8,13 @@ const getDistance = (pos1, pos2) => {
     return Math.sqrt(dx * dx + dy * dy);
 };
 
-function KonvaSound({ media, buttonColor, size }) {
+function KonvaSound({
+    media,
+    buttonColor,
+    size,
+    onAction,
+    onMediaItemsChange,
+}) {
     // Utiliser useMemo pour éviter de recréer le tableau à chaque rendu
     const mediaArray = useMemo(() => Object.values(media || {}), [media]);
 
@@ -59,7 +65,13 @@ function KonvaSound({ media, buttonColor, size }) {
 
         setMediaItems(updatedMediaItems);
         setElapsedTime(Date.now());
-    }, [mediaArray, size]); // Dépendances explicites
+    }, [mediaArray, size]);
+
+    useEffect(() => {
+        if (onMediaItemsChange && mediaItems.length > 0) {
+            onMediaItemsChange(mediaItems);
+        }
+    }, [mediaItems, onMediaItemsChange]);
 
     const handleResize = useMemo(() => {
         return () => {
@@ -105,10 +117,12 @@ function KonvaSound({ media, buttonColor, size }) {
             )
         );
 
-        setActionsLog((prevLog) => [
-            ...prevLog,
-            { id: mediaItems[index].id, x: newX, y: newY, time: Date.now() },
-        ]);
+        onAction({
+            id: mediaItems[index].id,
+            x: newX,
+            y: newY,
+            time: Date.now(),
+        });
     };
 
     // Gestionnaire audio avec useRef pour éviter les fuites
@@ -128,45 +142,6 @@ function KonvaSound({ media, buttonColor, size }) {
                     console.error("Erreur lors de la lecture audio:", err)
                 );
         }
-    };
-
-    const handleTerminate = () => {
-        const sessionData = JSON.parse(localStorage.getItem("session"));
-        const sessionId = sessionData?.id;
-
-        const threshold = 200;
-        const clustersMap = [];
-
-        mediaItems.forEach((item) => {
-            let foundCluster = false;
-            for (let cluster of clustersMap) {
-                if (cluster.some((g) => getDistance(g, item) < threshold)) {
-                    cluster.push(item);
-                    foundCluster = true;
-                    break;
-                }
-            }
-            if (!foundCluster) {
-                clustersMap.push([item]);
-            }
-        });
-
-        const preparedGroups = clustersMap.map((cluster, index) => ({
-            name: `Group ${index + 1}`,
-            color: clusterColors[index % clusterColors.length],
-            elements: cluster,
-        }));
-
-        const finalElapsedTime = Date.now() - elapsedTime;
-
-        navigate("/results", {
-            state: {
-                sessionId,
-                groups: preparedGroups,
-                elapsedTime: finalElapsedTime,
-                actionsLog,
-            },
-        });
     };
 
     return (
@@ -237,13 +212,6 @@ function KonvaSound({ media, buttonColor, size }) {
                     })}
                 </Layer>
             </Stage>
-
-            <button
-                onClick={handleTerminate}
-                className="fixed top-4 right-4 bg-green-500 text-white py-2 px-4 rounded"
-            >
-                Terminate
-            </button>
         </div>
     );
 }

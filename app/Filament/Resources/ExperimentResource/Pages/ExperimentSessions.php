@@ -8,12 +8,14 @@ use App\Models\ExperimentSession;
 use Filament\Resources\Pages\Page;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Table;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
+use Illuminate\Database\Eloquent\Builder;
 
 class ExperimentSessions extends Page implements HasTable
 {
@@ -27,35 +29,53 @@ class ExperimentSessions extends Page implements HasTable
 
     public function mount($record): void
     {
-        $this->experiment = Experiment::findOrFail($record);
+        $experiment = Experiment::findOrFail($record);
+
+        // Vérifier si l'utilisateur a le droit d'accéder à cette expérience
+        $user = Auth::user();
+        $canAccess = $experiment->created_by === $user->id ||
+            $experiment->accessRequests()
+            ->where('user_id', $user->id)
+            ->where('type', 'results')
+            ->where('status', 'approved')
+            ->exists();
+
+        if (!$canAccess) {
+            abort(403, 'Vous n\'avez pas accès à cette expérience.');
+        }
+
+        $this->experiment = $experiment;
     }
 
     public function table(Table $table): Table
     {
-        /** @var \App\Models\User */
         $user = Auth::user();
+        $isCreator = $this->experiment->created_by === $user->id;
 
         return $table
-            ->query(
-                ExperimentSession::query()
-                    ->where('experiment_id', $this->experiment->id)
-                    ->when(
-                        $user->hasRole('principal_experimenter'),
-                        fn($query) => $query->where('experiment_id', $this->experiment->id)
-                            ->whereHas('experiment', fn($q) => $q->where('created_by', $user->id()))
-                    )
-            )
+            ->query(ExperimentSession::query()->where('experiment_id', $this->experiment->id))
             ->columns([
-                TextColumn::make('participant_name')
-                    ->label('Nom du participant')
+                TextColumn::make('participant_number')
+                    ->label('Identifiant du participant')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('participant_email')
-                    ->label('Email du participant')
-                    ->searchable()
+                IconColumn::make('status')
+                    ->icons([
+                        'heroicon-o-check-circle' => fn($state): bool => $state === 'completed',
+                        'heroicon-o-clock' => fn($state): bool => $state === 'created',
+                    ])
+                    ->colors([
+                        'success' => fn($state): bool => $state === 'completed',
+                        'warning' => fn($state): bool => $state === 'created',
+                    ])
+                    ->label('Statut')
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->label('Date de participation')
+                    ->label('Date de création')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable(),
+                TextColumn::make('completed_at')
+                    ->label('Date de complétion')
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
             ])
@@ -64,7 +84,8 @@ class ExperimentSessions extends Page implements HasTable
                     ->label('Export JSON')
                     ->color('success')
                     ->icon('heroicon-o-arrow-down-tray')
-                    ->action(fn(ExperimentSession $record) => $this->exportJson($record)),
+                    ->action(fn(ExperimentSession $record) => $this->exportJson($record))
+                    ->visible($isCreator), // Seul le créateur peut exporter
 
                 Action::make('details')
                     ->label('Détails')
@@ -80,7 +101,10 @@ class ExperimentSessions extends Page implements HasTable
 
     public function exportJson(ExperimentSession $session)
     {
-        $this->authorize('view', $session);
+        // Vérifier si l'utilisateur est le créateur
+        if ($session->experiment->created_by !== Auth::id()) {
+            abort(403, 'Seul le créateur peut exporter les données.');
+        }
 
         $data = [
             'participant_name' => $session->participant_name,
@@ -101,5 +125,23 @@ class ExperimentSessions extends Page implements HasTable
     public function getTitle(): string | Htmlable
     {
         return new HtmlString('Participants pour l\'expérimentation' . ' : ' . $this->experiment->name);
+    }
+
+    // Ajout d'une méthode pour vérifier l'accès à la page
+    protected function authorizeAccess(): void
+    {
+        $user = Auth::user();
+        $experiment = $this->experiment;
+
+        $canAccess = $experiment->created_by === $user->id ||
+            $experiment->accessRequests()
+            ->where('user_id', $user->id)
+            ->where('type', 'results')
+            ->where('status', 'approved')
+            ->exists();
+
+        if (!$canAccess) {
+            abort(403);
+        }
     }
 }

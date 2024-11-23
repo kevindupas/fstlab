@@ -1,13 +1,30 @@
 <?php
 
-use App\Http\Controllers\ExperimentSessionController;
+use App\Http\Controllers\Api\ExperimentApiController;
+use App\Http\Controllers\Api\ExperimentSessionApiController;
+
 use Illuminate\Support\Facades\Route;
 
+
+// Récupérer la liste des expériences
+Route::get('/experiments', [ExperimentApiController::class, 'index']);
+
+// api.php
+
+Route::middleware(['web'])->group(function () {
+    Route::get('/user/auth-status', [ExperimentApiController::class, 'getAuthStatus']);
+    Route::post('/experiment/request-access/{experimentId}', [ExperimentApiController::class, 'requestAccess']);
+    Route::post('/experiment/request-results/{experimentId}', [ExperimentApiController::class, 'requestResults']);
+});
+
 // Récupérer les données d'une expérience en fonction du token
-Route::get('/experiment/session/{token}', [ExperimentSessionController::class, 'show']);
+Route::get('/experiment/session/{token}', [ExperimentSessionApiController::class, 'show']);
 
 // Enregistrer un participant pour une expérience
-Route::post('/experiment/register/{token}', [ExperimentSessionController::class, 'registerParticipant']);
+Route::post('/experiment/register/{token}', [ExperimentSessionApiController::class, 'registerParticipant']);
+
+// Supprimer une session d'expérience
+Route::delete('/experiment/session/{sessionId}', [ExperimentSessionApiController::class, 'deleteSession']);
 
 // Sauvegarder les données d'une session d'expérience
-Route::post('/experiment/save/{sessionId}', [ExperimentSessionController::class, 'saveExperimentData']);
+Route::post('/experiment/save/{sessionId}', [ExperimentSessionApiController::class, 'saveExperimentData']);

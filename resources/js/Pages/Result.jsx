@@ -9,6 +9,8 @@ function Result() {
     const sessionId = sessionData ? sessionData.id : null;
 
     const [updatedGroups, setUpdatedGroups] = useState(groups);
+    const [feedback, setFeedback] = useState("");
+    const [errors, setErrors] = useState([]);
 
     const handleGroupChange = (index, key, value) => {
         setUpdatedGroups((prevGroups) =>
@@ -23,6 +25,9 @@ function Result() {
             group_data: updatedGroups,
             actions_log: actionsLog,
             duration: elapsedTime,
+            feedback: feedback,
+            errors_log: errors,
+            // status: 'completed',
         };
 
         try {
@@ -132,6 +137,71 @@ function Result() {
                     </div>
                 </div>
             ))}
+
+            {/* Nouveau: Section Feedback */}
+            <div className="mt-8 border p-4 rounded-lg shadow-md">
+                <h3 className="text-2xl font-bold mb-4">Your Feedback</h3>
+                <div className="mb-4">
+                    <label className="block text-lg font-semibold mb-2">
+                        Please share your experience with this experiment:
+                    </label>
+                    <textarea
+                        value={feedback}
+                        onChange={(e) => setFeedback(e.target.value)}
+                        className="w-full p-2 border rounded-md h-32"
+                        placeholder="Share your thoughts, difficulties, or suggestions..."
+                    />
+                </div>
+            </div>
+
+            {/* Nouveau: Section Errors/Issues */}
+            <div className="mt-8 border p-4 rounded-lg shadow-md">
+                <h3 className="text-2xl font-bold mb-4">Technical Issues</h3>
+                <div className="mb-4">
+                    <label className="block text-lg font-semibold mb-2">
+                        Did you encounter any technical issues?
+                    </label>
+                    <div className="flex gap-2 mb-2">
+                        <button
+                            onClick={() =>
+                                setErrors([
+                                    ...errors,
+                                    { time: Date.now(), type: "audio" },
+                                ])
+                            }
+                            className="bg-red-500 text-white px-4 py-2 rounded-md"
+                        >
+                            Report Audio Issue
+                        </button>
+                        <button
+                            onClick={() =>
+                                setErrors([
+                                    ...errors,
+                                    { time: Date.now(), type: "visual" },
+                                ])
+                            }
+                            className="bg-red-500 text-white px-4 py-2 rounded-md"
+                        >
+                            Report Visual Issue
+                        </button>
+                    </div>
+                    {errors.length > 0 && (
+                        <div className="mt-2">
+                            <h4 className="font-semibold">Reported Issues:</h4>
+                            <ul className="list-disc list-inside">
+                                {errors.map((error, index) => (
+                                    <li key={index}>
+                                        {error.type} issue at{" "}
+                                        {new Date(
+                                            error.time
+                                        ).toLocaleTimeString()}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
+            </div>
 
             {/* <h3 className="text-2xl font-bold mt-8 mb-4">
                 Actions Log (Movements):

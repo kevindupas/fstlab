@@ -119,17 +119,7 @@ class ExperimentExportHandler
         }
 
         $handler = new ExperimentExportHandler($experiment);
-        $filesToZip = $handler->handleExport($request->all());
-
-        if (count($filesToZip) === 1) {
-            $filePath = reset($filesToZip);
-            return response()->download($filePath);
-        } elseif (count($filesToZip) > 1) {
-            $zipFilePath = $handler->createZip($filesToZip);
-            return response()->download($zipFilePath);
-        } else {
-            return response()->noContent();
-        }
+        return $handler->handleExport($request->all());
     }
 
     protected function createZip(array $files)

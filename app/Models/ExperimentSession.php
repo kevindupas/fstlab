@@ -10,7 +10,31 @@ class ExperimentSession extends Model
     use HasFactory;
 
     protected $fillable = [
-        'experiment_id', 'participant_name', 'participant_email', 'group_data', 'actions_log', 'duration'
+        'experiment_id',
+        'participant_number',
+        'group_data',
+        'actions_log',
+        'duration',
+        'started_at',
+        'completed_at',
+        'status',
+        'browser',
+        'device_type',
+        'operating_system',
+        'screen_width',
+        'screen_height',
+        'notes',
+        'feedback',
+        'errors_log',
+        'is_dark'
+    ];
+
+    protected $casts = [
+        'group_data' => 'array',
+        'actions_log' => 'array',
+        'errors_log' => 'array',
+        'started_at' => 'datetime',
+        'completed_at' => 'datetime',
     ];
 
     public function experiment()

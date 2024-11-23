@@ -11,8 +11,15 @@ class Experiment extends Model
     use HasFactory, HasLocks;
 
     protected $fillable = [
-        'name', 'description', 'type', 'media', 'button_size',
-        'button_color', 'created_by', 'status', 'link'
+        'name',
+        'description',
+        'type',
+        'media',
+        'button_size',
+        'button_color',
+        'created_by',
+        'status',
+        'link'
     ];
 
     protected $casts = [
@@ -32,5 +39,10 @@ class Experiment extends Model
     public function sessions()
     {
         return $this->hasMany(ExperimentSession::class);
+    }
+
+    public function accessRequests()
+    {
+        return $this->hasMany(ExperimentAccessRequest::class);
     }
 }

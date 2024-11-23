@@ -19,7 +19,6 @@ class EditExperiment extends EditRecord
         $record->fill($data);
         $record->save();
 
-        // Vérifiez si user_ids est présent et synchronisez les utilisateurs
         if (isset($data['user_ids'])) {
             $record->users()->sync($data['user_ids']);
         }
