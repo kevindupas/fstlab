@@ -30,7 +30,6 @@ export function AuthProvider({ children }) {
                 headers: {
                     Accept: "application/json",
                     "X-Requested-With": "XMLHttpRequest",
-                    // Ajouter le token CSRF si nécessaire
                     "X-CSRF-TOKEN": document
                         .querySelector('meta[name="csrf-token"]')
                         ?.getAttribute("content"),

@@ -4,7 +4,7 @@ import {
     UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
-import Header from "../Components/Header";
+import Header from "../Layouts/Header";
 import Modal from "../Components/Modal";
 import { useAuth } from "../Contexts/AuthContext";
 import { useExperiments } from "../Contexts/ExperimentsContext";

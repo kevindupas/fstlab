@@ -1,13 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import {
-    Route,
-    BrowserRouter as Router,
-    Routes,
-    useLocation,
-} from "react-router-dom";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "../css/app.css";
-import Header from "./Components/Header";
+import { Layout } from "./Layouts/Layout";
 import { AuthProvider } from "./Contexts/AuthContext";
 import { ExperimentsProvider } from "./Contexts/ExperimentsContext";
 import { SessionProvider } from "./Contexts/SessionContext";
@@ -16,18 +11,7 @@ import ExperimentSession from "./Pages/ExperimentSession";
 import Home from "./Pages/Home";
 import Login from "./Pages/Login";
 import Result from "./Pages/Result";
-
-// Layout component avec le Header
-function Layout({ children }) {
-    const location = useLocation();
-    const showHeader = ["/", "/experiments/"].includes(location.pathname);
-    return (
-        <>
-            {showHeader && <Header />}
-            {children}
-        </>
-    );
-}
+import HomeTwo from "./Pages/HomeTwo";
 
 function App() {
     return (
@@ -37,7 +21,7 @@ function App() {
                     <SessionProvider>
                         <Layout>
                             <Routes>
-                                <Route path="/" element={<Home />} />
+                                <Route path="/" element={<HomeTwo />} />
                                 <Route
                                     path="/login/:sessionId"
                                     element={<Login />}

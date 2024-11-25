@@ -202,10 +202,8 @@ function KonvaComponent({
         if (!isFinished) return;
 
         if (editingGroupIndex !== null) {
-            // Si on est en mode édition, change le groupe du média
             onMediaGroupChange(item.id, editingGroupIndex);
 
-            // On permet quand même la lecture du son ou l'affichage de l'image
             if (item.type === "sound") {
                 handlePlaySound(item.url);
             } else if (item.type === "image") {
