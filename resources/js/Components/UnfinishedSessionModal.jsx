@@ -11,8 +11,11 @@ export function UnfinishedSessionModal() {
     if (!showUnfinishedModal) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center">
+            <div
+                className="bg-white rounded-lg p-6 max-w-md w-full mx-4"
+                onClick={(e) => e.stopPropagation()}
+            >
                 <h2 className="text-xl font-bold text-gray-900 mb-4">
                     Session non terminée détectée
                 </h2>

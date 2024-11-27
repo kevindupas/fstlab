@@ -159,7 +159,6 @@ export default function Home() {
                                         <img
                                             src={company.logo}
                                             alt={company.name}
-                                            unoptimized
                                         />
                                     </li>
                                 ))}

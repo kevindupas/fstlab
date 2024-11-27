@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
         $supervisor = User::create([
             'name' => 'Supervisor User',
             'email' => 'supervisor@example.com',
-            'password' => Hash::make('password')
+            'password' => Hash::make('password'),
         ]);
         $supervisor->assignRole('supervisor');
 
@@ -23,11 +23,11 @@ class UserSeeder extends Seeder
             $principal = User::create([
                 'name' => "Principal Experimenter $i",
                 'email' => "principal$i@example.com",
-                'password' => Hash::make('password')
+                'password' => Hash::make('password'),
+                'created_by' => $supervisor->id  // Ajout de la relation
             ]);
             $principal->assignRole('principal_experimenter');
         }
-
         // Get all principal experimenters
         $principals = User::role('principal_experimenter')->get();
 

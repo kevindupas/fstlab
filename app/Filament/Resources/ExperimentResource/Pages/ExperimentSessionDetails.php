@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ExperimentResource\Pages;
 
 use App\Filament\Resources\ExperimentResource;
 use App\Models\ExperimentSession;
+use App\Traits\HasExperimentAccess;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Pages\Page;
@@ -19,6 +20,9 @@ use Filament\Support\Enums\FontWeight;
 
 class ExperimentSessionDetails extends Page
 {
+
+    use HasExperimentAccess;
+
     protected static string $resource = ExperimentResource::class;
 
     protected static string $view = 'filament.resources.experiment-resource.pages.experiment-session-details';
@@ -29,23 +33,11 @@ class ExperimentSessionDetails extends Page
     {
         $this->session = ExperimentSession::with('experiment')->findOrFail($record);
 
-        // Vérifier les permissions
-        $user = Auth::user();
-        $experiment = $this->session->experiment;
-
-        $canAccess = $experiment->created_by === $user->id ||
-            $experiment->accessRequests()
-            ->where('user_id', $user->id)
-            ->where('type', 'results')
-            ->where('status', 'approved')
-            ->exists();
-
-        if (!$canAccess) {
+        if (!$this->canAccessExperiment($this->session->experiment)) {
             abort(403, 'Vous n\'avez pas accès aux détails de cette session.');
         }
 
-        // Stocker si l'utilisateur est le créateur pour l'utiliser plus tard
-        $this->isCreator = $experiment->created_by === $user->id;
+        $this->isCreator = $this->session->experiment->created_by === Auth::id();
     }
 
     public function sessionInfolist(Infolist $infolist): Infolist

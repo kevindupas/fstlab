@@ -74,20 +74,48 @@ function ExperimentSession() {
         setStartTime(Date.now());
     }, []);
 
-    const handleCleanup = useCallback(async () => {
-        const storedSession = JSON.parse(localStorage.getItem("session"));
-        try {
-            if (storedSession?.id) {
-                await fetch(`/api/experiment/session/${storedSession.id}`, {
-                    method: "DELETE",
-                });
+    const handleExit = useCallback(
+        async (keepSession = false) => {
+            if (!keepSession) {
+                try {
+                    const storedSession = JSON.parse(
+                        localStorage.getItem("session")
+                    );
+                    console.log("Début du nettoyage");
+
+                    if (storedSession?.id) {
+                        await fetch(
+                            `/api/experiment/session/${storedSession.id}`,
+                            {
+                                method: "DELETE",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    Accept: "application/json",
+                                    "X-Requested-With": "XMLHttpRequest",
+                                },
+                            }
+                        );
+                    }
+
+                    localStorage.clear();
+                    console.log(
+                        "Après nettoyage, contenu localStorage:",
+                        localStorage
+                    );
+
+                    navigate("/");
+                } catch (error) {
+                    console.error("Error during cleanup:", error);
+                    // Même en cas d'erreur, on force le nettoyage
+                    localStorage.clear();
+                    navigate("/");
+                }
+            } else {
+                navigate("/");
             }
-        } catch (error) {
-            console.error("Error deleting session:", error);
-        } finally {
-            localStorage.clear();
-        }
-    }, []);
+        },
+        [navigate]
+    );
 
     const handleRestart = async () => {
         setIsLoading(true);
@@ -116,12 +144,16 @@ function ExperimentSession() {
         }
     };
 
-    const handleExit = (keepSession = false) => {
-        if (!keepSession) {
-            handleCleanup();
-        }
-        navigate("/");
-    };
+    useEffect(() => {
+        if (isFinished) return;
+
+        const timer = setInterval(() => {
+            const msElapsed = Date.now() - startTime;
+            setElapsedTime(msElapsed);
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [startTime, isFinished]);
 
     const handleTerminate = useCallback(() => {
         const threshold = 200;
@@ -163,10 +195,6 @@ function ExperimentSession() {
             elements: cluster,
         }));
 
-        // Calcul du temps écoulé au moment où l'utilisateur termine
-        const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
-        setElapsedTime(timeElapsed);
-
         setGroups(preparedGroups);
         setIsFinished(true);
     }, [currentMediaItems, startTime]);
@@ -182,29 +210,28 @@ function ExperimentSession() {
     const handleSubmitResults = async (data) => {
         try {
             const sessionData = JSON.parse(localStorage.getItem("session"));
-            const response = await fetch(`/api/experiment/save/${sessionId}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    groups: data.groups,
-                    feedback: data.feedback,
-                    group_comments: data.groups.map((g) => ({
-                        group_id: g.name,
-                        comment: g.comment,
-                    })),
-                    errors_log: data.errors,
-                    actions_log: actionsLog,
-                    duration: data.elapsedTime,
-                    sessionId: sessionData?.id,
-                }),
-            });
+            const response = await fetch(
+                `/api/experiment/save/${sessionData?.id}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                    body: JSON.stringify({
+                        group_data: data.groups,
+                        actions_log: actionsLog,
+                        duration: data.elapsedTime,
+                        feedback: data.feedback,
+                        errors_log: data.errors || [],
+                    }),
+                }
+            );
 
             if (response.ok) {
                 localStorage.removeItem("isRegistered");
-                localStorage.removeItem("participantEmail");
-                localStorage.removeItem("participantName");
+                localStorage.removeItem("participantNumber");
                 localStorage.removeItem("session");
                 navigate("/");
             }
@@ -317,6 +344,7 @@ function ExperimentSession() {
                                 onEditModeChange={handleEditModeChange}
                                 onSubmit={handleSubmitResults}
                                 elapsedTime={elapsedTime}
+                                actionsLog={actionsLog}
                                 sessionId={sessionId}
                             />
                         </div>
@@ -342,7 +370,11 @@ function ExperimentSession() {
                                 </p>
                                 <div className="flex flex-col gap-3">
                                     <button
-                                        onClick={() => handleExit(true)}
+                                        onClick={async () => {
+                                            // S'assurer que handleExit est bien exécuté avant la fermeture du modal
+                                            await handleExit(false);
+                                            setShowLeaveModal(false);
+                                        }}
                                         className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center gap-2"
                                     >
                                         <svg

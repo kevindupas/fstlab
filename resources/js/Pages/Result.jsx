@@ -12,12 +12,86 @@ function Result() {
     const [feedback, setFeedback] = useState("");
     const [errors, setErrors] = useState([]);
 
+    const formatTime = (timeInSeconds) => {
+        const minutes = Math.floor(timeInSeconds / 60);
+        const seconds = timeInSeconds % 60;
+        return minutes > 0
+            ? `${minutes} minute${
+                  minutes > 1 ? "s" : ""
+              } et ${seconds} seconde${seconds > 1 ? "s" : ""}`
+            : `${seconds} seconde${seconds > 1 ? "s" : ""}`;
+    };
+
     const handleGroupChange = (index, key, value) => {
-        setUpdatedGroups((prevGroups) =>
-            prevGroups.map((group, i) =>
+        setUpdatedGroups((prevGroups) => {
+            const newGroups = prevGroups.map((group, i) =>
                 i === index ? { ...group, [key]: value } : group
-            )
-        );
+            );
+            return newGroups.filter((group) => group.elements.length > 0);
+        });
+    };
+
+    // const handleMediaMove = (mediaId, fromGroupIndex, toGroupIndex) => {
+    //     setUpdatedGroups((prevGroups) => {
+    //         const newGroups = [...prevGroups];
+
+    //         // Retirer du groupe source
+    //         if (fromGroupIndex !== -1) {
+    //             const sourceGroup = { ...newGroups[fromGroupIndex] };
+    //             sourceGroup.elements = sourceGroup.elements.filter(
+    //                 (e) => e.id !== mediaId
+    //             );
+    //             newGroups[fromGroupIndex] = sourceGroup;
+    //         }
+
+    //         // Ajouter au groupe destination
+    //         if (toGroupIndex !== -1) {
+    //             const media = prevGroups[fromGroupIndex].elements.find(
+    //                 (e) => e.id === mediaId
+    //             );
+    //             if (media) {
+    //                 if (!newGroups[toGroupIndex]) {
+    //                     newGroups[toGroupIndex] = {
+    //                         name: `Groupe ${toGroupIndex + 1}`,
+    //                         color:
+    //                             "#" +
+    //                             Math.floor(Math.random() * 16777215).toString(
+    //                                 16
+    //                             ),
+    //                         elements: [],
+    //                     };
+    //                 }
+    //                 newGroups[toGroupIndex].elements.push(media);
+    //             }
+    //         }
+
+    //         return newGroups.filter((group) => group.elements.length > 0);
+    //     });
+    // };
+
+    const findNextGroupNumber = (groups) => {
+        const existingNumbers = groups
+            .map((g) => parseInt(g.name.match(/\d+/)?.[0] || "0"))
+            .sort((a, b) => a - b);
+
+        for (let i = 1; i <= existingNumbers.length + 1; i++) {
+            if (!existingNumbers.includes(i)) {
+                return i;
+            }
+        }
+        return existingNumbers.length + 1;
+    };
+
+    const addNewGroup = () => {
+        const nextNumber = findNextGroupNumber(updatedGroups);
+        setUpdatedGroups([
+            ...updatedGroups,
+            {
+                name: `Groupe ${nextNumber}`,
+                color: "#" + Math.floor(Math.random() * 16777215).toString(16),
+                elements: [],
+            },
+        ]);
     };
 
     const handleSendData = async () => {
@@ -27,7 +101,6 @@ function Result() {
             duration: elapsedTime,
             feedback: feedback,
             errors_log: errors,
-            // status: 'completed',
         };
 
         try {
@@ -40,22 +113,14 @@ function Result() {
             });
 
             if (response.ok) {
-                alert("Data sent successfully");
-
-                // Vider les clés spécifiques du localStorage
                 localStorage.removeItem("isRegistered");
                 localStorage.removeItem("participantEmail");
                 localStorage.removeItem("participantName");
                 localStorage.removeItem("session");
-
-                // Rediriger vers la page d'accueil ou une autre page
                 navigate("/");
-            } else {
-                alert("Failed to send data");
             }
         } catch (error) {
             console.error("Error sending data:", error);
-            alert("Error sending data");
         }
     };
 
@@ -67,7 +132,7 @@ function Result() {
         <div className="p-8 max-w-6xl mx-auto">
             <h2 className="text-3xl font-bold mb-8">Experiment Summary</h2>
             <p className="text-lg mb-6">
-                Total Time: {Math.floor(elapsedTime / 1000)} seconds
+                Total Time: {formatTime(Math.floor(elapsedTime / 1000))}
             </p>
 
             {updatedGroups.map((group, index) => (
@@ -138,7 +203,6 @@ function Result() {
                 </div>
             ))}
 
-            {/* Nouveau: Section Feedback */}
             <div className="mt-8 border p-4 rounded-lg shadow-md">
                 <h3 className="text-2xl font-bold mb-4">Your Feedback</h3>
                 <div className="mb-4">
@@ -154,7 +218,6 @@ function Result() {
                 </div>
             </div>
 
-            {/* Nouveau: Section Errors/Issues */}
             <div className="mt-8 border p-4 rounded-lg shadow-md">
                 <h3 className="text-2xl font-bold mb-4">Technical Issues</h3>
                 <div className="mb-4">
@@ -202,18 +265,6 @@ function Result() {
                     )}
                 </div>
             </div>
-
-            {/* <h3 className="text-2xl font-bold mt-8 mb-4">
-                Actions Log (Movements):
-            </h3>
-            <ul className="list-disc list-inside">
-                {actionsLog.map((log, index) => (
-                    <li key={index}>
-                        Media ID: {log.id}, New Position: ({log.x}, {log.y}),
-                        Time: {log.time}
-                    </li>
-                ))}
-            </ul> */}
 
             <div className="mt-8">
                 <button

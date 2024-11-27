@@ -61,7 +61,7 @@ function Header() {
                             <NavLink href="/experiments" isReactRoute>
                                 Expériences
                             </NavLink>
-                            <NavLink href="/" isReactRoute>
+                            <NavLink href="/how-it-work" isReactRoute>
                                 Comment ça fonctionne ?
                             </NavLink>
                         </div>
@@ -73,7 +73,7 @@ function Header() {
                                     <span>{user.name}</span>
                                 </div>
                                 <Button onClick={handleLogout} color="blue">
-                                    Logout
+                                    Déconnexion
                                 </Button>
                             </>
                         ) : (

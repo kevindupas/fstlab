@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class ExperimentSessionApiController extends Controller
 {
-    // Méthode pour résoudre le link vers un ID
+
     protected function resolveExperiment($link)
     {
         $experiment = Experiment::where('link', $link)->first();
@@ -23,7 +23,6 @@ class ExperimentSessionApiController extends Controller
         return $experiment;
     }
 
-    // Récupérer les données de l'expérience pour l'envoyer à React
     public function show($link)
     {
         $experiment = $this->resolveExperiment($link);
@@ -47,11 +46,10 @@ class ExperimentSessionApiController extends Controller
         return response()->json([
             'experiment' => $experiment,
             'media' => $media,
-            'experiment_id' => $experiment->id, // Ajout de l'ID
+            'experiment_id' => $experiment->id,
         ]);
     }
 
-    // Valider l'utilisateur avant de commencer l'expérience
     public function registerParticipant(Request $request, $link)
     {
 
@@ -78,7 +76,6 @@ class ExperimentSessionApiController extends Controller
             return response()->json(['message' => 'This number has already been used for this experiment.'], 409);
         }
 
-        // Créer la session pour ce participant
         $session = ExperimentSession::create([
             'experiment_id' => $experiment->id,
             'participant_number' => $request->participant_number,
@@ -96,12 +93,11 @@ class ExperimentSessionApiController extends Controller
             'session' => $session,
         ]);
     }
-    // Sauvegarder les données d'expérience après sa réalisation
+
     public function saveExperimentData(Request $request, $sessionId)
     {
         $request->validate([
             'group_data' => 'required|array',
-            'actions_log' => 'required|array',
             'duration' => 'required|integer',
             'feedback' => 'nullable|string',
 

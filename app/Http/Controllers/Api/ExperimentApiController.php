@@ -33,6 +33,21 @@ class ExperimentApiController extends Controller
         return response()->json($experiments);
     }
 
+    public function show($id)
+    {
+        try {
+            $experiment = Experiment::with(['creator'])
+                ->withCount('completed_sessions')
+                ->findOrFail($id);
+
+            return response()->json($experiment);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => "L'expérience n'a pas été trouvée"
+            ], 404);
+        }
+    }
+
     // ExperimentApiController.php
     public function getAuthStatus()
     {

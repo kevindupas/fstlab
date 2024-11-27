@@ -127,7 +127,10 @@ class ExperimentAccessRequestResource extends Resource
     // Masquer la ressource dans la navigation si l'utilisateur n'a pas d'expériences
     public static function shouldRegisterNavigation(): bool
     {
-        return Auth::user()->createdExperiments()->exists();
+        /** @var \App\Models\User */
+        $user = Auth::user();
+
+        return $user->createdExperiments()->exists();
     }
 
     public static function getRelations(): array

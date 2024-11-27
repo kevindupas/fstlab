@@ -5,6 +5,8 @@ namespace App\Filament\Resources\ExperimentResource\Pages;
 use App\Filament\Resources\ExperimentResource;
 use App\Models\Experiment;
 use App\Models\ExperimentSession;
+use App\Models\User;
+use App\Traits\HasExperimentAccess;
 use Filament\Resources\Pages\Page;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\Action;
@@ -20,6 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
 class ExperimentSessions extends Page implements HasTable
 {
     use InteractsWithTable;
+    use HasExperimentAccess;
 
     protected static string $resource = ExperimentResource::class;
 
@@ -31,16 +34,7 @@ class ExperimentSessions extends Page implements HasTable
     {
         $experiment = Experiment::findOrFail($record);
 
-        // Vérifier si l'utilisateur a le droit d'accéder à cette expérience
-        $user = Auth::user();
-        $canAccess = $experiment->created_by === $user->id ||
-            $experiment->accessRequests()
-            ->where('user_id', $user->id)
-            ->where('type', 'results')
-            ->where('status', 'approved')
-            ->exists();
-
-        if (!$canAccess) {
+        if (!$this->canAccessExperiment($experiment)) {
             abort(403, 'Vous n\'avez pas accès à cette expérience.');
         }
 
@@ -84,8 +78,8 @@ class ExperimentSessions extends Page implements HasTable
                     ->label('Export JSON')
                     ->color('success')
                     ->icon('heroicon-o-arrow-down-tray')
-                    ->action(fn(ExperimentSession $record) => $this->exportJson($record))
-                    ->visible($isCreator), // Seul le créateur peut exporter
+                    ->action(fn(ExperimentSession $record) => $this->exportJson($record)),
+                // ->visible($isCreator),
 
                 Action::make('details')
                     ->label('Détails')
@@ -130,17 +124,7 @@ class ExperimentSessions extends Page implements HasTable
     // Ajout d'une méthode pour vérifier l'accès à la page
     protected function authorizeAccess(): void
     {
-        $user = Auth::user();
-        $experiment = $this->experiment;
-
-        $canAccess = $experiment->created_by === $user->id ||
-            $experiment->accessRequests()
-            ->where('user_id', $user->id)
-            ->where('type', 'results')
-            ->where('status', 'approved')
-            ->exists();
-
-        if (!$canAccess) {
+        if (!$this->canAccessExperiment($this->experiment)) {
             abort(403);
         }
     }

@@ -9,6 +9,8 @@ function SidePanelResults({
     elapsedTime,
     onSubmit,
     onEditModeChange,
+    actionsLog = [],
+    sessionId,
 }) {
     const [localGroups, setLocalGroups] = useState(groups);
     const [feedback, setFeedback] = useState("");
@@ -16,10 +18,31 @@ function SidePanelResults({
     const [editingGroupIndex, setEditingGroupIndex] = useState(null);
     const [showEmptyGroups, setShowEmptyGroups] = useState(false);
 
-    const formatTime = (seconds) => {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-        return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+    console.log(elapsedTime);
+
+    const formatTime = (ms) => {
+        const totalSeconds = Math.floor(ms / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+
+        let timeString = "";
+
+        if (hours > 0) {
+            timeString = `${hours} heure${hours > 1 ? "s" : ""}`;
+            if (minutes > 0)
+                timeString += `, ${minutes} minute${minutes > 1 ? "s" : ""}`;
+            if (seconds > 0)
+                timeString += `, ${seconds} seconde${seconds > 1 ? "s" : ""}`;
+        } else if (minutes > 0) {
+            timeString = `${minutes} minute${minutes > 1 ? "s" : ""}`;
+            if (seconds > 0)
+                timeString += `, ${seconds} seconde${seconds > 1 ? "s" : ""}`;
+        } else {
+            timeString = `${seconds} seconde${seconds > 1 ? "s" : ""}`;
+        }
+
+        return timeString;
     };
 
     const imageExtensions = [".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp"];
@@ -44,14 +67,6 @@ function SidePanelResults({
         "#808000",
         "#800000",
     ];
-
-    // useEffect(() => {
-    //     const updatedGroups = groups.map((group) => ({
-    //         ...group,
-    //         comment: group.comment || "",
-    //     }));
-    //     setLocalGroups(updatedGroups);
-    // }, [groups]);
 
     useEffect(() => {
         // Ne filtre plus les groupes vides si on vient d'en ajouter un
@@ -92,33 +107,50 @@ function SidePanelResults({
             defaultColors.find((color) => !usedColors.has(color)) ||
             "#" + Math.floor(Math.random() * 16777215).toString(16);
 
+        // Trouver le prochain numéro de groupe disponible
+        const existingNumbers = groups
+            .map((g) => parseInt(g.name.match(/\d+/)?.[0] || "0"))
+            .sort((a, b) => a - b);
+
+        let nextNumber = 1;
+        for (const num of existingNumbers) {
+            if (num !== nextNumber) break;
+            nextNumber++;
+        }
+
         const newGroup = {
-            name: `Groupe ${groups.length + 1}`,
+            name: `Groupe ${nextNumber}`,
             color: availableColor,
             elements: [],
             comment: "",
         };
 
-        // Active l'affichage des groupes vides
         setShowEmptyGroups(true);
-
-        // Met à jour les groupes
-        const updatedGroups = [...groups, newGroup];
-        onGroupsChange(updatedGroups);
-
-        // Force l'édition du nouveau groupe
-        const newIndex = updatedGroups.length - 1;
-        setEditingGroupIndex(newIndex);
-        onEditModeChange(newIndex);
+        onGroupsChange([
+            ...groups.filter(
+                (g) => g.elements.length > 0 || g.name !== newGroup.name
+            ),
+            newGroup,
+        ]);
+        setEditingGroupIndex(groups.length);
+        onEditModeChange(groups.length);
     };
+
+    useEffect(() => {
+        if (!showEmptyGroups) {
+            setLocalGroups(groups.filter((group) => group.elements.length > 0));
+        } else {
+            setLocalGroups(groups);
+        }
+    }, [groups, showEmptyGroups]);
 
     const handleEditGroup = (index) => {
         if (editingGroupIndex === index) {
             setEditingGroupIndex(null);
             onEditModeChange(null);
-
-            // Si on termine l'édition, on peut cacher les groupes vides
             setShowEmptyGroups(false);
+            // Nettoyer les groupes vides après l'édition
+            onGroupsChange(groups.filter((g) => g.elements.length > 0));
         } else {
             setEditingGroupIndex(index);
             onEditModeChange(index);
@@ -132,6 +164,8 @@ function SidePanelResults({
                 feedback,
                 errors,
                 elapsedTime,
+                actionsLog,
+                sessionId,
             });
         }
     };
@@ -139,14 +173,14 @@ function SidePanelResults({
     return (
         <div className="border-l border-gray-500 bg-slate-50 flex-shrink-0 flex flex-col h-screen">
             <div className="p-6 border-b border-gray-200 bg-white">
-                <h2 className="text-2xl font-bold">
+                <h2 className="text-xl font-bold">
                     {!isOpen ? "Session en cours" : "Résultats de la session"}
                 </h2>
                 {isOpen && (
-                    <div className="flex items-center justify-between gap-2 text-gray-600 mt-2">
+                    <div className="flex flex-col items-center justify-between gap-4 text-gray-600 mt-2">
                         <div className="flex items-center gap-2">
                             <Clock size={16} />
-                            <p>Total Time: {formatTime(elapsedTime)}</p>
+                            <p>Durée totale: {formatTime(elapsedTime)}</p>
                         </div>
                         <button
                             onClick={handleAddGroup}
@@ -190,9 +224,9 @@ function SidePanelResults({
                             {localGroups.map((group, index) => (
                                 <div
                                     key={index}
-                                    className="bg-white rounded-lg shadow-md border"
+                                    className="bg-white rounded-lg shadow-md border overflow-hidden"
                                 >
-                                    <div className="p-3 border-b bg-gray-50">
+                                    <div className="p-4 border-b bg-gray-50">
                                         <div className="flex items-center gap-4 mb-4">
                                             <input
                                                 type="text"
@@ -204,7 +238,7 @@ function SidePanelResults({
                                                         e.target.value
                                                     )
                                                 }
-                                                className="flex-1 border rounded text-lg font-medium"
+                                                className="flex-1 border rounded-lg px-3 py-2 text-lg font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                                 placeholder="Nom du groupe"
                                             />
                                             <input
@@ -217,7 +251,7 @@ function SidePanelResults({
                                                         e.target.value
                                                     )
                                                 }
-                                                className="w-11 h-11 rounded border-2 border-black cursor-pointer"
+                                                className="w-12 h-12 rounded-lg border-2 cursor-pointer transition-transform hover:scale-105"
                                             />
                                         </div>
                                         <SpeechToText
@@ -230,21 +264,44 @@ function SidePanelResults({
                                                 )
                                             }
                                             placeholder="Commentaire sur ce groupe..."
-                                            className="border rounded h-20 text-sm w-[20.6rem]"
+                                            className="border rounded-lg h-20 text-sm w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         />
                                     </div>
-                                    <button
-                                        onClick={() => handleEditGroup(index)}
-                                        className={`px-3 py-1 rounded-md transition-colors ${
-                                            editingGroupIndex === index
-                                                ? "bg-blue-500 text-white"
-                                                : "bg-gray-200 hover:bg-gray-300"
-                                        }`}
-                                    >
-                                        {editingGroupIndex === index
-                                            ? "Terminer"
-                                            : "Modifier"}
-                                    </button>
+
+                                    <div className="px-4 py-3 bg-white border-b flex items-center justify-between">
+                                        <button
+                                            onClick={() =>
+                                                handleEditGroup(index)
+                                            }
+                                            className={`px-4 py-2 rounded-lg transition-all ${
+                                                editingGroupIndex === index
+                                                    ? "bg-blue-500 text-white shadow-lg transform scale-105"
+                                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                            } flex items-center gap-2`}
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 20 20"
+                                                fill="currentColor"
+                                                className="w-5 h-5"
+                                            >
+                                                {editingGroupIndex === index ? (
+                                                    <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm3.293-7.707a1 1 0 00-1.414-1.414L9 9.586 7.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l3-3z" />
+                                                ) : (
+                                                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zm-2.207 2.207L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                                )}
+                                            </svg>
+                                            {editingGroupIndex === index
+                                                ? "Terminer"
+                                                : "Modifier"}
+                                        </button>
+                                        <span className="text-sm text-gray-500">
+                                            {group.elements.length} élément
+                                            {group.elements.length > 1
+                                                ? "s"
+                                                : ""}
+                                        </span>
+                                    </div>
 
                                     <div className="p-4">
                                         <div className="grid grid-cols-3 gap-3">
@@ -315,18 +372,35 @@ function SidePanelResults({
                                 </div>
                             ))}
 
-                            <div className="bg-white rounded-lg shadow-md border p-4">
-                                <h3 className="text-lg font-semibold mb-3">
-                                    Commentaire global
-                                </h3>
-                                <SpeechToText
-                                    value={feedback}
-                                    onChange={setFeedback}
-                                    placeholder="Commentaire général sur l'expérience..."
-                                    className="h-32"
-                                />
+                            <div className="bg-white rounded-lg shadow-md border overflow-hidden">
+                                <div className="px-4 py-3 bg-gray-50 border-b flex items-center gap-3">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-5 w-5 text-gray-600"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                    >
+                                        <path
+                                            fillRule="evenodd"
+                                            d="M18 10c0 4.418-3.582 8-8 8s-8-3.582-8-8 3.582-8 8-8 8 3.582 8 8zm-8-5a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1zm0 8a1 1 0 100 2 1 1 0 000-2z"
+                                            clipRule="evenodd"
+                                        />
+                                    </svg>
+                                    <h3 className="text-lg font-semibold">
+                                        Commentaire global
+                                    </h3>
+                                </div>
+                                <div className="p-4">
+                                    <div className="relative">
+                                        <SpeechToText
+                                            value={feedback}
+                                            onChange={setFeedback}
+                                            placeholder="Décrivez votre expérience, vos observations ou toute autre remarque pertinente..."
+                                            className="min-h-[8rem] w-full rounded-lg border border-gray-200 p-3 pr-12 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                        />
+                                    </div>
+                                </div>
                             </div>
-
                             <div className="bg-white rounded-lg shadow-md border p-4">
                                 <h3 className="text-lg font-semibold mb-3">
                                     Problèmes techniques

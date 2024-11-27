@@ -7,9 +7,10 @@ import Footer from "./Footer";
 
 export function Layout({ children }) {
     const location = useLocation();
-    const showHeader = ["/", "/two", "/experiments/"].includes(
-        location.pathname
-    );
+    const showHeader =
+        ["/", "/two", "/experiments", "/how-it-work"].includes(
+            location.pathname
+        ) || location.pathname.startsWith("/experiment-detail");
 
     return (
         <DeviceOrientationCheck>

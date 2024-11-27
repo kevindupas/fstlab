@@ -12,6 +12,8 @@ import Home from "./Pages/Home";
 import Login from "./Pages/Login";
 import Result from "./Pages/Result";
 import HomeTwo from "./Pages/HomeTwo";
+import ExperimentDetail from "./Pages/ExperimentDetail";
+import HowItWork from "./Pages/HowItWork";
 
 function App() {
     return (
@@ -23,12 +25,21 @@ function App() {
                             <Routes>
                                 <Route path="/" element={<HomeTwo />} />
                                 <Route
+                                    path="/experiments/"
+                                    element={<ExperimentList />}
+                                />
+                                <Route
+                                    path="/how-it-work"
+                                    element={<HowItWork />}
+                                />
+
+                                <Route
                                     path="/login/:sessionId"
                                     element={<Login />}
                                 />
                                 <Route
-                                    path="/experiments/"
-                                    element={<ExperimentList />}
+                                    path="/experiment-detail/:id"
+                                    element={<ExperimentDetail />}
                                 />
                                 <Route
                                     path="/experiment/:sessionId"

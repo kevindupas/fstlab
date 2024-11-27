@@ -6,18 +6,19 @@ const SessionContext = createContext(null);
 
 export function SessionProvider({ children }) {
     const [showUnfinishedModal, setShowUnfinishedModal] = useState(false);
+    const [currentSessionId, setCurrentSessionId] = useState("");
     const navigate = useNavigate();
 
     // Vérifie si une session existe dans le localStorage
-    const checkExistingSession = (currentLink) => {
+    const checkExistingSession = (sessionId) => {
         const existingSession = localStorage.getItem("session");
         const isRegistered = localStorage.getItem("isRegistered") === "true";
 
         if (existingSession && isRegistered) {
             const storedSession = JSON.parse(existingSession);
-
             if (storedSession.status !== "completed") {
                 setShowUnfinishedModal(true);
+                setCurrentSessionId(sessionId);
                 return true;
             }
         }
@@ -34,11 +35,9 @@ export function SessionProvider({ children }) {
     };
 
     // Démarre une nouvelle session
-    const handleStartNew = async (currentLink) => {
+    const handleStartNew = async () => {
         try {
             const existingSession = JSON.parse(localStorage.getItem("session"));
-
-            // Supprimer l'ancienne session de la BDD si elle existe
             if (existingSession?.id) {
                 await fetch(`/api/experiment/session/${existingSession.id}`, {
                     method: "DELETE",
@@ -47,10 +46,9 @@ export function SessionProvider({ children }) {
         } catch (error) {
             console.error("Error deleting previous session:", error);
         } finally {
-            // Dans tous les cas, on nettoie le localStorage et on redirige
             localStorage.clear();
             setShowUnfinishedModal(false);
-            navigate(`/login/${currentLink}`);
+            navigate(`/login/${currentSessionId}`); // Utiliser l'ID sauvegardé
         }
     };
 
@@ -61,6 +59,7 @@ export function SessionProvider({ children }) {
                 checkExistingSession,
                 handleContinuePrevious,
                 handleStartNew,
+                currentSessionId,
             }}
         >
             {children}

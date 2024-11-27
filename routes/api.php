@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 // Récupérer la liste des expériences
 Route::get('/experiments', [ExperimentApiController::class, 'index']);
+Route::get('/experiment/{id}', [ExperimentApiController::class, 'show']);
 
 // api.php
 

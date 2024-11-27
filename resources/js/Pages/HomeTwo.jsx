@@ -25,8 +25,7 @@ export default function HomeTwo() {
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
-
-    const { checkExistingSession } = useSession();
+    const { showUnfinishedModal, checkExistingSession } = useSession();
 
     const companies = [
         [
@@ -48,7 +47,6 @@ export default function HomeTwo() {
         setError("");
 
         try {
-            // Vérifier si l'expérience existe
             const response = await fetch(
                 `/api/experiment/session/${sessionId}`
             );
@@ -59,9 +57,13 @@ export default function HomeTwo() {
                 return;
             }
 
-            // Utiliser le context pour vérifier la session existante
+            // Vérifier la session existante
             const hasUnfinishedSession = checkExistingSession(sessionId);
-            if (!hasUnfinishedSession) {
+
+            // Si une session existe, fermer la modal actuelle
+            if (hasUnfinishedSession) {
+                setShowModal(false);
+            } else {
                 navigate(`/login/${sessionId}`);
             }
         } catch (error) {
@@ -117,7 +119,6 @@ export default function HomeTwo() {
                                                     src={company.logo}
                                                     alt={company.name}
                                                     className="h-28 w-auto"
-                                                    unoptimized
                                                 />
                                             </li>
                                         ))}
@@ -148,7 +149,6 @@ export default function HomeTwo() {
                     alt=""
                     width={2245}
                     height={1636}
-                    unoptimized
                 />
                 <Container className="relative">
                     <div className="max-w-3xl md:mx-auto md:text-center xl:max-w-none">
@@ -211,7 +211,6 @@ export default function HomeTwo() {
                     alt=""
                     width={2245}
                     height={1636}
-                    unoptimized
                 />
                 <Container className="relative">
                     <div className="max-w-3xl md:mx-auto md:text-center xl:max-w-none">
@@ -286,11 +285,11 @@ export default function HomeTwo() {
             <FloatingLanguageButton />
 
             {/* Modal code d'expérience */}
-            {showModal && (
+            {showModal && !showUnfinishedModal && (
                 <Dialog
                     open={showModal}
                     onClose={() => setShowModal(false)}
-                    className="relative z-50"
+                    className="relative z-40"
                 >
                     <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
                     <div className="fixed inset-0 z-10 overflow-y-auto">
