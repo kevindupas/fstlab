@@ -8,7 +8,7 @@ import Footer from "./Footer";
 export function Layout({ children }) {
     const location = useLocation();
     const showHeader =
-        ["/", "/two", "/experiments", "/how-it-work"].includes(
+        ["/", "/two", "/experiments", "/how-it-work", "/changelog"].includes(
             location.pathname
         ) || location.pathname.startsWith("/experiment-detail");
 

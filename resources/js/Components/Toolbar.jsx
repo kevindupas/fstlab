@@ -1,6 +1,8 @@
 import React from "react";
+import { useTranslation } from "../Contexts/LanguageContext";
 
 function Toolbar({ onRestart, onLeave, onTerminate, isFinished }) {
+    const { t } = useTranslation();
     return (
         <div className="fixed bottom-0 left-0 right-[449px] bg-gray-800 h-14 flex items-center justify-between gap-4 px-4 shadow-lg z-40">
             <div className="flex space-x-4">
@@ -21,7 +23,7 @@ function Toolbar({ onRestart, onLeave, onTerminate, isFinished }) {
                             clipRule="evenodd"
                         />
                     </svg>
-                    Recommencer
+                    {t("experimentSession.toolbar.reload")}
                 </button>
 
                 <button
@@ -29,19 +31,7 @@ function Toolbar({ onRestart, onLeave, onTerminate, isFinished }) {
                     disabled={isFinished}
                     className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                    >
-                        <path
-                            fillRule="evenodd"
-                            d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
-                            clipRule="evenodd"
-                        />
-                    </svg>
-                    Quitter
+                    {t("experimentSession.toolbar.quit")}
                 </button>
             </div>
 
@@ -62,7 +52,7 @@ function Toolbar({ onRestart, onLeave, onTerminate, isFinished }) {
                             clipRule="evenodd"
                         />
                     </svg>
-                    Terminer
+                    {t("experimentSession.toolbar.terminate")}
                 </button>
             )}
         </div>

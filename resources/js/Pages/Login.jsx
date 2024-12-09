@@ -4,8 +4,10 @@ import UAParser from "ua-parser-js";
 import { UnfinishedSessionModal } from "../Components/UnfinishedSessionModal";
 import { useSession } from "../Contexts/SessionContext";
 import DeviceOrientationCheck from "../Utils/DeviceOrientationCheck";
+import { useTranslation } from "../Contexts/LanguageContext";
 
 function Login() {
+    const { t } = useTranslation();
     const {
         checkExistingSession,
         setParticipantNumber: resetParticipantNumber,
@@ -61,7 +63,7 @@ function Login() {
             const data = await response.json();
 
             if (response.status === 409) {
-                setError("Ce numéro a déjà été utilisé pour cette expérience.");
+                setError(t("login.error"));
                 return;
             }
 
@@ -80,9 +82,7 @@ function Login() {
                 navigate(`/experiment/${sessionId}`);
             }
         } catch (error) {
-            setError(
-                "Une erreur s'est produite lors de l'enregistrement. Veuillez réessayer."
-            );
+            setError(t("login.generic"));
             console.error("Registration error:", error);
         } finally {
             setIsLoading(false);
@@ -98,14 +98,15 @@ function Login() {
                     className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md"
                 >
                     <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                        S'inscrire pour l'expérience
+                        {t("login.title")}
                     </h2>
                     <div className="mb-4">
                         <label className="block text-gray-700 mb-2">
-                            Numéro d'identification :
+                            {t("login.label")} :
                         </label>
                         <input
                             type="text"
+                            placeholder={t("login.placeholder")}
                             value={participantNumber}
                             onChange={(e) =>
                                 setParticipantNumber(e.target.value)
@@ -147,10 +148,10 @@ function Login() {
                                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                     ></path>
                                 </svg>
-                                Enregistrement en cours...
+                                {t("login.loading")}
                             </div>
                         ) : (
-                            "Démarrer l'expérience"
+                            t("login.submit")
                         )}
                     </button>
                 </form>

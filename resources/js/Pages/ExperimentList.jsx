@@ -8,10 +8,13 @@ import {
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useExperiments } from "../Contexts/ExperimentsContext";
+import { useTranslation } from "../Contexts/LanguageContext";
+import FloatingLanguageButton from "../Components/FloatingLanguageButton";
 
 const ITEMS_PER_PAGE = 5;
 
 function ExperimentList() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { experiments, isLoading, error } = useExperiments();
     const [searchQuery, setSearchQuery] = useState("");
@@ -91,7 +94,7 @@ function ExperimentList() {
             <div className="min-h-screen bg-white px-6 py-24 sm:py-32 lg:px-8">
                 <div className="mx-auto max-w-2xl text-center">
                     <p className="text-lg font-semibold text-blue-600">
-                        Chargement...
+                        {t("experiment.list.loading")}
                     </p>
                 </div>
             </div>
@@ -117,11 +120,10 @@ function ExperimentList() {
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
                         <div className="mx-auto max-w-3xl text-center">
                             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                                Liste des Expérimentations
+                                {t("experiment.list.title")}
                             </h2>
                             <p className="mt-2 text-lg leading-8 text-gray-600">
-                                Découvrez toutes les expériences disponibles sur
-                                notre plateforme
+                                {t("experiment.list.message")}
                             </p>
                         </div>
 
@@ -134,7 +136,9 @@ function ExperimentList() {
                                 <input
                                     type="text"
                                     className="block w-full rounded-md border border-gray-300 bg-white py-2 pl-10 pr-3 text-sm placeholder-gray-500 focus:border-blue-500 focus:text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                    placeholder="Rechercher une expérimentation..."
+                                    placeholder={t(
+                                        "experiment.list.placeholder"
+                                    )}
                                     value={searchQuery}
                                     onChange={(e) =>
                                         handleSearch(e.target.value)
@@ -146,9 +150,10 @@ function ExperimentList() {
                         {/* Nombre de résultats */}
                         <div className="mx-auto mt-4 max-w-2xl">
                             <p className="text-sm text-gray-500">
-                                {filteredExperiments.length} résultat
+                                {filteredExperiments.length}{" "}
+                                {t("experiment.list.result")}
                                 {filteredExperiments.length > 1 ? "s" : ""}{" "}
-                                trouvé
+                                {t("experiment.list.find")}
                                 {filteredExperiments.length > 1 ? "s" : ""}
                             </p>
                         </div>
@@ -168,7 +173,7 @@ function ExperimentList() {
                                                     {experiment.name}
                                                 </h3>
                                                 <p className="text-sm text-gray-500">
-                                                    Par{" "}
+                                                    {t("experiment.list.by")}{" "}
                                                     {experiment.creator_name}
                                                 </p>
                                             </div>
@@ -182,7 +187,9 @@ function ExperimentList() {
                                                 {
                                                     experiment.completed_sessions_count
                                                 }{" "}
-                                                sessions complétées
+                                                {t(
+                                                    "experiment.list.completed_session"
+                                                )}
                                             </span>
                                         </div>
                                     </div>
@@ -195,7 +202,7 @@ function ExperimentList() {
                                             }
                                             className="rounded-md px-3.5 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 shadow-sm"
                                         >
-                                            En savoir plus
+                                            {t("experiment.list.more_info")}
                                         </button>
                                     </div>
                                 </div>
@@ -262,13 +269,13 @@ function ExperimentList() {
                         {/* Message quand aucun résultat */}
                         {filteredExperiments.length === 0 && (
                             <div className="mt-8 text-center text-gray-500">
-                                Aucune expérimentation ne correspond à votre
-                                recherche
+                                {t("experiment.list.no_result")}
                             </div>
                         )}
                     </div>
                 </div>
             </div>
+            <FloatingLanguageButton />
         </div>
     );
 }

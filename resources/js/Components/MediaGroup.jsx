@@ -15,7 +15,7 @@ function MediaGroup({
     groups,
     isFinished,
     cursor,
-    onClick, // Ajout de la prop onClick
+    onClick,
 }) {
     const [image, setImage] = useState(null);
     const [touchStart, setTouchStart] = useState(0);
@@ -83,6 +83,8 @@ function MediaGroup({
 
     const renderContent = () => {
         const groupColor = getGroupColor();
+        const displayIndex =
+            item.originalIndex !== undefined ? item.originalIndex : index;
 
         if (isImage) {
             return (
@@ -111,7 +113,7 @@ function MediaGroup({
                         cornerRadius={4}
                     />
                     <Text
-                        text={`p${index + 1}`}
+                        text={`p${displayIndex + 1}`}
                         fontSize={14}
                         x={8}
                         y={parseInt(item.button_size || size) - 22}
@@ -131,7 +133,7 @@ function MediaGroup({
                     strokeWidth={2}
                 />
                 <Text
-                    text={`s${index + 1}`}
+                    text={`s${displayIndex + 1}`}
                     fontSize={20}
                     x={parseInt(item.button_size || size) / 2 - 15}
                     y={parseInt(item.button_size || size) / 2 - 10}

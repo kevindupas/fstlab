@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Layer, Stage } from "react-konva";
 import MediaGroup from "./MediaGroup";
 import Modal from "./Modal";
+import { arrangeItemsInGrid } from "../Utils/layoutUtils";
+import { shuffleWithSeed } from "../Utils/randomUtils";
 
 function KonvaComponent({
     media,
@@ -25,43 +27,18 @@ function KonvaComponent({
     const [mediaItems, setMediaItems] = useState([]);
     const currentAudioRef = useRef(null);
 
-    const marginTop = 50;
-    const marginLeft = 50;
-
     useEffect(() => {
         if (!mediaArray.length) return;
 
-        const shuffledMedia = [...mediaArray].sort(() => Math.random() - 0.5);
+        const shuffledItems = shuffleWithSeed(mediaArray, 12213);
+        const arrangedItems = arrangeItemsInGrid(
+            shuffledItems,
+            size,
+            window.innerWidth,
+            window.innerHeight
+        );
 
-        const newWidth = window.innerWidth;
-        const newHeight = window.innerHeight;
-        const spacing = 20;
-
-        const updatedMediaItems = shuffledMedia.map((item, index) => {
-            const itemSize = parseInt(item.button_size || size);
-            const row = Math.floor(index / 5);
-            const col = index % 5;
-
-            const x =
-                item.type === "image"
-                    ? Math.random() * (newWidth - itemSize)
-                    : marginLeft + col * (itemSize + spacing);
-
-            const y =
-                item.type === "image"
-                    ? Math.random() * (newHeight - itemSize)
-                    : marginTop + row * (itemSize + spacing);
-
-            return {
-                ...item,
-                x: Math.min(x, newWidth - itemSize),
-                y: Math.min(y, newHeight - itemSize),
-                width: itemSize,
-                height: itemSize,
-            };
-        });
-
-        setMediaItems(updatedMediaItems);
+        setMediaItems(arrangedItems);
     }, [mediaArray, size]);
 
     useEffect(() => {
@@ -75,18 +52,9 @@ function KonvaComponent({
             const newWidth = window.innerWidth - 450;
             const newHeight = window.innerHeight - 50;
 
-            setStageSize({
-                width: newWidth,
-                height: newHeight,
-            });
-
+            setStageSize({ width: newWidth, height: newHeight });
             setMediaItems((prevItems) =>
-                prevItems.map((item) => {
-                    const itemSize = parseInt(item.button_size || size);
-                    const newX = Math.min(item.x, newWidth - itemSize);
-                    const newY = Math.min(item.y, newHeight - itemSize);
-                    return { ...item, x: newX, y: newY };
-                })
+                arrangeItemsInGrid(prevItems, size, newWidth, newHeight)
             );
         };
     }, [size]);
@@ -134,6 +102,24 @@ function KonvaComponent({
         });
     };
 
+    const handleDragMove = (e, index) => {
+        if (isFinished) return;
+
+        const item = mediaItems[index];
+        const itemSize = parseInt(item.button_size || size);
+
+        const newX = Math.max(
+            0,
+            Math.min(e.target.x(), stageSize.width - itemSize)
+        );
+        const newY = Math.max(
+            0,
+            Math.min(e.target.y(), stageSize.height - itemSize)
+        );
+
+        e.target.position({ x: newX, y: newY });
+    };
+
     const handlePlaySound = (url) => {
         if (currentAudioRef.current && !currentAudioRef.current.paused) {
             currentAudioRef.current.pause();
@@ -157,45 +143,26 @@ function KonvaComponent({
     };
 
     const getItemColor = (item) => {
-        // Avant la fin, les sons ont toujours la couleur de base
-        if (!isFinished && item.type === "sound") {
+        if (
+            !isFinished &&
+            (item.type === "sound" || item.type === "image_sound")
+        ) {
             return buttonColor;
         }
 
-        // Après la fin, on cherche la couleur du groupe
         if (isFinished) {
             const group = groups.find((g) =>
                 g.elements.some((element) => element.id === item.id)
             );
 
-            // Pour les sons, on utilise soit la couleur du groupe soit la couleur de base
-            if (item.type === "sound") {
+            if (item.type === "sound" || item.type === "image_sound") {
                 return group ? group.color : buttonColor;
             }
 
-            // Pour les images, on utilise la couleur du groupe ou transparent
             return group ? group.color : "transparent";
         }
 
-        // Par défaut, transparent pour les images
         return "transparent";
-    };
-    const handleDragMove = (e, index) => {
-        if (isFinished) return;
-
-        const item = mediaItems[index];
-        const itemSize = parseInt(item.button_size || size);
-
-        const newX = Math.max(
-            0,
-            Math.min(e.target.x(), stageSize.width - itemSize)
-        );
-        const newY = Math.max(
-            0,
-            Math.min(e.target.y(), stageSize.height - itemSize)
-        );
-
-        e.target.position({ x: newX, y: newY });
     };
 
     const handleGroupClick = (item) => {
@@ -204,15 +171,18 @@ function KonvaComponent({
         if (editingGroupIndex !== null) {
             onMediaGroupChange(item.id, editingGroupIndex);
 
-            if (item.type === "sound") {
-                handlePlaySound(item.url);
+            if (item.type === "sound" || item.type === "image_sound") {
+                handlePlaySound(
+                    item.type === "image_sound" ? item.sound_url : item.url
+                );
             } else if (item.type === "image") {
                 handleShowImage(item.url);
             }
         } else {
-            // Comportement normal
-            if (item.type === "sound") {
-                handlePlaySound(item.url);
+            if (item.type === "sound" || item.type === "image_sound") {
+                handlePlaySound(
+                    item.type === "image_sound" ? item.sound_url : item.url
+                );
             } else if (item.type === "image") {
                 handleShowImage(item.url);
             }

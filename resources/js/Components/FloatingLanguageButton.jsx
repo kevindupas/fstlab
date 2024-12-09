@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Plus, X } from "lucide-react";
+import { X } from "lucide-react";
 import { GB, FR, ES } from "country-flag-icons/react/3x2";
+import { useTranslation } from "../Contexts/LanguageContext";
 
 const FloatingLanguageButton = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const [currentLang, setCurrentLang] = useState("fr");
+    const { language, changeLanguage } = useTranslation();
 
     const languages = [
         {
@@ -28,13 +29,12 @@ const FloatingLanguageButton = () => {
     ];
 
     const handleLanguageSelect = (code) => {
-        setCurrentLang(code);
+        changeLanguage(code);
         setIsOpen(false);
-        console.log(`Changing language to: ${code}`);
     };
 
     const FlagComponent = languages.find(
-        (lang) => lang.code === currentLang
+        (lang) => lang.code === language
     )?.flag;
 
     return (
@@ -42,7 +42,7 @@ const FloatingLanguageButton = () => {
             {isOpen && (
                 <div className="flex flex-col gap-3 mb-3">
                     {languages
-                        .filter((lang) => lang.code !== currentLang)
+                        .filter((lang) => lang.code !== language)
                         .map((lang, index) => {
                             const Flag = lang.flag;
                             return (

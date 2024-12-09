@@ -1,0 +1,58 @@
+{
+  "header": {
+    "home": "Home",
+    "experiments": "Experiments",
+    "how_it_work": "How it works?",
+    "changelog": "Changelog",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register",
+    "admin_panel": "Admin Panel"
+  },
+  "home": {
+      "title": "Experimental Platform for",
+      "titleHighlight": "Auditory Research",
+      "description": "TCL-LabX is a tool dedicated to the study of auditory perception, specially designed for cochlear implant research. It analyzes how people with cochlear implants categorize and perceive different natural sounds in their environment.",
+      "objectives": {
+        "title": "What is the aim of the study?",
+        "description1": "TCL-LabX is a tool dedicated to the study of auditory perception, specially designed for cochlear implant research. It analyzes how people with cochlear implants categorize and perceive different natural sounds in their environment.",
+        "description2": "This study aims to better understand sound categorization strategies by implanted patients, thus contributing to the improvement of auditory rehabilitation techniques."
+      },
+      "participation": {
+        "title": "How to participate?",
+        "intro": "Your participation is entirely voluntary and anonymous. The experiment takes place in several stages:",
+        "steps": {
+          "step1": "Listening to different natural sounds",
+          "step2": "Free categorization according to your own criteria",
+          "step3": "Brief questionnaire about your experience"
+        },
+        "note": "You can stop the experiment at any time. Your data will remain strictly confidential and will be used only for research purposes."
+      },
+      "privacy": {
+        "title": "Your rights to privacy and confidentiality",
+        "voluntary": "Your participation in this research is voluntary. You are free to refuse to participate without having to justify yourself. If you participate, you can decide to stop your participation at any time without having to justify yourself and without incurring any liability or prejudice.",
+        "dataRetention": "Your data will be kept for 10 years after the publication of research results. Beyond this period, they will be deleted.",
+        "dataAccess": "Only the scientific supervisor and researchers associated with this project will have access to your data. The collected data will be processed in accordance with the General Data Protection Regulation (GDPR).",
+        "rights": "If you believe, after contacting us, that your data rights are not being respected, you can file a complaint with the CNIL: https://www.cnil.fr/fr/webform/adresser-une-plainte.",
+        "contact": {
+          "intro": "For more information, please don't hesitate to contact us:",
+          "researcher": "Pascal GAILLARD (MCF, CLLE Laboratory, University of Toulouse 2 Jean Jaurès - pascal.gaillard@univ-tlse2.fr), Scientific Project Manager"
+        }
+      },
+      "consent": {
+        "text": "By clicking here, you indicate that you have read and understood the information provided and consent to participate in this research",
+        "button": "Start the experiment"
+      },
+      "modal": {
+        "title": "Experiment Access Code",
+        "placeholder": "Enter the experiment code",
+        "submit": "Submit",
+        "cancel": "Cancel",
+        "loading": "Verifying...",
+        "error": {
+          "invalid": "Invalid experiment code",
+          "generic": "An error occurred"
+        }
+      }
+  }
+}

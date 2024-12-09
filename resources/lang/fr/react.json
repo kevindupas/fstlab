@@ -1,0 +1,134 @@
+{
+    "header" : {
+      "home": "Accueil",
+      "experiments": "Expériences",
+      "how_it_work": "Comment ça fonctionne ?",
+      "changelog" : "Journal des modifications",
+      "logout": "Déconnexion",
+      "login": "Connexion",
+      "register": "Inscription",
+      "admin_panel": "Panneau d'administration"
+    },
+    "home": {
+      "title": "Plateforme d'expérimentation",
+      "titleHighlight": "Auditive",
+      "description": "TCL-LabX est un outil dédié à l'étude de la perception auditive, spécialement conçu pour la recherche sur les implants cochléaires. Il permet d'analyser comment les personnes portant des implants cochléaires catégorisent et perçoivent les différents sons naturels de leur environnement.",
+      "objectives": {
+        "title": "Quel est l'objectif de l'étude ?",
+        "description1": "TCL-LabX est un outil dédié à l'étude de la perception auditive, spécialement conçu pour la recherche sur les implants cochléaires. Il permet d'analyser comment les personnes portant des implants cochléaires catégorisent et perçoivent les différents sons naturels de leur environnement.",
+        "description2": "Cette étude vise à mieux comprendre les stratégies de catégorisation des sons par les patients implantés, contribuant ainsi à l'amélioration des techniques de réhabilitation auditive."
+      },
+      "participation": {
+        "title": "Comment participer ?",
+        "intro": "Votre participation est entièrement volontaire et anonyme. L'expérience se déroule en plusieurs étapes :",
+        "steps": {
+          "step1": "Écoute de différents sons naturels",
+          "step2": "Catégorisation libre selon vos propres critères",
+          "step3": "Bref questionnaire sur votre expérience"
+        },
+        "note": "Vous pouvez interrompre l'expérience à tout moment. Vos données resteront strictement confidentielles et seront utilisées uniquement à des fins de recherche."
+      },
+      "privacy": {
+        "title": "Vos droits à la confidentialité et au respect de la vie privée",
+        "voluntary": "Votre participation à cette recherche est volontaire. Vous êtes donc libre de refuser de participer sans avoir à vous justifier. Si vous participez, vous pouvez décider à tout moment d'interrompre votre participation sans avoir à vous justifier et sans encourir aucune responsabilité ni aucun préjudice de ce fait.",
+        "dataRetention": "La durée de conservation de vos données est de 10 ans après la publication des résultats de recherche. Au-delà de cette période, elles seront effacées.",
+        "dataAccess": "Seuls le responsable scientifique et les chercheurs associés à ce projet auront accès à vos données. Les données recueillies seront traitées de façon conforme au Règlement général sur la protection des données (RGPD).",
+        "rights": "Si vous estimez, après nous avoir contactés, que vos droits sur vos données ne sont pas respectés, vous pouvez adresser une réclamation (plainte) à la CNIL : https://www.cnil.fr/fr/webform/adresser-une-plainte.",
+        "contact": {
+          "intro": "Pour plus d'informations, n'hésitez pas à nous contacter :",
+          "researcher": "Pascal GAILLARD (MCF, Laboratoire CLLE, Université Toulouse 2 Jean Jaurès - pascal.gaillard@univ-tlse2.fr), Responsable Scientifique du projet"
+        }
+      },
+      "consent": {
+        "text": "En cliquant ici, vous indiquez que vous avez bien lu et compris les renseignements donnés et vous consentez à participer à cette recherche",
+        "button": "Commencer l'expérience"
+      },
+      "modal": {
+        "title": "Code d'accès à l'expérience",
+        "placeholder": "Entrez le code d'expérience",
+        "submit": "Valider",
+        "cancel": "Annuler",
+        "loading": "Vérification...",
+        "error": {
+          "invalid": "Code d'expérience invalide",
+          "generic": "Une erreur s'est produite"
+        }
+      }
+    },
+    "experiment" : {
+      "list" : {
+        "loading" : "Chargement...",
+        "title" : "Liste des Expérimentations",
+        "message" : "Découvrez toutes les expériences disponibles sur notre plateforme",
+        "placeholder" : "Rechercher une expérimentation...",
+        "result" : "Résultat",
+        "find" : "trouvé",
+        "by" : "Par",
+        "completed_session" : "sessions complétées",
+        "more_info" : "En savoir plus",
+        "no_result" : "Aucune expérimentation ne correspond à votre recherche"
+      },
+      "detail" : {
+        "no_experiment" : "Expérience non trouvée",
+        "return_to_list" : "Retour à la liste",
+        "by" : "Par",
+        "completed_session" : "sessions complétées",
+        "description" : "Description",
+        "isNotAuthenticated" : "Vous devez être connecté pour demander l'accès à cette expérimentation.",
+        "login" : "Se connecter",
+        "call_to_result_access" : "Demander l'accès aux résultats",
+        "call_to_experiment_access" : "Demander l'accès à l'expérimentation",
+        "cancel" : "Annuler",
+        "submit" : "Envoyer la demande",
+        "message" : "Message",
+        "placeholderResult": "Expliquez pourquoi vous souhaitez accéder aux résultats...",
+        "placeholderExperiment": "Expliquez pourquoi vous souhaitez à cette expérimentation...",
+        "requirement" : "Le message doit contenir au moins 10 caractères"
+      }
+    },
+    "login": {
+      "title" : "S'inscrire pour l'expérience",
+      "label" : "Numéro d'identification",
+      "placeholder" : "Entrez votre numéro d'identification",
+      "submit" : "Démarrer l'expérience",
+      "loading" : "Enregistrement en cours...",
+      "error" : "Ce numéro a déjà été utilisé pour cette expérience.",
+      "generic" : "Une erreur s'est produite lors de l'enregistrement. Veuillez réessayer."
+    },
+    "unfinishedModal" : {
+      "title" : "Session non terminée détectée",
+      "message" : "Une session est déjà en cours. Voulez-vous la continuer ou en démarrer une nouvelle ? Le démarrage d'une nouvelle session supprimera la session en cours.",
+      "ContinueThisSession" : "Continuer la session en cours",
+      "startNewSession" : "Démarrer une nouvelle session"
+    },
+    "experimentSession" : {
+      "toolbar" : {
+        "reload" : "Recommencer",
+        "quit" : "Quitter",
+        "terminate" : "Terminer"
+      },
+      "session" : {
+        "error" : {
+          "notFound" : "Expérience introuvable",
+          "generic" : "Une erreur est survenue lors du chargement de l'expérience. Veuillez réessayer.",
+          "reload" : "Une erreur est survenue lors du rechargement de l'expérience. Veuillez réessayer."
+
+        },
+        "loading" : "Chargement de l'expérience...",
+        "return_to_home" : "Retour à l'accueil",
+        "quit_session" : "Comment souhaitez-vous quitter ?"
+
+          
+      },
+      "result" : {
+
+      },
+      "modal" : {
+        "title" : "Confirmation de fin de session",
+        "message" : "Êtes-vous sûr de vouloir terminer cette session ? Vous ne pourrez pas la reprendre.",
+        "cancel" : "Annuler",
+        "terminate" : "Terminer"
+      }
+    }
+  }
+  

@@ -24,14 +24,14 @@ function ExperimentDetail() {
                 <div className="max-w-3xl mx-auto">
                     <div className="text-center">
                         <p className="text-lg font-semibold text-red-600">
-                            Expérience non trouvée
+                            {t("experiment.detail.no_experiment")}
                         </p>
                         <button
                             onClick={() => navigate("/experiments")}
                             className="mt-4 inline-flex items-center text-indigo-600 hover:text-indigo-500"
                         >
                             <ArrowLeft className="h-5 w-5 mr-2" />
-                            Retour à la liste
+                            {t("experiment.detail.return_to_list")}
                         </button>
                     </div>
                 </div>
@@ -94,7 +94,7 @@ function ExperimentDetail() {
                     className="mb-6 inline-flex items-center text-indigo-600 hover:text-indigo-500"
                 >
                     <ArrowLeft className="h-5 w-5 mr-2" />
-                    Retour à la liste
+                    {t("experiment.detail.return_to_list")}
                 </button>
 
                 <div className="border-b border-gray-200 pb-10">
@@ -110,8 +110,8 @@ function ExperimentDetail() {
                         </div>
                         <div className="flex items-center gap-2">
                             <span className="text-sm text-gray-500">
-                                {experiment.completed_sessions_count} sessions
-                                complétées
+                                {experiment.completed_sessions_count}{" "}
+                                {t("experiment.detail.completed_session")}
                             </span>
                         </div>
                     </div>
@@ -120,7 +120,7 @@ function ExperimentDetail() {
                 <div className="mt-8 space-y-8">
                     <section>
                         <h2 className="text-2xl font-bold text-gray-900">
-                            Description
+                            {t("experiment.detail.description")}
                         </h2>
                         <p className="mt-4 text-gray-600">
                             {experiment.description}
@@ -131,13 +131,12 @@ function ExperimentDetail() {
                         {!isAuthenticated && (
                             <div className="rounded-md bg-red-50 p-4">
                                 <p className="text-sm text-red-700">
-                                    Vous devez être connecté pour demander
-                                    l'accès à cette expérimentation.
+                                    {t("experiment.detail.isNotAuthenticated")}
                                     <a
                                         href="/admin/login"
                                         className="ml-1 font-medium underline hover:text-red-600"
                                     >
-                                        Se connecter
+                                        {t("experiment.detail.login")}
                                     </a>
                                 </p>
                             </div>
@@ -157,7 +156,7 @@ function ExperimentDetail() {
                                 {!isAuthenticated && (
                                     <Lock className="h-4 w-4 mr-2" />
                                 )}
-                                Demander l'accès aux résultats
+                                {t("experiment.detail.call_to_result_access")}
                             </button>
                             <button
                                 onClick={() => handleRequestAccess("access")}
@@ -172,7 +171,9 @@ function ExperimentDetail() {
                                 {!isAuthenticated && (
                                     <Lock className="h-4 w-4 mr-2" />
                                 )}
-                                Demander l'accès à l'expérimentation
+                                {t(
+                                    "experiment.detail.call_to_experiment_access"
+                                )}
                             </button>
                         </div>
                     </div>
@@ -186,11 +187,11 @@ function ExperimentDetail() {
                     setShowRequestModal(false);
                     setRequestMessage("");
                 }}
-                title={`Demande d'accès ${
+                title={
                     requestType === "results"
-                        ? "aux résultats"
-                        : "à l'expérimentation"
-                }`}
+                        ? t("experiment.detail.call_to_result_access")
+                        : t("experiment.detail.call_to_experiment_access")
+                }
                 footer={
                     <>
                         <button
@@ -200,39 +201,44 @@ function ExperimentDetail() {
                                 setRequestMessage("");
                             }}
                         >
-                            Annuler
+                            {t("experiment.detail.cancel")}
                         </button>
                         <button
-                            className={`px-4 py-2 text-sm text-white rounded-md ${
+                            className={clsx(
+                                "px-4 py-2 text-sm text-white rounded-md",
                                 requestMessage.length >= 10
                                     ? "bg-indigo-600 hover:bg-indigo-500"
                                     : "bg-gray-400 cursor-not-allowed"
-                            }`}
+                            )}
                             disabled={requestMessage.length < 10}
                             onClick={handleSubmitRequest}
                         >
-                            Envoyer la demande
+                            {t("experiment.detail.submit")}
                         </button>
                     </>
                 }
             >
                 <div className="space-y-4">
                     <label className="block">
-                        <span className="text-gray-700">Message</span>
+                        <span className="text-gray-700">
+                            {t("experiment.detail.message")}
+                        </span>
                         <textarea
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                             rows="4"
                             value={requestMessage}
                             onChange={(e) => setRequestMessage(e.target.value)}
-                            placeholder={`Expliquez pourquoi vous souhaitez accéder ${
+                            placeholder={
                                 requestType === "results"
-                                    ? "aux résultats"
-                                    : "à cette expérimentation"
-                            }...`}
+                                    ? t("experiment.detail.placeholderResult")
+                                    : t(
+                                          "experiment.detail.placeholderExperiment"
+                                      )
+                            }
                         />
                         {requestMessage.length < 10 && (
                             <p className="mt-1 text-sm text-red-500">
-                                Le message doit contenir au moins 10 caractères
+                                {t("experiment.detail.requirement")}
                             </p>
                         )}
                     </label>

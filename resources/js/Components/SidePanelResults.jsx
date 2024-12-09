@@ -1,6 +1,7 @@
 import { AlertCircle, Clock, Image as ImageIcon, Music } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import SpeechToText from "./SpeechToText";
+import clsx from "clsx";
 
 function SidePanelResults({
     isOpen,
@@ -273,11 +274,12 @@ function SidePanelResults({
                                             onClick={() =>
                                                 handleEditGroup(index)
                                             }
-                                            className={`px-4 py-2 rounded-lg transition-all ${
+                                            className={clsx(
+                                                "px-4 py-2 rounded-lg transition-all flex items-center gap-2",
                                                 editingGroupIndex === index
                                                     ? "bg-blue-500 text-white shadow-lg transform scale-105"
                                                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                            } flex items-center gap-2`}
+                                            )}
                                         >
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"

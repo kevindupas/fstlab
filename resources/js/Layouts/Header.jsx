@@ -7,8 +7,10 @@ import { Logo } from "../Components/Logo";
 import { NavLink } from "../Components/NavLink";
 import { Button } from "../Components/Button";
 import { Container } from "../Components/Container";
+import { useTranslation } from "../Contexts/LanguageContext";
 
 function Header() {
+    const { t } = useTranslation();
     const { user, isLoading, refreshAuth } = useAuth();
 
     if (isLoading) {
@@ -56,24 +58,30 @@ function Header() {
                         </Link>
                         <div className="hidden md:flex md:gap-x-6">
                             <NavLink href="/" isReactRoute>
-                                Accueil
+                                {t("header.home")}
                             </NavLink>
                             <NavLink href="/experiments" isReactRoute>
-                                Expériences
+                                {t("header.experiments")}
                             </NavLink>
                             <NavLink href="/how-it-work" isReactRoute>
-                                Comment ça fonctionne ?
+                                {t("header.how_it_work")}
+                            </NavLink>
+                            <NavLink href="/changelog" isReactRoute>
+                                {t("header.changelog")}
                             </NavLink>
                         </div>
                     </div>
-                    <div className="flex items-center gap-x-5 md:gap-x-8">
+                    <div className="flex items-center gap-x-3 md:gap-x-6">
                         {user ? (
                             <>
-                                <div className="hidden md:block">
-                                    <span>{user.name}</span>
-                                </div>
-                                <Button onClick={handleLogout} color="blue">
-                                    Déconnexion
+                                <NavLink
+                                    href="/admin"
+                                    className="group inline-flex items-center justify-center rounded-full py-2 px-4 text-sm font-semibold focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 bg-blue-600 text-white hover:text-slate-100 hover:bg-blue-500 active:bg-blue-800 active:text-blue-100 focus-visible:outline-blue-600"
+                                >
+                                    {t("header.admin_panel")}
+                                </NavLink>
+                                <Button onClick={handleLogout} color="red">
+                                    {t("header.logout")}
                                 </Button>
                             </>
                         ) : (
@@ -84,7 +92,7 @@ function Header() {
                                         isReactRoute={false}
                                         className="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                                     >
-                                        Connexion
+                                        {t("header.login")}
                                     </NavLink>
                                 </div>
                                 <NavLink
@@ -92,7 +100,7 @@ function Header() {
                                     className="group inline-flex items-center justify-center rounded-full py-2 px-4 text-sm font-semibold focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 bg-blue-600 text-white hover:text-slate-100 hover:bg-blue-500 active:bg-blue-800 active:text-blue-100 focus-visible:outline-blue-600"
                                     isReactRoute={false}
                                 >
-                                    Inscription
+                                    {t("header.register")}
                                 </NavLink>
                             </>
                         )}

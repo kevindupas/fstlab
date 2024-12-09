@@ -5,8 +5,10 @@ import KonvaComponent from "../Components/KonvaComponent";
 import SidePanelResults from "../Components/SidePanelResults";
 import Toolbar from "../Components/Toolbar";
 import DeviceOrientationCheck from "../Utils/DeviceOrientationCheck";
+import { useTranslation } from "../Contexts/LanguageContext";
 
 function ExperimentSession() {
+    const { t } = useTranslation();
     const { sessionId } = useParams();
     const navigate = useNavigate();
 
@@ -53,7 +55,7 @@ function ExperimentSession() {
                 const data = await response.json();
 
                 if (!data.experiment) {
-                    setError("Expérience introuvable");
+                    setError(t("experimentSession.session.error.notFound"));
                     return;
                 }
 
@@ -61,7 +63,7 @@ function ExperimentSession() {
                 setMedia(data.media);
             } catch (error) {
                 console.error("Error:", error);
-                setError("Une erreur est survenue");
+                setError(t("experimentSession.session.error.generic"));
             } finally {
                 setIsLoading(false);
             }
@@ -126,7 +128,7 @@ function ExperimentSession() {
             const data = await response.json();
 
             if (!data.experiment) {
-                setError("Expérience introuvable");
+                setError(t("experimentSession.session.error.notFound"));
                 return;
             }
 
@@ -138,7 +140,7 @@ function ExperimentSession() {
             setElapsedTime(Date.now());
         } catch (error) {
             console.error("Error:", error);
-            setError("Une erreur est survenue lors du redémarrage");
+            setError(t("experimentSession.session.error.reload"));
         } finally {
             setIsLoading(false);
         }
@@ -296,7 +298,7 @@ function ExperimentSession() {
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto" />
                         <p className="mt-4 text-gray-700">
-                            Chargement de l'expérience...
+                            {t("experimentSession.session.loading")}
                         </p>
                     </div>
                 </div>
@@ -310,7 +312,7 @@ function ExperimentSession() {
                             onClick={() => navigate("/")}
                             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
                         >
-                            Retour à l'accueil
+                            {t("experimentSession.session.return_to_home")}
                         </button>
                     </div>
                 </div>
@@ -361,7 +363,9 @@ function ExperimentSession() {
                         <div className="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center">
                             <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
                                 <h2 className="text-xl font-bold text-gray-900 mb-4">
-                                    Comment souhaitez-vous quitter ?
+                                    {t(
+                                        "experimentSession.session.quit_session"
+                                    )}
                                 </h2>
                                 <p className="text-gray-600 mb-6">
                                     Vous pouvez soit sauvegarder votre session

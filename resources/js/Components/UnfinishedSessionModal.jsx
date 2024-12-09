@@ -2,8 +2,10 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { useSession } from "../Contexts/SessionContext";
+import { useTranslation } from "../Contexts/LanguageContext";
 
 export function UnfinishedSessionModal() {
+    const { t } = useTranslation();
     const { showUnfinishedModal, handleContinuePrevious, handleStartNew } =
         useSession();
     const { sessionId } = useParams();
@@ -17,25 +19,23 @@ export function UnfinishedSessionModal() {
                 onClick={(e) => e.stopPropagation()}
             >
                 <h2 className="text-xl font-bold text-gray-900 mb-4">
-                    Session non terminée détectée
+                    {t("unfinishedModal.title")}
                 </h2>
                 <p className="text-gray-600 mb-6">
-                    Une session est déjà en cours. Voulez-vous la continuer ou
-                    en démarrer une nouvelle ? Le démarrage d'une nouvelle
-                    session supprimera la session en cours.
+                    {t("unfinishedModal.message")}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-end">
                     <button
                         onClick={handleContinuePrevious}
                         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
                     >
-                        Continuer la session en cours
+                        {t("unfinishedModal.ContinueThisSession")}
                     </button>
                     <button
                         onClick={() => handleStartNew(sessionId)}
                         className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
                     >
-                        Démarrer une nouvelle session
+                        {t("unfinishedModal.startNewSession")}
                     </button>
                 </div>
             </div>
