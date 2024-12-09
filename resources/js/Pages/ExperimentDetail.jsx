@@ -5,9 +5,11 @@ import { useExperiments } from "../Contexts/ExperimentsContext";
 import Modal from "../Components/Modal";
 import { ArrowLeft, Lock } from "lucide-react";
 import clsx from "clsx";
+import { useTranslation } from "../Contexts/LanguageContext";
 
 function ExperimentDetail() {
     const { id } = useParams();
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
     const { experiments } = useExperiments();
