@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\Api\ExperimentApiController;
 use App\Http\Controllers\Api\ExperimentSessionApiController;
-
+use App\Http\Controllers\Api\TranslationController;
 use Illuminate\Support\Facades\Route;
 
+// Récupérer les traductions
+Route::get('/translations/{locale}', [TranslationController::class, 'getTranslations']);
 
 // Récupérer la liste des expériences
 Route::get('/experiments', [ExperimentApiController::class, 'index']);
