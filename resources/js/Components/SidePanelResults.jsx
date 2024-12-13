@@ -182,7 +182,7 @@ function SidePanelResults({
                     <div className="flex flex-col items-center justify-between gap-4 text-gray-600 mt-2">
                         <div className="flex items-center gap-2">
                             <Clock size={16} />
-                            <p>Durée totale: {formatTime(elapsedTime)}</p>
+                            Durée totale: {formatTime(elapsedTime)}
                         </div>
                         <button
                             onClick={handleAddGroup}
