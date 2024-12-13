@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Experiment;
 use App\Models\ExperimentAccessRequest;
+use App\Notifications\AccessRequestSubmitted;
+use App\Notifications\NewAccessRequestReceived;
 use Filament\Facades\Filament;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -135,6 +137,10 @@ class ExperimentApiController extends Controller
             'request_message' => $request->message,
         ]);
         $accessRequest->save();
+
+        // Envoyer les notifications
+        $accessRequest->user->notify(new AccessRequestSubmitted($accessRequest));
+        $experiment->creator->notify(new NewAccessRequestReceived($accessRequest));
 
         return response()->json(['message' => 'Demande d\'accès aux résultats envoyée avec succès']);
     }

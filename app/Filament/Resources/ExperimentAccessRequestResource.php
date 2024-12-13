@@ -4,7 +4,10 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ExperimentAccessRequestResource\Pages;
 use App\Models\ExperimentAccessRequest;
+use App\Models\User;
+use App\Notifications\AccessRequestProcessed;
 use Filament\Forms;
+use Filament\Forms\Components\Placeholder;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -16,44 +19,57 @@ class ExperimentAccessRequestResource extends Resource
     protected static ?string $model = ExperimentAccessRequest::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-inbox';
-    protected static ?string $navigationLabel = 'Demandes d\'accès';
+    // protected static ?string $navigationLabel = 'Demandes d\'accès';
+    protected static ?string $navigationGroup = 'Experiments';
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.resources.experiment-access-request.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.resources.experiment-access-request.plural');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.resources.experiment-access-request.navigation_label');
+    }
 
     public static function form(Forms\Form $form): Forms\Form
     {
         return $form
             ->schema([
                 Forms\Components\Select::make('status')
-                    ->label('Statut')
-                    ->options([
-                        'pending' => 'En attente',
-                        'approved' => 'Approuvée',
-                        'rejected' => 'Rejetée',
-                    ])
+                    ->label(__('filament.resources.experiment-access-request.form.status.label'))
+                    ->options(__('filament.resources.experiment-access-request.form.status.options'))
                     ->required()
-                    ->live() // Rend le champ réactif
+                    ->live()
+                    ->disabled(fn($record) => $record->status !== 'pending')
                     ->afterStateUpdated(function ($state, Forms\Set $set) {
                         if ($state === 'rejected') {
-                            $set('response_message', ''); // Reset le message si besoin
+                            $set('response_message', '');
                         }
                     }),
                 Forms\Components\Textarea::make('response_message')
-                    ->label('Message de réponse')
+                    ->label(__('filament.resources.experiment-access-request.form.response_message.label'))
                     ->required(fn($get) => $get('status') === 'rejected')
                     ->visible(fn($get) => $get('status') === 'rejected')
-                    ->helperText('Veuillez expliquer la raison du refus'),
+                    ->disabled(fn($record) => $record->status !== 'pending')
+                    ->helperText(__('filament.resources.experiment-access-request.form.response_message.helper_text')),
                 Forms\Components\Textarea::make('request_message')
-                    ->label('Message de demande')
+                    ->label(__('filament.resources.experiment-access-request.form.request_message.label'))
                     ->disabled()
                     ->columnSpanFull(),
-                // Afficher l'expérience concernée
-                Forms\Components\TextInput::make('experiment.name')
-                    ->label('Expérience')
-                    ->disabled()
+                Placeholder::make('experiment')
+                    ->label(__('filament.resources.experiment-access-request.form.experiment.label'))
+                    ->content(fn($record) => $record->experiment?->name)
                     ->columnSpanFull(),
-                // Afficher le demandeur
-                Forms\Components\TextInput::make('user.name')
-                    ->label('Demandeur')
-                    ->disabled()
+
+                Placeholder::make('user')
+                    ->label(__('filament.resources.experiment-access-request.form.user.label'))
+                    ->content(fn($record) => $record->user?->name)
                     ->columnSpanFull(),
             ]);
     }
@@ -63,27 +79,18 @@ class ExperimentAccessRequestResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('experiment.name')
-                    ->label('Expérience')
+                    ->label(__('filament.resources.experiment-access-request.table.columns.experiment'))
                     ->searchable(),
                 TextColumn::make('user.name')
-                    ->label('Demandeur')
+                    ->label(__('filament.resources.experiment-access-request.table.columns.user'))
                     ->searchable(),
                 TextColumn::make('type')
-                    ->label('Type')
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'access' => 'Accès à l\'expérience',
-                        'results' => 'Accès aux résultats',
-                        default => $state,
-                    }),
+                    ->label(__('filament.resources.experiment-access-request.table.columns.type'))
+                    ->formatStateUsing(fn(string $state): string => __("filament.resources.experiment-access-request.table.columns.type_options.$state")),
                 TextColumn::make('status')
-                    ->label('Statut')
+                    ->label(__('filament.resources.experiment-access-request.table.columns.status'))
                     ->badge()
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'pending' => 'En attente',
-                        'approved' => 'Approuvée',
-                        'rejected' => 'Rejetée',
-                        default => $state,
-                    })
+                    ->formatStateUsing(fn(string $state): string => __("filament.resources.experiment-access-request.form.status.options.$state"))
                     ->color(fn(string $state): string => match ($state) {
                         'pending' => 'warning',
                         'approved' => 'success',
@@ -91,11 +98,11 @@ class ExperimentAccessRequestResource extends Resource
                         default => 'gray',
                     }),
                 TextColumn::make('created_at')
-                    ->label('Date de demande')
+                    ->label(__('filament.resources.experiment-access-request.table.columns.created_at'))
                     ->dateTime()
                     ->sortable(),
             ])
-            ->defaultSort('created_at', 'desc'); // Plus récent en premier
+            ->defaultSort('created_at', 'desc');
     }
 
     // Limiter l'accès aux demandes
@@ -124,15 +131,51 @@ class ExperimentAccessRequestResource extends Resource
         return 'warning';
     }
 
-    // Masquer la ressource dans la navigation si l'utilisateur n'a pas d'expériences
     public static function shouldRegisterNavigation(): bool
     {
         /** @var \App\Models\User */
         $user = Auth::user();
 
+        // Vérifie si l'utilisateur est banni
+        if ($user->status === 'banned') {
+            return false;
+        }
+
+        // Vérifie si le principal experimenter est banni
+        if ($user->hasRole('secondary_experimenter')) {
+            $principal = User::find($user->created_by);
+            if ($principal && $principal->status === 'banned') {
+                return false;
+            }
+        }
+
+        // Vérifie si l'utilisateur a des expériences
         return $user->createdExperiments()->exists();
     }
 
+    protected function authorizeAccess(): void
+    {
+        /** @var \App\Models\User */
+        $user = Auth::user();
+
+        if ($user->status === 'banned') {
+            abort(403, 'Votre compte est banni.');
+        }
+
+        if ($user->hasRole('secondary_experimenter')) {
+            $principal = User::find($user->created_by);
+            if ($principal && $principal->status === 'banned') {
+                abort(403, 'Le compte de votre expérimentateur principal est banni.');
+            }
+        }
+
+        // Vérifie si l'utilisateur a des expériences
+        if (!$user->createdExperiments()->exists()) {
+            abort(403, 'Vous n\'avez pas encore créé d\'expérimentation.');
+        }
+
+        parent::authorizeAccess();
+    }
     public static function getRelations(): array
     {
         return [

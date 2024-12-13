@@ -11,14 +11,13 @@
         "php": "^8.2",
         "althinect/filament-spatie-roles-permissions": "^2.2",
         "awcodes/filament-tiptap-editor": "^3.0",
+        "bezhansalleh/filament-language-switch": "^3.1",
         "filament/filament": "^3.2",
-        "filament/spatie-laravel-translatable-plugin": "^3.2",
         "kenepa/resource-lock": "^2.1",
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "leandrocfe/filament-apex-charts": "^3.1",
-        "spatie/laravel-medialibrary": "^11.9",
         "statikbe/laravel-filament-chained-translation-manager": "^3.2"
     },
     "require-dev": {

@@ -10,8 +10,8 @@
       "admin_panel": "Panneau d'administration"
     },
     "home": {
-      "title": "Plateforme d'expérimentation",
-      "titleHighlight": "Auditive",
+      "title": "Plateforme de catégorisation",
+      "titleHighlight": "Auditive et Visuel",
       "description": "TCL-LabX est un outil dédié à l'étude de la perception auditive, spécialement conçu pour la recherche sur les implants cochléaires. Il permet d'analyser comment les personnes portant des implants cochléaires catégorisent et perçoivent les différents sons naturels de leur environnement.",
       "objectives": {
         "title": "Quel est l'objectif de l'étude ?",
@@ -128,6 +128,11 @@
         "message" : "Êtes-vous sûr de vouloir terminer cette session ? Vous ne pourrez pas la reprendre.",
         "cancel" : "Annuler",
         "terminate" : "Terminer"
+      },
+      "thankYou": {
+        "title": "Merci de votre participation !",
+        "message": "Vos résultats ont été enregistrés avec succès. Vous pouvez maintenant fermer cette fenêtre.",
+        "returnHome": "Retourner à l'accueil"
       }
     }
   }

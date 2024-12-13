@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ExperimentResource\Pages;
-use App\Filament\Resources\ExperimentResource\RelationManagers\UsersRelationManager;
 use App\Models\Experiment;
 use App\Services\ExperimentExportHandler;
 use Filament\Tables\Actions\Action;
@@ -13,10 +12,8 @@ use Filament\Resources\Resource;
 use Filament\Forms;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Form;
-use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
-use Filament\Resources\Concerns\Translatable;
 use Filament\Tables;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Table;
@@ -30,22 +27,35 @@ class ExperimentResource extends Resource
 {
 
     use UsesResourceLock;
-    use Translatable;
-
+    protected static bool $shouldRegisterNavigation = false;
     protected static ?string $model = Experiment::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-squares-plus';
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.resources.experiment.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.resources.experiment.plural');
+    }
 
     public static function form(Form $form): Form
     {
         return $form->schema([
             Forms\Components\Radio::make('status')
                 ->options([
-                    'none' => 'No',
-                    'start' => 'Yes',
+                    'none' => __('filament.resources.experiment.form.status.options.none'),
+                    'start' => __('filament.resources.experiment.form.status.options.start'),
                 ])
-                ->label('Start Experiment ?')->inlineLabel(true)->default('none')->inline(),
+                ->label(__('filament.resources.experiment.form.status.label'))
+                ->inlineLabel(true)
+                ->default('none')
+                ->inline(),
             Forms\Components\TextInput::make('link')
+                ->label(__('filament.resources.experiment.form.link.label'))
                 ->suffixAction(
                     Forms\Components\Actions\Action::make('copyCostToPrice')
                         ->icon('heroicon-m-clipboard')
@@ -55,31 +65,39 @@ class ExperimentResource extends Resource
                 )
                 ->visible(fn($get) => $get('link') !== null && $get('status') !== 'none')
                 ->default(function ($livewire) {
-                    return $livewire->record && $livewire->record->link ? url("/experiment/" . $livewire->record->link) : 'No active session';
+                    return $livewire->record && $livewire->record->link
+                        ? url("/experiment/" . $livewire->record->link)
+                        : __('filament.resources.experiment.form.link.no_active_session');
                 })
                 ->disabled(true)
                 ->columnSpan('full'),
             Forms\Components\Grid::make()
                 ->schema([
                     Forms\Components\TextInput::make('name')
+                        ->label(__('filament.resources.experiment.form.name'))
                         ->required()
                         ->unique(ignorable: fn($record) => $record),
                     Forms\Components\Select::make('type')
+                        ->label(__('filament.resources.experiment.form.type.label'))
                         ->options([
-                            'image' => 'Image',
-                            'sound' => 'Sound',
-                            'image_sound' => 'Image and Sound',
+                            'image' => __('filament.resources.experiment.form.type.options.image'),
+                            'sound' => __('filament.resources.experiment.form.type.options.sound'),
+                            'image_sound' => __('filament.resources.experiment.form.type.options.image_sound'),
                         ])
                         ->reactive()
                         ->required(),
                     Forms\Components\TextInput::make('button_size')
-                        ->placeholder('Button size in px')
+                        ->label(__('filament.resources.experiment.form.button_size.label'))
+                        ->placeholder(__('filament.resources.experiment.form.button_size.placeholder'))
                         ->numeric()
                         ->extraAttributes(["step" => "0.01"])
                         ->minValue(1)
                         ->maxValue(100)
                         ->suffix('px'),
-                    Forms\Components\ColorPicker::make('button_color')->placeholder('Button color')->default('#ff1414'),
+                    Forms\Components\ColorPicker::make('button_color')
+                        ->label(__('filament.resources.experiment.form.button_color.label'))
+                        ->placeholder(__('filament.resources.experiment.form.button_color.placeholder'))
+                        ->default('#ff1414'),
                 ])
                 ->columnSpan([
                     'sm' => 2,
@@ -87,6 +105,7 @@ class ExperimentResource extends Resource
             Forms\Components\Grid::make()
                 ->schema([
                     Forms\Components\MarkdownEditor::make('description')
+                        ->label(__('filament.resources.experiment.form.description'))
                         ->toolbarButtons([
                             'blockquote',
                             'bold',
@@ -100,8 +119,10 @@ class ExperimentResource extends Resource
                             'strike',
                             'table',
                             'undo',
-                        ])->columnSpan('full'),
+                        ])
+                        ->columnSpan('full'),
                     Forms\Components\FileUpload::make('media')
+                        ->label(__('filament.resources.experiment.form.media'))
                         ->multiple()
                         ->acceptedFileTypes(['audio/*'])
                         ->minFiles(2)
@@ -109,6 +130,7 @@ class ExperimentResource extends Resource
                         ->columnSpan('full')
                         ->visible(fn($get) => $get('type') === 'sound'),
                     Forms\Components\FileUpload::make('media')
+                        ->label(__('filament.resources.experiment.form.media'))
                         ->multiple()
                         ->acceptedFileTypes(['image/*'])
                         ->imagePreviewHeight('250')
@@ -119,6 +141,7 @@ class ExperimentResource extends Resource
                         ->columnSpan('full')
                         ->visible(fn($get) => $get('type') === 'image'),
                     Forms\Components\FileUpload::make('media')
+                        ->label(__('filament.resources.experiment.form.media'))
                         ->multiple()
                         ->acceptedFileTypes(['image/*', 'audio/*'])
                         ->imagePreviewHeight('250')
@@ -133,13 +156,13 @@ class ExperimentResource extends Resource
         ]);
     }
 
-
     public static function table(Table $table): Table
     {
-
         return $table->columns([
-            Tables\Columns\TextColumn::make('name'),
+            Tables\Columns\TextColumn::make('name')
+                ->label(__('filament.resources.experiment.table.columns.name')),
             Tables\Columns\TextColumn::make('type')
+                ->label(__('filament.resources.experiment.table.columns.type'))
                 ->badge()
                 ->color(fn(string $state): string => match ($state) {
                     'sound' => 'success',
@@ -147,6 +170,7 @@ class ExperimentResource extends Resource
                     'image_sound' => 'warning',
                 }),
             Tables\Columns\TextColumn::make('status')
+                ->label(__('filament.resources.experiment.table.columns.status'))
                 ->badge()
                 ->color(fn(string $state): string => match ($state) {
                     'none' => 'info',
@@ -154,12 +178,13 @@ class ExperimentResource extends Resource
                     'pause' => 'warning',
                     'stop' => 'danger',
                 }),
-            Tables\Columns\TextColumn::make('created_at')->dateTime(),
-            Tables\Columns\TextColumn::make('updated_at')->dateTime(),
+            Tables\Columns\TextColumn::make('created_at')
+                ->label(__('filament.resources.experiment.table.columns.created_at'))
+                ->dateTime(),
+            Tables\Columns\TextColumn::make('updated_at')
+                ->label(__('filament.resources.experiment.table.columns.updated_at'))
+                ->dateTime(),
         ])
-            ->filters([
-                //
-            ])
             ->modifyQueryUsing(function ($query) {
                 /** @var \App\Models\User */
                 $user = Auth::user();
@@ -175,22 +200,24 @@ class ExperimentResource extends Resource
             })
             ->actions([
                 Action::make('manageExperiment')
-                    ->label('Session')
+                    ->label(__('filament.resources.experiment.table.actions.manageExperiment.label'))
                     ->color('success')
                     ->icon('heroicon-o-play')
                     ->form([
                         Forms\Components\TextInput::make('link')
-                            ->label('Experiment Link')
+                            ->label(__('filament.resources.experiment.table.actions.manageExperiment.fields.link'))
                             ->disabled(true)
                             ->visible(fn($get) => $get('status') !== 'none')
-                            ->reactive()  // S'assure que ce champ est réactif
-                            ->default(fn($record) => $record->link ? url("/experiment/{$record->link}") : 'No active session'),
+                            ->reactive()
+                            ->default(fn($record) => $record->link
+                                ? url("/experiment/{$record->link}")
+                                : __('filament.resources.experiment.form.link.no_active_session')),
 
                         Forms\Components\ToggleButtons::make('experimentStatus')
                             ->options([
-                                'start' => 'Start',
-                                'pause' => 'Pause',
-                                'stop' => 'Stop'
+                                'start' => __('filament.resources.experiment.table.actions.manageExperiment.fields.experimentStatus.options.start'),
+                                'pause' => __('filament.resources.experiment.table.actions.manageExperiment.fields.experimentStatus.options.pause'),
+                                'stop' => __('filament.resources.experiment.table.actions.manageExperiment.fields.experimentStatus.options.stop')
                             ])
                             ->colors([
                                 'start' => 'success',
@@ -203,36 +230,42 @@ class ExperimentResource extends Resource
                                 'stop' => 'heroicon-o-stop',
                             ])
                             ->default(fn($record) => $record->status)
-                            ->reactive()  // Rend le ToggleButtons réactif
+                            ->reactive()
                             ->afterStateUpdated(function ($state, $set, $record) {
                                 if ($state === 'start' && !$record->link) {
                                     $record->link = Str::random(40);
                                     $set('link', url("/experiment/{$record->link}"));
                                 } elseif ($state === 'stop') {
                                     $record->link = null;
-                                    $set('link', 'No active session');
+                                    $set('link', __('filament.resources.experiment.form.link.no_active_session'));
                                 }
                                 $record->status = $state;
                                 $record->save();
                             }),
                         Placeholder::make('Informations')
-                            ->content(new HtmlString('
-                                <div>' . Blade::render('<x-heroicon-o-play class="inline-block w-5 h-5 mr-2 text-green-500" />') . ' <strong>Start:</strong> Activates the session and generates a unique link if one does not exist. The session becomes accessible to participants.</div><br>
-                                <div>' . Blade::render('<x-heroicon-o-pause class="inline-block w-5 h-5 mr-2 text-yellow-500" />') . ' <strong>Pause:</strong> Temporarily suspends the session. The link remains active, but participants cannot continue the session until it is resumed.</div><br>
-                                <div>' . Blade::render('<x-heroicon-o-stop class="inline-block w-5 h-5 mr-2 text-red-500" />') . ' <strong>Stop:</strong> Ends the session and deactivates the link. To reactivate the session, you must start it again, which generates a new link.</div>
-                            '))
+                            ->content(new HtmlString(
+                                '<div>' . Blade::render('<x-heroicon-o-play class="inline-block w-5 h-5 mr-2 text-green-500" />') .
+                                    ' <strong>' . __('filament.resources.experiment.table.actions.manageExperiment.fields.experimentStatus.options.start') . ':</strong> ' .
+                                    __('filament.resources.experiment.table.actions.manageExperiment.fields.info.start') . '</div><br>' .
+
+                                    '<div>' . Blade::render('<x-heroicon-o-pause class="inline-block w-5 h-5 mr-2 text-yellow-500" />') .
+                                    ' <strong>' . __('filament.resources.experiment.table.actions.manageExperiment.fields.experimentStatus.options.pause') . ':</strong> ' .
+                                    __('filament.resources.experiment.table.actions.manageExperiment.fields.info.pause') . '</div><br>' .
+
+                                    '<div>' . Blade::render('<x-heroicon-o-stop class="inline-block w-5 h-5 mr-2 text-red-500" />') .
+                                    ' <strong>' . __('filament.resources.experiment.table.actions.manageExperiment.fields.experimentStatus.options.stop') . ':</strong> ' .
+                                    __('filament.resources.experiment.table.actions.manageExperiment.fields.info.stop') . '</div>'
+                            ))
                             ->columnSpan('full'),
-
-
                     ])
                     ->action(function ($data, $record, $livewire) {
                         Notification::make()
-                            ->title('Experiment session status updated.')
+                            ->title(__('filament.resources.experiment.table.actions.manageExperiment.notification'))
                             ->success()
                             ->send();
                     }),
                 Action::make('export')
-                    ->label('Export')
+                    ->label(__('filament.resources.experiment.table.actions.export.label'))
                     ->color('info')
                     ->icon('heroicon-o-cloud-arrow-down')
                     ->visible(function ($record) {
@@ -242,26 +275,26 @@ class ExperimentResource extends Resource
                     })
                     ->form([
                         Forms\Components\Placeholder::make('export_placeholder')
-                            ->content(new HtmlString('<div>Select the format in which you want to export the experiment data. You can choose JSON, XML, or both.</div>'))
+                            ->content(new HtmlString(__('filament.resources.experiment.table.actions.export.fields.placeholder')))
                             ->columnSpan('full'),
                         Forms\Components\Grid::make()
                             ->schema([
                                 Forms\Components\Toggle::make('export_json')
-                                    ->label('Export as JSON')
+                                    ->label(__('filament.resources.experiment.table.actions.export.fields.json'))
                                     ->reactive(),
                                 Forms\Components\Toggle::make('export_xml')
-                                    ->label('Export as XML')
+                                    ->label(__('filament.resources.experiment.table.actions.export.fields.xml'))
                                     ->reactive(),
                             ])
                             ->columnSpan([
                                 'sm' => 2,
                             ]),
                         Forms\Components\Placeholder::make('media_export_info')
-                            ->content(new HtmlString('<div>Including media will add all associated media files to the export. This option will create a zip folder containing your configuration and the media files.</div>'))
+                            ->content(new HtmlString(__('filament.resources.experiment.table.actions.export.fields.media_info')))
                             ->visible(fn($get) => $get('export_json') || $get('export_xml'))
                             ->columnSpan('full'),
                         Forms\Components\Toggle::make('include_media')
-                            ->label('Include Media')
+                            ->label(__('filament.resources.experiment.table.actions.export.fields.include_media'))
                             ->visible(fn($get) => $get('export_json') || $get('export_xml'))
                             ->columnSpan('full'),
                     ])
@@ -269,11 +302,10 @@ class ExperimentResource extends Resource
                     ->action(function ($data, Experiment $record, $livewire) {
                         $handler = new ExperimentExportHandler($record);
                         Notification::make()
-                            ->title('Exported successfully')
+                            ->title(__('filament.resources.experiment.table.actions.export.success'))
                             ->success()
                             ->send();
-                        $downloadResponse = $handler->handleExport($data);
-                        return $downloadResponse;
+                        return $handler->handleExport($data);
                     }),
                 EditAction::make(),
                 DeleteAction::make(),
@@ -289,25 +321,22 @@ class ExperimentResource extends Resource
             'index' => Pages\ListExperiments::route('/'),
             'create' => Pages\CreateExperiment::route('/create'),
             'edit' => Pages\EditExperiment::route('/{record}/edit'),
-            'sessions' => Pages\ExperimentSessions::route('/{record}/sessions'),
-            'statistics' => Pages\ExperimentStatistics::route('/{record}/statistics'),
-            'session-details' => Pages\ExperimentSessionDetails::route('/session/{record}'),
         ];
     }
 
     protected function beforeCreate(): void {}
 
-    public static function getRelations(): array
-    {
-        /** @var \App\Models\User */
-        $user = Auth::user();
+    // public static function getRelations(): array
+    // {
+    //     /** @var \App\Models\User */
+    //     $user = Auth::user();
 
-        if ($user && $user->hasAnyPermission('edit_experiment_with_user')) {
-            return [
-                UsersRelationManager::class,
-            ];
-        }
+    //     if ($user && $user->hasAnyPermission('edit_experiment_with_user')) {
+    //         return [
+    //             UsersRelationManager::class,
+    //         ];
+    //     }
 
-        return [];
-    }
+    //     return [];
+    // }
 }

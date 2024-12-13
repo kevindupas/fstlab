@@ -15,6 +15,9 @@ import HowItWork from "./Pages/HowItWork";
 import Changelog from "./Pages/Changelog";
 import { LanguageProvider } from "./Contexts/LanguageContext";
 import Home from "./Pages/Home";
+import ThankYou from "./Pages/ThankYou";
+import {ExperimentStatusProvider} from "./Contexts/ExperimentStatusContext.jsx";
+import ExperimentError from "./Pages/ExperimentError.jsx";
 
 function App() {
     return (
@@ -22,6 +25,7 @@ function App() {
             <LanguageProvider>
                 <AuthProvider>
                     <ExperimentsProvider>
+                        <ExperimentStatusProvider>
                         <SessionProvider>
                             <Layout>
                                 <Routes>
@@ -56,9 +60,15 @@ function App() {
                                         path="/results"
                                         element={<Result />}
                                     />
+                                    <Route path="/experiment-error" element={<ExperimentError />} />
+                                    <Route
+                                        path="/thank-you"
+                                        element={<ThankYou />}
+                                    />
                                 </Routes>
                             </Layout>
                         </SessionProvider>
+                            </ExperimentStatusProvider>
                     </ExperimentsProvider>
                 </AuthProvider>
             </LanguageProvider>

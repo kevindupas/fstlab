@@ -1,16 +1,22 @@
 // ExperimentSession.jsx
 import React, { useCallback, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import KonvaComponent from "../Components/KonvaComponent";
 import SidePanelResults from "../Components/SidePanelResults";
 import Toolbar from "../Components/Toolbar";
 import DeviceOrientationCheck from "../Utils/DeviceOrientationCheck";
 import { useTranslation } from "../Contexts/LanguageContext";
+import {useExperimentStatus} from "../Contexts/ExperimentStatusContext.jsx";
+import {TestModeModal} from "../Components/TestModeModal.jsx";
 
 function ExperimentSession() {
     const { t } = useTranslation();
     const { sessionId } = useParams();
     const navigate = useNavigate();
+    const { checkExperimentStatus } = useExperimentStatus();
+    const [showTestModeModal, setShowTestModeModal] = useState(true);
+    const location = useLocation();
+    const isTestMode = location.state?.isTest;
 
     // États de base
     const [experiment, setExperiment] = useState(null);
@@ -39,9 +45,16 @@ function ExperimentSession() {
     // Vérification initiale et chargement
     useEffect(() => {
         const checkSession = async () => {
+            if (isTestMode) {
+                // En mode test, on utilise directement les données passées dans location.state
+                setExperiment({ experiment: location.state.experiment });
+                setMedia(location.state.media);
+                setIsLoading(false);
+                return;
+            }
+            // Vérifie d'abord que l'utilisateur est connecté
             const existingSession = localStorage.getItem("session");
-            const isRegistered =
-                localStorage.getItem("isRegistered") === "true";
+            const isRegistered = localStorage.getItem("isRegistered") === "true";
 
             if (!existingSession || !isRegistered) {
                 navigate(`/login/${sessionId}`);
@@ -49,9 +62,17 @@ function ExperimentSession() {
             }
 
             try {
-                const response = await fetch(
-                    `/api/experiment/session/${sessionId}`
-                );
+                // Vérifie le statut de l'expérience
+                const isExperimentAvailable = await checkExperimentStatus(sessionId);
+
+                if (!isExperimentAvailable) {
+                    // Si l'expérience n'est pas disponible, le modal sera géré par le contexte
+                    // et la redirection vers la home page sera automatique
+                    return;
+                }
+
+                // Si l'expérience est disponible, charge les données
+                const response = await fetch(`/api/experiment/session/${sessionId}`);
                 const data = await response.json();
 
                 if (!data.experiment) {
@@ -59,6 +80,7 @@ function ExperimentSession() {
                     return;
                 }
 
+                // Si tout est ok, met à jour les états
                 setExperiment(data);
                 setMedia(data.media);
             } catch (error) {
@@ -70,7 +92,7 @@ function ExperimentSession() {
         };
 
         checkSession();
-    }, [sessionId, navigate]);
+    }, [sessionId, navigate, checkExperimentStatus, t]);
 
     useEffect(() => {
         setStartTime(Date.now());
@@ -192,7 +214,7 @@ function ExperimentSession() {
         ];
 
         const preparedGroups = clustersMap.map((cluster, index) => ({
-            name: `Groupe ${index + 1}`,
+            name: `C${index + 1}`,
             color: clusterColors[index % clusterColors.length],
             elements: cluster,
         }));
@@ -210,6 +232,11 @@ function ExperimentSession() {
     }, []);
 
     const handleSubmitResults = async (data) => {
+        if (isTestMode) {
+            // En mode test, on va directement à la page de remerciement sans sauvegarder
+            navigate("/thank-you", { state: { isTest: true } });
+            return;
+        }
         try {
             const sessionData = JSON.parse(localStorage.getItem("session"));
             const response = await fetch(
@@ -235,7 +262,7 @@ function ExperimentSession() {
                 localStorage.removeItem("isRegistered");
                 localStorage.removeItem("participantNumber");
                 localStorage.removeItem("session");
-                navigate("/");
+                navigate("/thank-you");
             }
         } catch (error) {
             console.error("Error sending results:", error);
@@ -293,6 +320,14 @@ function ExperimentSession() {
 
     return (
         <DeviceOrientationCheck>
+            {isTestMode && (
+                <>
+                    <TestModeModal
+                        isOpen={showTestModeModal}
+                        onClose={() => setShowTestModeModal(false)}
+                    />
+                </>
+            )}
             {isLoading ? (
                 <div className="flex items-center justify-center min-h-screen">
                     <div className="text-center">
@@ -346,6 +381,7 @@ function ExperimentSession() {
                                 onEditModeChange={handleEditModeChange}
                                 onSubmit={handleSubmitResults}
                                 elapsedTime={elapsedTime}
+                                instruction={ experiment?.experiment?.instruction}
                                 actionsLog={actionsLog}
                                 sessionId={sessionId}
                             />
@@ -354,6 +390,7 @@ function ExperimentSession() {
 
                     <Toolbar
                         onRestart={handleRestart}
+                        isTestMode={isTestMode}
                         onLeave={() => setShowLeaveModal(true)}
                         onTerminate={handleTerminate}
                         isFinished={isFinished}

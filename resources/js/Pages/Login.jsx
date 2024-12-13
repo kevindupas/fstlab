@@ -5,9 +5,11 @@ import { UnfinishedSessionModal } from "../Components/UnfinishedSessionModal";
 import { useSession } from "../Contexts/SessionContext";
 import DeviceOrientationCheck from "../Utils/DeviceOrientationCheck";
 import { useTranslation } from "../Contexts/LanguageContext";
+import {useExperimentStatus} from "../Contexts/ExperimentStatusContext.jsx";
 
 function Login() {
     const { t } = useTranslation();
+    const { checkExperimentStatus } = useExperimentStatus();
     const {
         checkExistingSession,
         setParticipantNumber: resetParticipantNumber,
@@ -19,9 +21,26 @@ function Login() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        checkExistingSession(sessionId);
-        setParticipantNumber("");
-    }, [sessionId]);
+        const verifyExperimentStatus = async () => {
+            try {
+                const isExperimentAvailable = await checkExperimentStatus(sessionId);
+                if (!isExperimentAvailable) {
+                    return;
+                }
+
+                // On ne vérifie la session existante que si l'expérience est disponible
+                checkExistingSession(sessionId);
+                setParticipantNumber("");
+            } catch (error) {
+                console.error("Error verifying experiment status:", error);
+                setError(t("login.generic"));
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        verifyExperimentStatus();
+    }, [sessionId, checkExperimentStatus, checkExistingSession, t]);
 
     const getSystemInfo = () => {
         const parser = new UAParser();
@@ -41,6 +60,12 @@ function Login() {
         e.preventDefault();
         setIsLoading(true);
         setError("");
+
+        const isExperimentAvailable = await checkExperimentStatus(sessionId);
+        if (!isExperimentAvailable) {
+            setIsLoading(false);
+            return;
+        }
 
         try {
             const systemData = getSystemInfo();

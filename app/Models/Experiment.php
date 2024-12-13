@@ -19,11 +19,15 @@ class Experiment extends Model
         'button_color',
         'created_by',
         'status',
-        'link'
+        'link',
+        'doi',
+        'instruction',
+        'documents',
     ];
 
     protected $casts = [
         'media' => 'array',
+        'documents' => 'array',
     ];
 
     public function users()

@@ -26,11 +26,31 @@ function KonvaComponent({
     const mediaArray = useMemo(() => Object.values(media || {}), [media]);
     const [mediaItems, setMediaItems] = useState([]);
     const currentAudioRef = useRef(null);
+    const [currentSoundUrl, setCurrentSoundUrl] = useState(null);
+
+    const getSoundUrl = (item) => {
+        const soundExtensions = [".wav", ".mp3", ".ogg", ".m4a", ".aac"];
+
+        if (item.type === "image_sound") {
+            // Si c'est une URL se terminant par une extension de son, c'est un son
+            if (soundExtensions.some(ext => item.url.toLowerCase().endsWith(ext))) {
+                return item.url;
+            }
+        }
+        if (item.type === "sound") {
+            return item.url;
+        }
+        return null;
+    };
 
     useEffect(() => {
         if (!mediaArray.length) return;
 
-        const shuffledItems = shuffleWithSeed(mediaArray, 12213);
+        const shuffledItems = shuffleWithSeed(mediaArray, 12213).map((item, originalIndex) => ({
+            ...item,
+            originalIndex // Ajouter l'index original à chaque item
+        }));
+
         const arrangedItems = arrangeItemsInGrid(
             shuffledItems,
             size,
@@ -120,16 +140,27 @@ function KonvaComponent({
         e.target.position({ x: newX, y: newY });
     };
 
+
     const handlePlaySound = (url) => {
-        if (currentAudioRef.current && !currentAudioRef.current.paused) {
+        // Toujours arrêter le son actuel
+        if (currentAudioRef.current) {
             currentAudioRef.current.pause();
             currentAudioRef.current = null;
-            return;
+            setCurrentSoundUrl(null);
         }
 
-        const audio = new Audio(url);
-        currentAudioRef.current = audio;
-        audio.play().catch((err) => console.error("Erreur audio:", err));
+        // Jouer le nouveau son si fourni
+        if (url) {
+            const audio = new Audio(url);
+            currentAudioRef.current = audio;
+            audio.play().catch((err) => console.error("Erreur audio:", err));
+            setCurrentSoundUrl(url);
+
+            audio.onended = () => {
+                setCurrentSoundUrl(null);
+                currentAudioRef.current = null;
+            };
+        }
     };
 
     useEffect(() => {
@@ -138,6 +169,13 @@ function KonvaComponent({
     }, []);
 
     const handleShowImage = (url) => {
+        // Si un son est en cours, on l'arrête
+        if (currentAudioRef.current) {
+            currentAudioRef.current.pause();
+            currentAudioRef.current = null;
+            setCurrentSoundUrl(null);
+        }
+
         setSelectedImage(url);
         setShowImageModal(true);
     };
@@ -166,26 +204,8 @@ function KonvaComponent({
     };
 
     const handleGroupClick = (item) => {
-        if (!isFinished) return;
-
         if (editingGroupIndex !== null) {
             onMediaGroupChange(item.id, editingGroupIndex);
-
-            if (item.type === "sound" || item.type === "image_sound") {
-                handlePlaySound(
-                    item.type === "image_sound" ? item.sound_url : item.url
-                );
-            } else if (item.type === "image") {
-                handleShowImage(item.url);
-            }
-        } else {
-            if (item.type === "sound" || item.type === "image_sound") {
-                handlePlaySound(
-                    item.type === "image_sound" ? item.sound_url : item.url
-                );
-            } else if (item.type === "image") {
-                handleShowImage(item.url);
-            }
         }
     };
 
@@ -205,26 +225,17 @@ function KonvaComponent({
                             buttonColor={getItemColor(item)}
                             size={size}
                             isTablet={isTablet}
-                            draggable={!isFinished} // Déjà correct
-                            onDragEnd={(e) =>
-                                !isFinished && handleDragEnd(e, index)
-                            }
-                            onDragMove={(e) =>
-                                !isFinished && handleDragMove(e, index)
-                            }
+                            draggable={!isFinished}
+                            onDragEnd={(e) => !isFinished && handleDragEnd(e, index)}
+                            onDragMove={(e) => !isFinished && handleDragMove(e, index)}
                             onPlaySound={handlePlaySound}
                             onShowImage={handleShowImage}
+                            currentSoundUrl={currentSoundUrl}
                             onClick={() => handleGroupClick(item)}
                             isClickable={true}
                             groups={groups}
                             isFinished={isFinished}
-                            cursor={
-                                isFinished
-                                    ? item.type === "sound"
-                                        ? "pointer"
-                                        : "zoom-in"
-                                    : "move"
-                            }
+                            cursor={isFinished ? (item.type === "sound" ? "pointer" : "zoom-in") : "move"}
                         />
                     ))}
                 </Layer>

@@ -3,6 +3,13 @@
 namespace App\Providers\Filament;
 
 use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugin;
+use App\Filament\Pages\Auth\Login;
+use App\Filament\Pages\Auth\Register;
+use App\Filament\Pages\ContactAdmin;
+use App\Filament\Pages\Experiments\Sessions\ExperimentSessions;
+use App\Filament\Widgets\BannedUserWidget;
+use App\Filament\Widgets\DashboardStatsWidget;
+use App\Filament\Widgets\ExperimentAccessRequestsWidget;
 use App\Filament\Widgets\ExperimentTableWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -17,6 +24,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Kenepa\ResourceLock\ResourceLockPlugin;
 use Leandrocfe\FilamentApexCharts\FilamentApexChartsPlugin;
@@ -25,24 +33,38 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+
+        $plugins = [
+            FilamentApexChartsPlugin::make()
+        ];
+
+        /** @var User|null */
+        $user = Auth::user();
+
+        if ($user && $user->hasRole('supervisor')) {
+            $plugins[] = FilamentSpatieRolesPermissionsPlugin::make();
+            $plugins[] = ResourceLockPlugin::make();
+        }
+
+
         return $panel
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
-            ->registration()
+            ->login(Login::class)
+            ->registration(Register::class)
+            ->passwordReset()
+            ->profile()
             ->colors([
                 'primary' => Color::Blue,
             ])
-            ->plugins([
-                FilamentSpatieRolesPermissionsPlugin::make(),
-                ResourceLockPlugin::make(),
-                FilamentApexChartsPlugin::make()
-            ])
+            ->plugins($plugins)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
+                ExperimentSessions::class,
+                ContactAdmin::class,
             ])
             ->viteTheme('resources/css/filament/admin/theme.css')
             // ->viteTheme('resources/css/app.css')
@@ -50,7 +72,10 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 // Widgets\AccountWidget::class,
                 // Widgets\FilamentInfoWidget::class,
+                BannedUserWidget::class,
                 ExperimentTableWidget::class,
+                ExperimentAccessRequestsWidget::class,
+                DashboardStatsWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -62,6 +87,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                \App\Http\Middleware\RedirectIfPendingApproval::class,
             ])
             ->authMiddleware([
                 Authenticate::class,

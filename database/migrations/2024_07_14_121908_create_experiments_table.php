@@ -13,15 +13,18 @@ class CreateExperimentsTable extends Migration
     {
         Schema::create('experiments', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
+            $table->string('name');
             $table->text('description')->nullable();
+            $table->text('instruction')->nullable();
             $table->string('type');
             $table->json('media')->nullable();
             $table->string('button_size')->nullable();
             $table->string('button_color')->nullable();
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
-            $table->enum('status', ['none', 'start', 'pause', 'stop'])->default('none');
+            $table->enum('status', ['none', 'start', 'pause', 'stop', 'test'])->default('none');
             $table->string('link')->unique()->nullable();
+            $table->string('doi')->unique()->nullable();
+            $table->json('documents')->nullable();
             $table->timestamps();
         });
 

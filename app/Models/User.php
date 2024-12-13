@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,7 +13,7 @@ use Kenepa\ResourceLock\Models\Concerns\HasLocks;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, CanResetPassword;
 
 
     /**
@@ -24,6 +26,13 @@ class User extends Authenticatable
         'email',
         'password',
         'created_by',
+        'university',
+        'status',
+        'orcid',
+        'registration_reason',
+        'rejection_reason',
+        'banned_reason',
+        'unbanned_reason',
     ];
 
     /**

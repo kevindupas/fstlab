@@ -21,12 +21,13 @@ class RolesAndPermissionsSeeder extends Seeder
         Permission::create(['name' => 'edit_experiment_with_user']);
         Permission::create(['name' => 'view data']);
         Permission::create(['name' => 'export data']);
+        Permission::create(['name' => 'view_experiments_list']);
 
         // Create roles and assign created permissions
 
         // Supervisor role
         $supervisor = Role::create(['name' => 'supervisor']);
-        $supervisor->givePermissionTo('manage users');
+        $supervisor->givePermissionTo('manage users', 'view_experiments_list');
 
         // Principal Experimenter role
         $principalExperimenter = Role::create(['name' => 'principal_experimenter']);

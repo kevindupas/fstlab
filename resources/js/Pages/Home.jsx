@@ -8,11 +8,12 @@ import { Button } from "../Components/Button";
 import { ChevronsDown } from "lucide-react";
 import FloatingLanguageButton from "../Components/FloatingLanguageButton";
 import { useTranslation } from "../Contexts/LanguageContext";
+import {useExperimentStatus} from "../Contexts/ExperimentStatusContext.jsx";
 
 const logos = {
     ut2j: new URL("../../assets/logos/ut2j_logo.png", import.meta.url).href,
-    clle: new URL("../../assets/logos/logo_clle.png", import.meta.url),
-    anr: new URL("../../assets/logos/anr_logo.png", import.meta.url).href,
+    clle: new URL("../../assets/logos/cnrs.png", import.meta.url),
+    anr: new URL("../../assets/logos/MSHS.png", import.meta.url).href,
 };
 
 const backgroundImage = new URL(
@@ -22,6 +23,7 @@ const backgroundImage = new URL(
 
 export default function Home() {
     const { t } = useTranslation();
+    const { checkExperimentStatus } = useExperimentStatus();
     const [showModal, setShowModal] = useState(false);
     const [sessionId, setSessionId] = useState("");
     const [error, setError] = useState("");

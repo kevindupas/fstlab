@@ -17,8 +17,8 @@ return new class extends Migration
             $table->foreignId('experiment_id')->constrained();
             $table->enum('type', ['access', 'results']);
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
-            $table->text('request_message')->nullable(); // Message de l'utilisateur
-            $table->text('response_message')->nullable(); // Réponse de l'expérimentateur
+            $table->text('request_message')->nullable();
+            $table->text('response_message')->nullable();
             $table->timestamps();
         });
     }

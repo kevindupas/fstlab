@@ -13,35 +13,34 @@ trait HasExperimentAccess
         /** @var User */
         $user = Auth::user();
 
-        // Si c'est une demande d'accès approuvée
-        $hasApprovedAccess = $experiment->accessRequests()
+        // Si c'est un supervisor
+        if ($user->hasRole('supervisor')) {
+            $principalIds = $this->getPrincipalIds();
+            $secondaryIds = $this->getSecondaryIds($principalIds);
+
+            return $experiment->created_by === $user->id ||
+                in_array($experiment->created_by, $principalIds) ||
+                in_array($experiment->created_by, $secondaryIds);
+        }
+
+        // Si c'est un principal experimenter
+        if ($user->hasRole('principal_experimenter')) {
+            $secondaryIds = $user->createdUsers()
+                ->role('secondary_experimenter')
+                ->pluck('id')
+                ->toArray();
+
+            return $experiment->created_by === $user->id ||
+                in_array($experiment->created_by, $secondaryIds);
+        }
+
+        // Pour les autres rôles (secondary_experimenter, etc.)
+        return $experiment->created_by === $user->id ||
+            $experiment->accessRequests()
             ->where('user_id', $user->id)
             ->where('type', 'results')
             ->where('status', 'approved')
             ->exists();
-
-        // Si c'est le créateur
-        if ($experiment->created_by === $user->id || $hasApprovedAccess) {
-            return true;
-        }
-
-        // Si c'est un supervisor
-        if ($user->hasRole('supervisor')) {
-            $principalIds = User::role('principal_experimenter')
-                ->where('created_by', $user->id)
-                ->pluck('id')
-                ->toArray();
-
-            $secondaryIds = User::role('secondary_experimenter')
-                ->whereIn('created_by', $principalIds)
-                ->pluck('id')
-                ->toArray();
-
-            return in_array($experiment->created_by, $principalIds) ||
-                in_array($experiment->created_by, $secondaryIds);
-        }
-
-        return false;
     }
 
     public function getPrincipalIds(): array

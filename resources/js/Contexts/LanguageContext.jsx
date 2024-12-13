@@ -17,7 +17,9 @@ export const LanguageProvider = ({ children }) => {
             }
 
             try {
-                const response = await fetch(`/api/translations/${language}`);
+                const response = await fetch(
+                    `/api/translations/${language}?_=${Date.now()}`
+                );
                 if (!response.ok) {
                     throw new Error("Failed to fetch translations");
                 }

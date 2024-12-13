@@ -13,6 +13,7 @@ use App\Filament\Resources\ExperimentResource\Pages\ExperimentStatistics\Widgets
 use App\Filament\Resources\ExperimentResource\Pages\ExperimentStatistics\Widgets\DurationChartWidget;
 use App\Filament\Resources\ExperimentResource\Pages\ExperimentStatistics\Widgets\ActionsTimelineChartWidget;
 use App\Filament\Resources\ExperimentResource\Pages\ExperimentStatistics\Widgets\ErrorsByTypeChartWidget;
+use Filament\Resources\Concerns\Translatable;
 
 class ExperimentStatistics extends Page
 {

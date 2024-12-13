@@ -28,7 +28,8 @@ class ExperimentSeeder extends Seeder
 
     public function run()
     {
-        $principalExperimenters = User::role('principal_experimenter')->get();
+        // Récupère uniquement les principaux expérimentateurs approuvés
+        $principalExperimenters = User::role('principal_experimenter')->where('status', 'approved')->get();
         $experimentTypes = ['image', 'sound', 'image_sound'];
         $statuses = ['none', 'start', 'pause', 'stop'];
 
@@ -44,12 +45,13 @@ class ExperimentSeeder extends Seeder
                     'name' => "Experiment {$experimenter->id}-{$i}",
                     'description' => "Test experiment {$i} created by {$experimenter->name}",
                     'type' => $type,
-                    'button_size' => rand(30, 60),
+                    'button_size' => 60,
                     'button_color' => '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT),
                     'created_by' => $experimenter->id,
                     'status' => $status,
                     'link' => $status === 'start' ? Str::random(6) : null,
-                    'media' => $this->getMediaForType($type)
+                    'media' => $this->getMediaForType($type),
+                    'documents' => null
                 ]);
 
                 // Assign some secondary experimenters

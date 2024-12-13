@@ -1,13 +1,16 @@
-import { AlertCircle, Clock, Image as ImageIcon, Music } from "lucide-react";
+import {AlertCircle, CirclePlus, Clock, Image as ImageIcon, Music} from "lucide-react";
 import React, { useEffect, useState } from "react";
 import SpeechToText from "./SpeechToText";
 import clsx from "clsx";
+import ReactMarkdown from 'react-markdown';
+import isLightColor from "../Utils/isLightColor.jsx";
 
 function SidePanelResults({
     isOpen,
     groups = [],
     onGroupsChange,
     elapsedTime,
+    instruction,
     onSubmit,
     onEditModeChange,
     actionsLog = [],
@@ -18,8 +21,6 @@ function SidePanelResults({
     const [errors, setErrors] = useState([]);
     const [editingGroupIndex, setEditingGroupIndex] = useState(null);
     const [showEmptyGroups, setShowEmptyGroups] = useState(false);
-
-    console.log(elapsedTime);
 
     const formatTime = (ms) => {
         const totalSeconds = Math.floor(ms / 1000);
@@ -120,7 +121,7 @@ function SidePanelResults({
         }
 
         const newGroup = {
-            name: `Groupe ${nextNumber}`,
+            name: `C${nextNumber}`,
             color: availableColor,
             elements: [],
             comment: "",
@@ -187,20 +188,7 @@ function SidePanelResults({
                             onClick={handleAddGroup}
                             className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors flex items-center gap-2"
                         >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            >
-                                <line x1="12" y1="5" x2="12" y2="19"></line>
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                            </svg>
+                            <CirclePlus />
                             Ajouter un groupe
                         </button>
                     </div>
@@ -210,24 +198,17 @@ function SidePanelResults({
             <div className="flex-1 overflow-y-auto">
                 <div className="p-4">
                     {!isOpen ? (
-                        <div className="flex flex-col items-center justify-center text-center p-6">
-                            <AlertCircle className="h-20 w-20 text-gray-400 mb-4" />
-                            <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                                Session en cours
-                            </h3>
-                            <p className="text-gray-500">
-                                Regroupez les éléments puis cliquez sur
-                                "Terminer"
-                            </p>
+                        <div className="flex flex-col text-justify p-6">
+                            <ReactMarkdown>{instruction}</ReactMarkdown>
                         </div>
                     ) : (
                         <div className="space-y-4">
                             {localGroups.map((group, index) => (
                                 <div
                                     key={index}
-                                    className="bg-white rounded-lg shadow-md border overflow-hidden"
+                                    className="bg-white rounded-lg shadow-lg border overflow-hidden"
                                 >
-                                    <div className="p-4 border-b bg-gray-50">
+                                    <div className="p-4 border-b bg-slate-300">
                                         <div className="flex items-center gap-4 mb-4">
                                             <input
                                                 type="text"
@@ -269,7 +250,7 @@ function SidePanelResults({
                                         />
                                     </div>
 
-                                    <div className="px-4 py-3 bg-white border-b flex items-center justify-between">
+                                    <div className="px-4 py-3 bg-slate-300 border-b flex items-center justify-between">
                                         <button
                                             onClick={() =>
                                                 handleEditGroup(index)
@@ -305,60 +286,52 @@ function SidePanelResults({
                                         </span>
                                     </div>
 
-                                    <div className="p-4">
+                                    <div className="p-4 bg-slate-300">
                                         <div className="grid grid-cols-3 gap-3">
-                                            {group.elements.map(
-                                                (item, elemIndex) => {
-                                                    const isImage = isImageUrl(
-                                                        item.url
-                                                    );
-                                                    const isSound = isSoundUrl(
-                                                        item.url
-                                                    );
+                                            {group.elements.map((item) => {
+                                                    const isImage = isImageUrl(item.url);
+                                                    const isSound = isSoundUrl(item.url);
 
                                                     return (
                                                         <div
-                                                            key={elemIndex}
+                                                            key={item.id}
                                                             className="aspect-square rounded-lg overflow-hidden border flex items-center justify-center relative group"
                                                             style={{
-                                                                backgroundColor:
-                                                                    isSound
-                                                                        ? group.color
-                                                                        : "transparent",
+                                                                backgroundColor: isSound ? group.color : "transparent",
                                                             }}
                                                         >
                                                             {isSound && (
                                                                 <div className="absolute top-2 right-2">
-                                                                    <Music className="w-4 h-4 text-white" />
+                                                                    <Music className={clsx("w-4 h-4", isLightColor(group.color) ? 'text-black' : 'text-white')} />
                                                                 </div>
                                                             )}
 
                                                             {isImage ? (
                                                                 <div className="relative w-full h-full">
                                                                     <img
-                                                                        src={
-                                                                            item.url
-                                                                        }
+                                                                        src={item.url}
                                                                         alt=""
                                                                         className="w-full h-full object-cover"
                                                                     />
                                                                     <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 px-2 py-1 rounded text-white text-xs">
-                                                                        p
-                                                                        {elemIndex +
-                                                                            1}
+                                                                        p{item.originalIndex + 1}
                                                                     </div>
                                                                 </div>
                                                             ) : isSound ? (
-                                                                <div className="flex flex-col items-center justify-center text-white">
-                                                                    <span className="text-sm font-medium">
-                                                                        s
-                                                                        {elemIndex +
-                                                                            1}
-                                                                    </span>
+                                                                <div
+                                                                    className="flex flex-col items-center justify-center">
+                                                                        <span
+                                                                            className={`text-sm font-medium ${
+                                                                                isLightColor(group.color) ? 'text-black' : 'text-white'
+                                                                            }`}
+                                                                        >
+                                                                            s{item.originalIndex + 1}
+                                                                        </span>
                                                                 </div>
                                                             ) : (
-                                                                <div className="flex flex-col items-center justify-center text-gray-400 gap-2">
-                                                                    <AlertCircle className="w-6 h-6" />
+                                                                <div
+                                                                    className="flex flex-col items-center justify-center text-gray-400 gap-2">
+                                                                    <AlertCircle className="w-6 h-6"/>
                                                                     <span className="text-xs">
                                                                         Type non
                                                                         reconnu
@@ -374,8 +347,8 @@ function SidePanelResults({
                                 </div>
                             ))}
 
-                            <div className="bg-white rounded-lg shadow-md border overflow-hidden">
-                                <div className="px-4 py-3 bg-gray-50 border-b flex items-center gap-3">
+                            <div className="bg-slate-300 rounded-lg shadow-md border overflow-hidden">
+                                <div className="px-4 py-3 bg-slate-300 border-b flex items-center gap-3">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         className="h-5 w-5 text-gray-600"
@@ -403,7 +376,7 @@ function SidePanelResults({
                                     </div>
                                 </div>
                             </div>
-                            <div className="bg-white rounded-lg shadow-md border p-4">
+                            <div className="bg-slate-300 rounded-lg shadow-md border p-4">
                                 <h3 className="text-lg font-semibold mb-3">
                                     Problèmes techniques
                                 </h3>

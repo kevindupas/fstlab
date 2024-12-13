@@ -54,5 +54,10 @@
           "generic": "An error occurred"
         }
       }
+  },
+  "thankYou" : {
+    "title" : "Merci pour votre participation",
+    "message" : "Votre session a bien été enregistrée. Merci pour votre participation !",
+    "returnHome" : "Retour à l'accueil"
   }
 }

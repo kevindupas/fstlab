@@ -16,6 +16,13 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
+            $table->string('university')->nullable();
+            $table->string('orcid')->nullable();
+            $table->enum('status', ['pending', 'approved', 'rejected', 'banned'])->default('pending');
+            $table->text('registration_reason')->nullable();
+            $table->text('rejection_reason')->nullable();
+            $table->text('banned_reason')->nullable();
+            $table->text('unbanned_reason')->nullable();
             $table->string('password');
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('cascade');
             $table->rememberToken();

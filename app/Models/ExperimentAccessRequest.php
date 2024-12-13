@@ -16,6 +16,8 @@ class ExperimentAccessRequest extends Model
         'response_message',
     ];
 
+    protected $with = ['experiment', 'user'];
+
     public function experiment()
     {
         return $this->belongsTo(Experiment::class);

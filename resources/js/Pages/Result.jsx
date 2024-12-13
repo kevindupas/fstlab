@@ -31,44 +31,6 @@ function Result() {
         });
     };
 
-    // const handleMediaMove = (mediaId, fromGroupIndex, toGroupIndex) => {
-    //     setUpdatedGroups((prevGroups) => {
-    //         const newGroups = [...prevGroups];
-
-    //         // Retirer du groupe source
-    //         if (fromGroupIndex !== -1) {
-    //             const sourceGroup = { ...newGroups[fromGroupIndex] };
-    //             sourceGroup.elements = sourceGroup.elements.filter(
-    //                 (e) => e.id !== mediaId
-    //             );
-    //             newGroups[fromGroupIndex] = sourceGroup;
-    //         }
-
-    //         // Ajouter au groupe destination
-    //         if (toGroupIndex !== -1) {
-    //             const media = prevGroups[fromGroupIndex].elements.find(
-    //                 (e) => e.id === mediaId
-    //             );
-    //             if (media) {
-    //                 if (!newGroups[toGroupIndex]) {
-    //                     newGroups[toGroupIndex] = {
-    //                         name: `Groupe ${toGroupIndex + 1}`,
-    //                         color:
-    //                             "#" +
-    //                             Math.floor(Math.random() * 16777215).toString(
-    //                                 16
-    //                             ),
-    //                         elements: [],
-    //                     };
-    //                 }
-    //                 newGroups[toGroupIndex].elements.push(media);
-    //             }
-    //         }
-
-    //         return newGroups.filter((group) => group.elements.length > 0);
-    //     });
-    // };
-
     const findNextGroupNumber = (groups) => {
         const existingNumbers = groups
             .map((g) => parseInt(g.name.match(/\d+/)?.[0] || "0"))
@@ -87,7 +49,7 @@ function Result() {
         setUpdatedGroups([
             ...updatedGroups,
             {
-                name: `Groupe ${nextNumber}`,
+                name: `C ${nextNumber}`,
                 color: "#" + Math.floor(Math.random() * 16777215).toString(16),
                 elements: [],
             },

@@ -23,3 +23,19 @@ body {
 .animate-rotate-device {
     animation: rotate-device 1.5s ease-in-out infinite alternate;
 }
+
+h2 {
+    @apply text-2xl font-bold mb-4;
+}
+
+p {
+    @apply mb-4 text-gray-700;
+}
+
+ol {
+    @apply list-decimal list-inside mb-4 pl-4;
+}
+
+strong {
+    @apply font-semibold text-black;
+}
