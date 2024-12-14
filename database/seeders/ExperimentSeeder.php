@@ -58,6 +58,7 @@ class ExperimentSeeder extends Seeder
                 $experiment = Experiment::create([
                     'name' => "Experiment {$experimenter->id}-{$i}",
                     'description' => "Test experiment {$i} created by {$experimenter->name}",
+                    'instruction' => "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat.",
                     'type' => $type,
                     'button_size' => 60,
                     'button_color' => '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT),
@@ -65,6 +66,7 @@ class ExperimentSeeder extends Seeder
                     'status' => $status,
                     'link' => $status === 'start' ? Str::random(6) : null,
                     'media' => $this->getMediaForType($type),
+                    'doi' => "10.1234/demo.$type." . Str::random(2) . date('Y'),
                     'documents' => null
                 ]);
 

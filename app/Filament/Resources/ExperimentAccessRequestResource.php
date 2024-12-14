@@ -176,6 +176,7 @@ class ExperimentAccessRequestResource extends Resource
 
         parent::authorizeAccess();
     }
+
     public static function getRelations(): array
     {
         return [

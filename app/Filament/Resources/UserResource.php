@@ -172,30 +172,9 @@ class UserResource extends Resource
                         return $record->roles->pluck('name')->join(', ');
                     }),
             ])
-            ->modifyQueryUsing(function (Builder $query) {
-                /** @var \App\Models\User */
-                $user = Auth::user();
-
-                if ($user->hasRole('principal_experimenter')) {
-                    // Un principal_experimenter ne voit que les utilisateurs qu'il a créés
-                    $query->where('created_by', $user->id);
-                } elseif ($user->hasRole('supervisor')) {
-                    // Un supervisor ne voit que les principal_experimenters qu'il a créés
-                    $query->whereHas('roles', function ($q) {
-                        $q->where('name', 'principal_experimenter');
-                    })
-                        ->where('created_by', Auth::id());  // Ajout de cette condition
-                } else {
-                    return $query->where('id', 0);
-                }
-            })
             ->actions([
                 EditAction::make(),
-                // DeleteAction::make(),
             ]);
-        // ->bulkActions([
-        //     DeleteBulkAction::make(),
-        // ]);
     }
 
     public static function getRelations(): array
@@ -288,7 +267,10 @@ class UserResource extends Resource
                     $query->whereHas('roles', function ($q) {
                         $q->where('name', 'principal_experimenter');
                     })
-                        ->where('created_by', Auth::id());
+                        ->where(function ($q) {
+                            $q->where('created_by', Auth::id())
+                                ->orWhereNull('created_by');
+                        });
                 }
             });
     }

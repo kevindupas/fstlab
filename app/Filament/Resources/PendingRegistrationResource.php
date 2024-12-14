@@ -104,17 +104,16 @@ class PendingRegistrationResource extends Resource
         ];
     }
 
-    // public static function getNavigationBadge(): ?string
-    // {
-    //     return static::getModel()::whereHas('users', function ($query) {
-    //         $query->where('status', Auth::id());
-    //     })
-    //         ->where('status', 'pending')
-    //         ->count() ?: null;
-    // }
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::where('status', 'pending')
+            ->whereHas('roles', fn($q) => $q->where('name', 'principal_experimenter'))
+            ->count() ?: null;
+    }
 
     public static function getNavigationBadgeColor(): ?string
     {
         return 'warning';
     }
+
 }

@@ -19,8 +19,10 @@ class EditPendingRegistration extends EditRecord
         if ($record->wasChanged('status')) {
             if ($record->status === 'approved') {
                 $record->notify(new RegistrationApproved());
+                $this->redirect($this->getResource()::getUrl('index'));
             } else {
                 $record->notify(new RegistrationRejected($record->rejection_reason));
+                $this->redirect($this->getResource()::getUrl('index'));
             }
         }
     }
