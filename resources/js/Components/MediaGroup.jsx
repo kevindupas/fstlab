@@ -13,7 +13,6 @@ function MediaGroup({
                         isTablet,
                         draggable,
                         groups,
-                        isFinished,
                         cursor,
                         onClick,
                         currentSoundUrl

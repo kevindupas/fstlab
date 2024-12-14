@@ -15,6 +15,7 @@ function KonvaComponent({
     groups = [],
     editingGroupIndex,
     onMediaGroupChange,
+    onInteractionsUpdate
 }) {
     const [stageSize, setStageSize] = useState({
         width: window.innerWidth,
@@ -27,6 +28,7 @@ function KonvaComponent({
     const [mediaItems, setMediaItems] = useState([]);
     const currentAudioRef = useRef(null);
     const [currentSoundUrl, setCurrentSoundUrl] = useState(null);
+    const [mediaInteractions, setMediaInteractions] = useState({});
 
     const getSoundUrl = (item) => {
         const soundExtensions = [".wav", ".mp3", ".ogg", ".m4a", ".aac"];
@@ -91,19 +93,9 @@ function KonvaComponent({
         const item = mediaItems[index];
         const itemSize = parseInt(item.button_size || size);
 
-        // Contraindre X entre 0 et la largeur du stage moins la taille de l'item
-        const newX = Math.max(
-            0,
-            Math.min(e.target.x(), stageSize.width - itemSize)
-        );
+        const newX = Math.max(0, Math.min(e.target.x(), stageSize.width - itemSize));
+        const newY = Math.max(0, Math.min(e.target.y(), stageSize.height - itemSize));
 
-        // Contraindre Y entre 0 et la hauteur du stage moins la taille de l'item
-        const newY = Math.max(
-            0,
-            Math.min(e.target.y(), stageSize.height - itemSize)
-        );
-
-        // Si la position a changé, forcer le repositionnement
         if (e.target.x() !== newX || e.target.y() !== newY) {
             e.target.position({ x: newX, y: newY });
         }
@@ -116,6 +108,7 @@ function KonvaComponent({
 
         onAction({
             id: item.id,
+            type: 'move',  // Ajout du type pour les déplacements
             x: newX,
             y: newY,
             time: Date.now(),
@@ -142,15 +135,36 @@ function KonvaComponent({
 
 
     const handlePlaySound = (url) => {
-        // Toujours arrêter le son actuel
+        if (url) {
+            // Gérer le compteur d'interactions
+            const newInteractions = {
+                ...mediaInteractions,
+                [url]: (mediaInteractions[url] || 0) + 1
+            };
+            setMediaInteractions(newInteractions);
+            onInteractionsUpdate(newInteractions);
+
+            // Ajouter l'action au log
+            const item = mediaItems.find(item => item.url === url);
+            if (item) {
+                onAction({
+                    id: item.id,
+                    type: 'sound',
+                    x: item.x,
+                    y: item.y,
+                    time: Date.now()
+                });
+            }
+        }
+
+        // Reste de la logique de lecture du son
         if (currentAudioRef.current) {
             currentAudioRef.current.pause();
             currentAudioRef.current = null;
             setCurrentSoundUrl(null);
         }
 
-        // Jouer le nouveau son si fourni
-        if (url) {
+        if (url && url !== currentSoundUrl) {
             const audio = new Audio(url);
             currentAudioRef.current = audio;
             audio.play().catch((err) => console.error("Erreur audio:", err));
@@ -169,7 +183,27 @@ function KonvaComponent({
     }, []);
 
     const handleShowImage = (url) => {
-        // Si un son est en cours, on l'arrête
+        // Gérer le compteur d'interactions
+        const newInteractions = {
+            ...mediaInteractions,
+            [url]: (mediaInteractions[url] || 0) + 1
+        };
+        setMediaInteractions(newInteractions);
+        onInteractionsUpdate(newInteractions);
+
+        // Ajouter l'action au log
+        const item = mediaItems.find(item => item.url === url);
+        if (item) {
+            onAction({
+                id: item.id,
+                type: 'image',
+                x: item.x,
+                y: item.y,
+                time: Date.now()
+            });
+        }
+
+        // Reste de la logique d'affichage de l'image
         if (currentAudioRef.current) {
             currentAudioRef.current.pause();
             currentAudioRef.current = null;

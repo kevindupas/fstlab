@@ -27,6 +27,7 @@ function ExperimentSession() {
     const [startTime, setStartTime] = useState(Date.now());
     const [elapsedTime, setElapsedTime] = useState(0);
     const [actionsLog, setActionsLog] = useState([]);
+    const [mediaInteractions, setMediaInteractions] = useState({});
     const [currentMediaItems, setCurrentMediaItems] = useState([]);
     const [editingGroupIndex, setEditingGroupIndex] = useState(null);
 
@@ -41,6 +42,11 @@ function ExperimentSession() {
     const handleEditModeChange = (groupIndex) => {
         setEditingGroupIndex(groupIndex);
     };
+
+    const handleInteractionsUpdate = (interactions) => {
+        setMediaInteractions(interactions);
+    };
+
 
     // Vérification initiale et chargement
     useEffect(() => {
@@ -193,13 +199,19 @@ function ExperimentSession() {
             let foundCluster = false;
             for (let cluster of clustersMap) {
                 if (cluster.some((g) => getDistance(g, item) < threshold)) {
-                    cluster.push(item);
+                    cluster.push({
+                        ...item,
+                        interactions: mediaInteractions[item.url] || 0
+                    });
                     foundCluster = true;
                     break;
                 }
             }
             if (!foundCluster) {
-                clustersMap.push([item]);
+                clustersMap.push([{
+                    ...item,
+                    interactions: mediaInteractions[item.url] || 0
+                }]);
             }
         });
 
@@ -221,7 +233,7 @@ function ExperimentSession() {
 
         setGroups(preparedGroups);
         setIsFinished(true);
-    }, [currentMediaItems, startTime]);
+    }, [currentMediaItems, mediaInteractions]);
 
     const updateActionsLog = useCallback((newAction) => {
         setActionsLog((prevLog) => [...prevLog, newAction]);
@@ -357,15 +369,11 @@ function ExperimentSession() {
                         <div className="flex-1 xl:flex">
                             <KonvaComponent
                                 media={media}
-                                buttonColor={
-                                    experiment?.experiment?.button_color ||
-                                    "#3B82F6"
-                                }
-                                size={
-                                    experiment?.experiment?.button_size || 100
-                                }
+                                buttonColor={experiment?.experiment?.button_color || "#3B82F6"}
+                                size={experiment?.experiment?.button_size || 100}
                                 onAction={updateActionsLog}
                                 onMediaItemsChange={updateMediaItems}
+                                onInteractionsUpdate={handleInteractionsUpdate}
                                 isFinished={isFinished}
                                 groups={groups}
                                 editingGroupIndex={editingGroupIndex}
