@@ -86,22 +86,21 @@ class ExperimentSessionDetails extends Page
                 Section::make('Feedback et Notes')
                     ->schema([
                         TextEntry::make('feedback')
-                            ->label('Feedback du participant'),
+                            ->label('Feedback du participant')
+                            ->formatStateUsing(fn ($state) => $state ?: 'N/A'),
                         TextEntry::make('errors_log')
                             ->label('Erreurs rapportées')
                             ->formatStateUsing(function ($state) {
-                                if (!$state) return 'Aucune erreur';
+                                if (!$state) return null;
                                 $errors = json_decode($state);
+                                if (empty($errors)) return null;
                                 return collect($errors)->map(function ($error) {
                                     $time = \Carbon\Carbon::createFromTimestampMs($error->time)->format('H:i:s');
                                     return "Erreur {$error->type} à {$time}";
                                 })->join('<br>');
                             })
-                            ->html(),
-                        // Notes visibles uniquement pour le créateur
-                        TextEntry::make('notes')
-                            ->label('Notes de l\'examinateur')
-                            ->visible(fn() => $this->isCreator),
+                            ->hidden(fn ($state) => !$state || empty(json_decode($state)))
+                            ->html()
                     ]),
             ]);
     }
@@ -114,8 +113,9 @@ class ExperimentSessionDetails extends Page
             'actionsLog' => collect(json_decode($this->record->actions_log))->map(function ($action) {
                 return [
                     'id' => $action->id,
-                    'x' => $action->x,
-                    'y' => $action->y,
+                    'type' => $action->type ?? 'move',
+                    'x' => $action->x ?? null,
+                    'y' => $action->y ?? null,
                     'time' => \Carbon\Carbon::createFromTimestampMs($action->time)->format('H:i:s.v'),
                 ];
             })
