@@ -6,6 +6,7 @@ use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugi
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Auth\Register;
 use App\Filament\Pages\ContactAdmin;
+use App\Filament\Pages\Experiments\Sessions\ExperimentSessionExport;
 use App\Filament\Pages\Experiments\Sessions\ExperimentSessions;
 use App\Filament\Widgets\BannedUserWidget;
 use App\Filament\Widgets\DashboardStatsWidget;
@@ -14,6 +15,7 @@ use App\Filament\Widgets\ExperimentTableWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -25,9 +27,11 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Kenepa\ResourceLock\ResourceLockPlugin;
 use Leandrocfe\FilamentApexCharts\FilamentApexChartsPlugin;
+use Illuminate\Support\Facades\Route;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -65,7 +69,26 @@ class AdminPanelProvider extends PanelProvider
                 Pages\Dashboard::class,
                 ExperimentSessions::class,
                 ContactAdmin::class,
+                ExperimentSessionExport::class,
             ])
+            ->renderHook(
+                'panels::global-search.after',
+                fn (): string => Blade::render(<<<HTML
+                <div class="flex items-center">
+                    <a href="/" class="bg-green-400 flex items-center gap-2 px-3 py-2 text-sm font-medium text-black dark:text-white hover:text-primary-500 focus:outline-none">
+                        <x-heroicon-o-home class="w-5 h-5" />
+                        Accueil
+                    </a>
+                </div>
+            HTML)
+            )
+            ->userMenuItems([
+                'profile' => MenuItem::make()->label('Edit profile'),
+            ])
+            ->routes(function () {
+                Route::get('experiment-session-export/{record}', ExperimentSessionExport::class)
+                    ->name('filament.admin.pages.experiment-session-export');
+            })
             ->viteTheme('resources/css/filament/admin/theme.css')
             // ->viteTheme('resources/css/app.css')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')

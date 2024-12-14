@@ -29,7 +29,21 @@ class ExperimentSeeder extends Seeder
     public function run()
     {
         // Récupère uniquement les principaux expérimentateurs approuvés
-        $principalExperimenters = User::role('principal_experimenter')->where('status', 'approved')->get();
+        if (empty($this->imageFiles) || empty($this->soundFiles)) {
+            $this->command->error('Les fichiers médias sont manquants !');
+            return;
+        }
+
+        // Récupère les expérimentateurs principaux
+        $principalExperimenters = User::role('principal_experimenter')
+            ->where('status', 'approved')
+            ->get();
+
+        if ($principalExperimenters->isEmpty()) {
+            $this->command->error('Aucun expérimentateur principal trouvé !');
+            return;
+        }
+
         $experimentTypes = ['image', 'sound', 'image_sound'];
         $statuses = ['none', 'start', 'pause', 'stop'];
 

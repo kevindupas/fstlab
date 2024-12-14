@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\ExperimentApiController;
+use App\Http\Controllers\Api\HowItWorkApiController;
 use App\Http\Controllers\Api\ExperimentSessionApiController;
 use App\Http\Controllers\Api\TranslationController;
 use Illuminate\Support\Facades\Route;
@@ -11,6 +12,8 @@ Route::get('/translations/{locale}', [TranslationController::class, 'getTranslat
 // Récupérer la liste des expériences
 Route::get('/experiments', [ExperimentApiController::class, 'index']);
 Route::get('/experiment/{id}', [ExperimentApiController::class, 'show']);
+
+Route::get('/howitwork/experiments', [HowItWorkApiController::class, 'getTestExperiments']);
 
 // api.php
 

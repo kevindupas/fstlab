@@ -23,11 +23,13 @@ class Experiment extends Model
         'doi',
         'instruction',
         'documents',
+        'howitwork_page'
     ];
 
     protected $casts = [
         'media' => 'array',
         'documents' => 'array',
+        'howitwork_page' => 'boolean',
     ];
 
     public function users()

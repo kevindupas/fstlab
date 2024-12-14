@@ -10,7 +10,10 @@ class UserSeeder extends Seeder
 {
     public function run()
     {
-        // Create supervisor - TOUJOURS avec le statut 'approved'
+        // Désactiver temporairement l'Observer
+        User::unsetEventDispatcher();
+
+        // Create supervisor
         $supervisor = User::create([
             'name' => 'Supervisor User',
             'email' => 'supervisor@example.com',
@@ -18,15 +21,13 @@ class UserSeeder extends Seeder
             'university' => 'Supervisory University',
             'registration_reason' => 'Overseeing research operations',
             'orcid' => null,
-            'status' => 'approved', // Explicitement 'approved'
-            'created_by' => null // Le superviseur n'a pas de créateur
+            'status' => 'approved',
+            'created_by' => null
         ]);
         $supervisor->assignRole('supervisor');
 
         $principals = [];
         for ($i = 1; $i <= 4; $i++) {
-            $status = $i % 2 == 0 ? 'pending' : 'approved';
-
             $principal = User::create([
                 'name' => "Principal Experimenter $i",
                 'email' => "principal$i@example.com",
@@ -34,18 +35,14 @@ class UserSeeder extends Seeder
                 'university' => "Principal University $i",
                 'registration_reason' => "Conducting primary research in field $i",
                 'orcid' => null,
-                'status' => $status,
+                'status' => 'approved', // Tous approuvés pour le seeding
                 'created_by' => $supervisor->id
             ]);
             $principal->assignRole('principal_experimenter');
-
-            // Only add approved principals to the list for creating secondary experimenters
-            if ($status === 'approved') {
-                $principals[] = $principal;
-            }
+            $principals[] = $principal;
         }
 
-        // Create secondary experimenters only for approved principal experimenters
+        // Create secondary experimenters
         for ($i = 1; $i <= 10; $i++) {
             // Skip if no approved principals
             if (empty($principals)) break;

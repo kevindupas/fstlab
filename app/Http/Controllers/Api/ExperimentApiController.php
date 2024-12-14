@@ -17,6 +17,7 @@ class ExperimentApiController extends Controller
     public function index()
     {
         $experiments = Experiment::with('creator')
+            ->where('status', '!=', 'test')
             ->withCount(['sessions as completed_sessions_count' => function ($query) {
                 $query->whereNotNull('completed_at');
             }])
@@ -35,10 +36,12 @@ class ExperimentApiController extends Controller
         return response()->json($experiments);
     }
 
+
     public function show($id)
     {
         try {
             $experiment = Experiment::with(['creator'])
+                ->where('status', '!=', 'test')  // Exclusion des expériences en test
                 ->withCount('completed_sessions')
                 ->findOrFail($id);
 

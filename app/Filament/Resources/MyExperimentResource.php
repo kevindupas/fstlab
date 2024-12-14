@@ -49,82 +49,111 @@ class MyExperimentResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $user = Auth::user();
         return $form->schema([
-            Forms\Components\TextInput::make('doi')
-                ->label(__('filament.resources.my_experiment.form.doi'))
-                ->required()
-                ->unique(ignorable: fn($record) => $record),
-            Forms\Components\Select::make('status')
-                ->options([
-                    'none' => __('filament.resources.my_experiment.form.status.options.none'),
-                    'test' => __('filament.resources.my_experiment.form.status.options.test'),
-                    'start' => __('filament.resources.my_experiment.form.status.options.start'),
-                ])
-                ->label(__('filament.resources.my_experiment.form.status.label'))
-                ->default('none')
-                ->live()
-                ->afterStateUpdated(function ($state, $set, $record) {
-                    if (in_array($state, ['start', 'test'])) {
-                        $link = Str::random(6);
-                        $set('link', $link);
-                    } else {
-                        $set('link', null);
-                    }
-                }),
+            Forms\Components\Section::make('Configuration de base')
+                ->description('Paramètres principaux de votre expérimentation')
+                ->schema([
+                    Forms\Components\TextInput::make('doi')
+                        ->label('DOI')
+                        ->helperText('Le digital object identifier (DOI) est un mécanisme d\'identification de ressources stable, unique pour votre expérimentation.')
+                        ->unique(ignorable: fn($record) => $record),
 
-            Forms\Components\TextInput::make('link')
-                ->label(__('filament.resources.my_experiment.form.link.label'))
-                ->extraAttributes(function ($state) {
-                    $fullUrl = url("/experiment/" . $state);
-                    return [
-                        'x-on:click' => 'window.navigator.clipboard.writeText("' . $fullUrl . '"); $tooltip("Copié dans le presse-papier", { timeout: 1500 });',
-                    ];
-                })
-                ->suffixAction(
-                    Forms\Components\Actions\Action::make('copy')
-                        ->icon('heroicon-m-clipboard')
-                )
-                ->visible(fn($get) => in_array($get('status'), ['start', 'test']))
-                ->default(fn($record) => $record?->link)
-                ->formatStateUsing(fn($state) => $state ? url("/experiment/" . $state) : '')
-                ->disabled()
-                ->columnSpan('full'),
+                    Forms\Components\Toggle::make('howitwork_page')
+                        ->label('Afficher sur How It Work')
+                        ->helperText('Si activé, l\'expérimentation en mode "test" sera visible sur la page How It Work. Désactivé automatiquement si le status change.')
+                        ->visible(fn () => $user->hasRole('supervisor')),
 
-            Forms\Components\Grid::make()
+                    Forms\Components\Select::make('status')
+                        ->options([
+                            'none' => __('filament.resources.my_experiment.form.status.options.none'),
+                            'test' => __('filament.resources.my_experiment.form.status.options.test'),
+                            'start' => __('filament.resources.my_experiment.form.status.options.start'),
+                        ])
+                        ->label('Démarrer l\'expérience')
+                        ->helperText('Mode "test" pour essayer sans sauvegarder de résultats. Mode "start" pour démarrer réellement l\'expérience.')
+                        ->default('none')
+                        ->live()
+                        ->afterStateUpdated(function ($state, $set, $record) {
+                            if (in_array($state, ['start', 'test'])) {
+                                $link = Str::random(6);
+                                $set('link', $link);
+                            } else {
+                                $set('link', null);
+                            }
+
+                            // Désactiver howitwork_page si ce n'est pas en mode test
+                            if ($state !== 'test') {
+                                $set('howitwork_page', false);
+                            }
+                        }),
+
+                    Forms\Components\TextInput::make('link')
+                        ->label('Lien de l\'expérience')
+                        ->helperText('Lien unique pour accéder à votre expérience. Cliquez pour copier.')
+                        ->extraAttributes(function ($state) {
+                            $fullUrl = url("/experiment/" . $state);
+                            return [
+                                'x-on:click' => 'window.navigator.clipboard.writeText("' . $fullUrl . '"); $tooltip("Copié dans le presse-papier", { timeout: 1500 });',
+                            ];
+                        })
+                        ->suffixAction(
+                            Forms\Components\Actions\Action::make('copy')
+                                ->icon('heroicon-m-clipboard')
+                        )
+                        ->visible(fn($get) => in_array($get('status'), ['start', 'test']))
+                        ->default(fn($record) => $record?->link)
+                        ->formatStateUsing(fn($state) => $state ? url("/experiment/" . $state) : '')
+                        ->disabled()
+                        ->columnSpan('full'),
+                ])->collapsible(),
+
+            Forms\Components\Section::make('Informations générales')
+                ->description('Définissez les caractéristiques principales de votre expérience')
                 ->schema([
                     Forms\Components\TextInput::make('name')
-                        ->label(__('filament.resources.my_experiment.form.name'))
-                        ->required()
-                        ->unique(ignorable: fn($record) => $record),
+                        ->label('Nom')
+                        ->helperText('Donnez un nom unique et descriptif à votre expérimentation')
+                        ->required(),
+                        //->unique(ignorable: fn($record) => $record),
+
                     Forms\Components\Select::make('type')
-                        ->label(__('filament.resources.my_experiment.form.type.label'))
+                        ->label('Type de médias')
+                        ->helperText('Choisissez le type de médias pour votre expérience. Cela déterminera les types de fichiers que vous pourrez uploader.')
                         ->options([
-                            'image' => __('filament.resources.my_experiment.form.type.options.image'),
-                            'sound' => __('filament.resources.my_experiment.form.type.options.sound'),
-                            'image_sound' => __('filament.resources.my_experiment.form.type.options.image_sound'),
+                            'image' => 'Images uniquement',
+                            'sound' => 'Sons uniquement',
+                            'image_sound' => 'Images et sons',
                         ])
                         ->reactive()
                         ->required(),
+                ])->collapsible(),
+
+            Forms\Components\Section::make('Apparence')
+                ->description('Personnalisez l\'apparence des boutons dans votre expérience')
+                ->schema([
                     Forms\Components\TextInput::make('button_size')
-                        ->label(__('filament.resources.my_experiment.form.button_size.label'))
-                        ->placeholder(__('filament.resources.my_experiment.form.button_size.placeholder'))
+                        ->label('Taille des boutons')
+                        ->helperText('La taille minimale recommandée est de 60px pour une bonne ergonomie')
                         ->numeric()
                         ->default('60')
                         ->extraAttributes(["step" => "1"])
                         ->minValue(60)
                         ->maxValue(100)
                         ->suffix('px'),
-                    Forms\Components\ColorPicker::make('button_color')
-                        ->label(__('filament.resources.my_experiment.form.button_color.label'))
-                        ->placeholder(__('filament.resources.my_experiment.form.button_color.placeholder'))
-                        ->default('#ff1414'),
-                ])
-                ->columns(2),
 
-            Forms\Components\Grid::make()
+                    Forms\Components\ColorPicker::make('button_color')
+                        ->label('Couleur des boutons')
+                        ->helperText('Choisissez une couleur visible pour les boutons de sons')
+                        ->default('#ff1414'),
+                ])->collapsible(),
+
+            Forms\Components\Section::make('Contenu')
+                ->description('Décrivez votre expérience et fournissez les instructions nécessaires')
                 ->schema([
                     Forms\Components\RichEditor::make('description')
-                        ->label(__('filament.resources.my_experiment.form.description'))
+                        ->label('Description')
+                        ->helperText('Décrivez les enjeux de votre expérimentation. Cette description sera visible publiquement.')
                         ->disableToolbarButtons([
                             'blockquote',
                             'strike',
@@ -132,29 +161,30 @@ class MyExperimentResource extends Resource
                             'attachFiles'
                         ])
                         ->columnSpan('full'),
+
                     Forms\Components\MarkdownEditor::make('instruction')
-                        ->label(__('filament.resources.my_experiment.form.instruction'))
-                        ->toolbarButtons([
-                            'blockquote',
-                            'bold',
-                            'bulletList',
-                            'codeBlock',
-                            'heading',
-                            'italic',
-                            'link',
-                            'orderedList',
-                            'redo',
-                            'strike',
-                            'table',
-                            'undo',
-                        ])
+                        ->label('Instructions')
+                        ->helperText('Fournissez des instructions claires pour les participants.')
                         ->columnSpan('full'),
+                ])->collapsible(),
+
+            Forms\Components\Section::make('Médias')
+                ->description('Ajoutez vos fichiers médias (limite de 20Mo par fichier)')
+                ->schema([
+                    // Les trois composants FileUpload existants avec maxFileSize
                     Forms\Components\FileUpload::make('media')
                         ->label(__('filament.resources.my_experiment.form.media'))
+                        ->helperText('Formats audio acceptés : MP3, WAV, AAC, OGG (max 20Mo)')
                         ->multiple()
+                        ->maxSize(20000)
                         ->disk('public')
                         ->visibility('public')
-                        ->acceptedFileTypes(['audio/*'])
+                        ->acceptedFileTypes([
+                            'audio/mpeg',        // MP3
+                            'audio/wav',         // WAV
+                            'audio/aac',         // AAC
+                            'audio/ogg',         // OGG
+                        ])
                         ->minFiles(2)
                         ->maxFiles(30)
                         ->directory('experiments/audio')
@@ -164,15 +194,23 @@ class MyExperimentResource extends Resource
                         )
                         ->columnSpan('full')
                         ->visible(fn($get) => $get('type') === 'sound'),
+
                     Forms\Components\FileUpload::make('media')
                         ->label(__('filament.resources.my_experiment.form.media'))
+                        ->helperText('Formats image acceptés : JPG, JPEG, PNG, GIF, WebP (max 20Mo)')
                         ->multiple()
+                        ->maxSize(20000)
                         ->disk('public')
                         ->visibility('public')
-                        ->acceptedFileTypes(['image/*'])
+                        ->acceptedFileTypes([
+                            'image/jpeg',        // JPG, JPEG
+                            'image/png',         // PNG
+                            'image/gif',         // GIF
+                            'image/webp',        // WebP
+                        ])
                         ->imagePreviewHeight('250')
-                        ->imageEditor()
-                        ->imageEditorMode(2)
+                        //->imageEditor()
+                        //->imageEditorMode(2)
                         ->preserveFilenames()
                         ->directory('experiments/images')
                         ->getUploadedFileNameForStorageUsing(
@@ -185,25 +223,42 @@ class MyExperimentResource extends Resource
                         ->visible(fn($get) => $get('type') === 'image'),
                     Forms\Components\FileUpload::make('media')
                         ->label(__('filament.resources.my_experiment.form.media'))
+                        ->helperText('Formats acceptés : JPG, JPEG, PNG, GIF, WebP, MP3, WAV, AAC, OGG (max 20Mo)')
                         ->multiple()
+                        ->maxSize(20000)
                         ->disk('public')
                         ->visibility('public')
-                        ->acceptedFileTypes(['image/*', 'audio/*'])
-                        ->imagePreviewHeight('250')
-                        ->imageEditor()
+                        ->acceptedFileTypes([
+                            'image/jpeg',        // JPG, JPEG
+                            'image/png',         // PNG
+                            'image/gif',         // GIF
+                            'image/webp',        // WebP
+                            'audio/mpeg',        // MP3
+                            'audio/wav',         // WAV
+                            'audio/aac',         // AAC
+                            'audio/ogg',         // OGG
+                        ])
+                        //->imagePreviewHeight('250')
+                        //->imageEditor()
                         ->preserveFilenames()
                         ->directory('experiments/mixed')
                         ->getUploadedFileNameForStorageUsing(
                             fn(TemporaryUploadedFile $file): string => (string) str($file->getClientOriginalName())
                                 ->prepend(now()->format('Y-m-d-His') . "-"),
                         )
-                        ->imageEditorMode(2)
                         ->minFiles(2)
                         ->maxFiles(30)
                         ->columnSpan('full')
                         ->visible(fn($get) => $get('type') === 'image_sound'),
+                ])->collapsible(),
+
+            Forms\Components\Section::make('Documents complémentaires')
+                ->description('Ajoutez des documents supplémentaires liés à votre expérience')
+                ->schema([
                     Forms\Components\FileUpload::make('documents')
-                        ->label(__('filament.resources.my_experiment.form.documents'))
+                        ->label('Documents')
+                        ->helperText('Formats acceptés : PDF, JPG, JPEG, PNG (max 20Mo)')
+                        ->maxSize(20000) // 20Mo
                         ->multiple()
                         ->preserveFilenames()
                         ->directory('experiments/documents')
@@ -211,17 +266,21 @@ class MyExperimentResource extends Resource
                             fn(TemporaryUploadedFile $file): string => (string) str($file->getClientOriginalName())
                                 ->prepend(now()->format('Y-m-d-His') . "-"),
                         )
-                        ->acceptedFileTypes(['image/*', 'application/pdf'])
+                        ->acceptedFileTypes([
+                            'application/pdf',   // PDF
+                            'image/jpeg',        // JPG, JPEG
+                            'image/png',         // PNG
+                        ])
                         ->maxFiles(20)
                         ->columnSpan('full')
-                ])
-
-                ->columnSpan('full'),
+                ])->collapsible(),
         ]);
     }
 
     public static function table(Table $table): Table
     {
+        $user = Auth::user();
+        $isSupevisor = $user->hasRole('supervisor');
         return $table
             ->query(
                 static::getEloquentQuery()
@@ -249,6 +308,14 @@ class MyExperimentResource extends Resource
                         'stop' => 'danger',
                         'test' => 'info',
                     }),
+                Tables\Columns\IconColumn::make('howitwork_page')
+                    ->label('How It Work')
+                    ->visible(fn() => $isSupevisor)
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('filament.resources.my_experiment.table.columns.created_at'))
                     ->dateTime()
@@ -298,8 +365,14 @@ class MyExperimentResource extends Resource
                                         $record->link = null;
                                         $set('link', 'No active session');
                                     }
+
+                                    if ($state !== 'test') {
+                                        $record->howitwork_page = false;
+                                    }
+                                    
                                     $record->status = $state;
                                     $record->save();
+
                                 }),
                             Placeholder::make('Informations')
                                 ->content(new HtmlString(
