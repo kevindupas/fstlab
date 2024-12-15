@@ -180,10 +180,7 @@ class MyExperimentResource extends Resource
                         ->disk('public')
                         ->visibility('public')
                         ->acceptedFileTypes([
-                            'audio/mpeg',        // MP3
-                            'audio/wav',         // WAV
-                            'audio/aac',         // AAC
-                            'audio/ogg',         // OGG
+                            'audio/*',
                         ])
                         ->minFiles(2)
                         ->maxFiles(30)
@@ -203,10 +200,7 @@ class MyExperimentResource extends Resource
                         ->disk('public')
                         ->visibility('public')
                         ->acceptedFileTypes([
-                            'image/jpeg',        // JPG, JPEG
-                            'image/png',         // PNG
-                            'image/gif',         // GIF
-                            'image/webp',        // WebP
+                            'image/*',
                         ])
                         ->imagePreviewHeight('250')
                         //->imageEditor()
@@ -229,14 +223,8 @@ class MyExperimentResource extends Resource
                         ->disk('public')
                         ->visibility('public')
                         ->acceptedFileTypes([
-                            'image/jpeg',        // JPG, JPEG
-                            'image/png',         // PNG
-                            'image/gif',         // GIF
-                            'image/webp',        // WebP
-                            'audio/mpeg',        // MP3
-                            'audio/wav',         // WAV
-                            'audio/aac',         // AAC
-                            'audio/ogg',         // OGG
+                            'image/*',
+                            'audio/*',
                         ])
                         //->imagePreviewHeight('250')
                         //->imageEditor()
@@ -369,7 +357,7 @@ class MyExperimentResource extends Resource
                                     if ($state !== 'test') {
                                         $record->howitwork_page = false;
                                     }
-                                    
+
                                     $record->status = $state;
                                     $record->save();
 
