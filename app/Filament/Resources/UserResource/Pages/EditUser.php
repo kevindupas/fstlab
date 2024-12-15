@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Gate;
@@ -55,15 +56,13 @@ class EditUser extends EditRecord
     {
         $user = $this->record;
 
-
-        Log::info('User status changed', [
-            'status' => $user->status,
-            'banned_reason' => $user->banned_reason,
-            'status_changed' => $user->wasChanged('status'),
-        ]);
-
         if ($user->wasChanged('status') && $user->status === 'banned' && $user->banned_reason) {
             $user->notify(new UserBanned($user->banned_reason));
+            $this->redirect($this->getResource()::getUrl('index'));
+            Notification::make()
+                ->title(__('Banni avec succès'))
+                ->warning()
+                ->send();
         }
     }
 }

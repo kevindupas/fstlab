@@ -54,18 +54,13 @@ class ContactAdmin extends Page
                     ->placeholder(__('filament.resources.my_experiment.form.description_placeholder'))
                     ->required()
                     ->toolbarButtons([
-                        'blockquote',
                         'bold',
                         'bulletList',
-                        'codeBlock',
-                        'heading',
+                        'orderedList',
                         'italic',
                         'link',
-                        'orderedList',
-                        'redo',
-                        'strike',
-                        'table',
                         'undo',
+                        'redo',
                     ])
                     ->columnSpan('full'),
             ])

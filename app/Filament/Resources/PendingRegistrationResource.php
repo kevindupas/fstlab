@@ -24,6 +24,16 @@ class PendingRegistrationResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $navigationLabel = 'Demandes d\'inscription';
 
+    public static function getModelLabel(): string
+    {
+        return __('Demande d\'inscription');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Demandes d\'inscription');
+    }
+
     public static function shouldRegisterNavigation(): bool
     {
         /** @var \App\Models\User */

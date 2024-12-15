@@ -2,11 +2,13 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Pages\ContactUser;
+use App\Filament\Pages\Experiments\Details\ExperimentDetails;
 use App\Filament\Resources\UserResource\Pages;
+use App\Models\Experiment;
 use App\Models\User;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
-use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -15,9 +17,9 @@ use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Components\TextEntry;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
@@ -28,7 +30,17 @@ class UserResource extends Resource
     protected static ?string $navigationGroup = 'Users';
     protected static ?int $navigationSort = -1;
     protected static ?string $navigationIcon = 'heroicon-o-user';
-    protected static ?string $navigationLabel = 'Utilisateurs';
+    protected static ?string $navigationLabel = 'Utilisateurs Approuvés';
+
+    public static function getModelLabel(): string
+    {
+        return __('Utilisateur Approuvé');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Utilisateurs Approuvés');
+    }
 
     public static function form(Form $form): Form
     {
@@ -48,7 +60,6 @@ class UserResource extends Resource
 
         return $form
             ->schema([
-
                 TextInput::make('name')
                     ->required()
                     ->maxLength(255)
@@ -156,8 +167,10 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
-                TextColumn::make('email'),
+                TextColumn::make('name')->searchable()
+                    ->sortable(),
+                TextColumn::make('email')->searchable()
+                    ->sortable(),
                 TextColumn::make('status')
                     ->label(__('filament.resources.my_experiment.table.columns.status'))
                     ->badge()
@@ -173,7 +186,20 @@ class UserResource extends Resource
                     }),
             ])
             ->actions([
-                EditAction::make(),
+                Tables\Actions\Action::make('contact')
+                    ->label('Contact')
+                    ->icon('heroicon-o-envelope')
+                    ->color('warning')
+                    ->url(fn (User $record) => "/admin/contact-user?user={$record->id}"),
+                Tables\Actions\Action::make('experiments')
+                    ->label('Voir les expériences')
+                    ->icon('heroicon-o-beaker')
+                    ->color('info')
+                    ->url(fn (User $record) => "/admin/experiments-list?filter_user={$record->id}"),
+                EditAction::make()->label('Détails')->icon('heroicon-o-eye'),
+            ])
+            ->bulkActions([
+                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 

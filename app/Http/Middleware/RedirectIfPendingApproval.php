@@ -10,11 +10,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RedirectIfPendingApproval
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next)
     {
         if (Auth::check() && Auth::user()?->status === 'pending') {
@@ -23,9 +18,10 @@ class RedirectIfPendingApproval
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            return redirect()
-                ->route('filament.admin.auth.login')
-                ->with('warning', 'Votre compte est en attente d\'approbation. Vous recevrez un email dès que votre compte sera validé.');
+            $redirect = redirect()->route('filament.admin.auth.login');
+            $redirect->with(['warning' => 'Votre compte est en attente d\'approbation. Vous recevrez un email dès que votre compte sera validé.']);
+
+            return $redirect;
         }
 
         return $next($request);

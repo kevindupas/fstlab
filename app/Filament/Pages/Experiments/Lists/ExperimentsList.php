@@ -2,9 +2,12 @@
 
 namespace App\Filament\Pages\Experiments\Lists;
 
+use App\Filament\Pages\ContactUser;
 use App\Filament\Pages\Experiments\Details\ExperimentDetails;
 use App\Models\Experiment;
+use App\Models\User;
 use App\Traits\HasExperimentAccess;
+use Filament\Actions\Action;
 use Filament\Pages\Page;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -25,6 +28,8 @@ class ExperimentsList extends Page implements HasTable
     protected static ?int $navigationSort = 1;
 
     protected static string $view = 'filament.pages.experiments.lists.experiments-list';
+
+    protected static ?string $title = "Liste des Expérimentations";
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -51,6 +56,11 @@ class ExperimentsList extends Page implements HasTable
                     ])
                     ->with(['creator']);
 
+                // Si un filtre utilisateur est présent
+                if ($userId = request()->query('filter_user')) {
+                    $query->where('created_by', $userId);
+                    return $query;
+                }
                 /** @var \App\Models\User */
                 $user = Auth::user();
 
@@ -104,7 +114,6 @@ class ExperimentsList extends Page implements HasTable
                     ->sortable(),
             ])
             ->actions([
-
                 Tables\Actions\Action::make('view')
                     ->label('Voir l\'expérimentation')
                     ->icon('heroicon-o-eye')
@@ -118,6 +127,13 @@ class ExperimentsList extends Page implements HasTable
 
     protected function getHeaderActions(): array
     {
-        return [];
+        return [
+            Action::make('clearFilter')
+                ->label('Retirer le filtre')
+                ->icon('heroicon-o-x-mark')
+                ->color('danger')
+                ->url('/admin/experiments-list')
+                ->visible(fn() => request()->has('filter_user')),
+        ];
     }
 }

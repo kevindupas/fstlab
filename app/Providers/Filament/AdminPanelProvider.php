@@ -6,6 +6,7 @@ use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugi
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Auth\Register;
 use App\Filament\Pages\ContactAdmin;
+use App\Filament\Pages\ContactUser;
 use App\Filament\Pages\Experiments\Sessions\ExperimentSessionExport;
 use App\Filament\Pages\Experiments\Sessions\ExperimentSessions;
 use App\Filament\Widgets\BannedUserWidget;
@@ -70,6 +71,7 @@ class AdminPanelProvider extends PanelProvider
                 ExperimentSessions::class,
                 ContactAdmin::class,
                 ExperimentSessionExport::class,
+                ContactUser::class,
             ])
             ->renderHook(
                 'panels::global-search.after',
@@ -88,6 +90,8 @@ class AdminPanelProvider extends PanelProvider
             ->routes(function () {
                 Route::get('experiment-session-export/{record}', ExperimentSessionExport::class)
                     ->name('filament.admin.pages.experiment-session-export');
+                Route::get('contact-user/{user}/{experiment?}', ContactUser::class)
+                    ->name('filament.admin.pages.contact-user');
             })
             ->viteTheme('resources/css/filament/admin/theme.css')
             // ->viteTheme('resources/css/app.css')

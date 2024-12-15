@@ -22,6 +22,17 @@ class BannedUsersResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-no-symbol';
     protected static ?string $navigationLabel = 'Utilisateurs bannis';
 
+    public static function getModelLabel(): string
+    {
+        return __('Utilisateur banni');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Utilisateurs bannis');
+    }
+
+
     public static function shouldRegisterNavigation(): bool
     {
         /** @var \App\Models\User */
@@ -68,9 +79,9 @@ class BannedUsersResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Nom'),
+                    ->label('Nom')->searchable(),
                 Tables\Columns\TextColumn::make('email')
-                    ->label('Email'),
+                    ->label('Email')->searchable(),
                 Tables\Columns\TextColumn::make('university')
                     ->label('Université'),
                 Tables\Columns\TextColumn::make('created_at')

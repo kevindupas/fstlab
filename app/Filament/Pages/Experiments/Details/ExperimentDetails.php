@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages\Experiments\Details;
 
+use App\Filament\Pages\ContactUser;
 use App\Filament\Pages\Experiments\Lists\ExperimentsList;
 use App\Models\Experiment;
 use App\Models\User;
@@ -11,9 +12,7 @@ use Filament\Pages\Page;
 use Filament\Infolists\Infolist;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\Section;
-use Filament\Support\Colors\Color;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\HtmlString;
 
 class ExperimentDetails extends Page
@@ -21,6 +20,8 @@ class ExperimentDetails extends Page
     protected static string $view = 'filament.pages.experiments.details.experiment-details';
     protected static bool $shouldRegisterNavigation = false;
     protected static ?string $slug = 'experiment-details/{record}';
+
+    protected static ?string $title = "Détails de l'expérimentation";
 
     public Experiment $record;
 
@@ -312,6 +313,12 @@ class ExperimentDetails extends Page
                     // Rediriger vers la liste des expérimentations
                     $this->redirect(ExperimentsList::getUrl());
                 }),
+            \Filament\Actions\Action::make('contactUs')
+                ->label('Contacter l\'expérimentateur')
+                ->color('info')
+                ->icon('heroicon-o-envelope')
+                ->url("/admin/contact-user?user={$this->record->created_by}&experiment={$this->record->id}")
+                ->hidden(fn() => User::find($this->record->created_by)->hasRole('supervisor'))
         ];
     }
 }

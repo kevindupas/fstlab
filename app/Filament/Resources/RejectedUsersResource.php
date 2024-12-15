@@ -24,6 +24,16 @@ class RejectedUsersResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-user-minus';
     protected static ?string $navigationLabel = 'Utilisateurs rejetés';
 
+    public static function getModelLabel(): string
+    {
+        return __('Utilisateur rejeté');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Utilisateurs rejetés');
+    }
+
     public static function shouldRegisterNavigation(): bool
     {
         /** @var \App\Models\User */

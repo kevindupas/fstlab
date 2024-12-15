@@ -412,11 +412,18 @@ function ExperimentSession() {
                                         "experimentSession.session.quit_session"
                                     )}
                                 </h2>
-                                <p className="text-gray-600 mb-6">
-                                    Vous pouvez soit sauvegarder votre session
-                                    pour continuer plus tard, soit la supprimer
-                                    définitivement.
-                                </p>
+                                {isTestMode ? (
+                                    <p className="text-gray-600 mb-6">
+                                        Vous êtes actuellement en mode test. Aucune donnée ne sera sauvegardée, et cette
+                                        session est utilisée uniquement à des fins de démonstration.
+                                    </p>
+                                ) : (
+                                    <p className="text-gray-600 mb-6">
+                                        Vous pouvez soit sauvegarder votre session
+                                        pour continuer plus tard, soit la supprimer
+                                        définitivement.
+                                    </p>
+                                )}
                                 <div className="flex flex-col gap-3">
                                     <button
                                         onClick={async () => {
