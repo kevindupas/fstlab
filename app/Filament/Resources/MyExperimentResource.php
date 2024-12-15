@@ -180,7 +180,13 @@ class MyExperimentResource extends Resource
                         ->disk('public')
                         ->visibility('public')
                         ->acceptedFileTypes([
-                            'audio/*',
+                            'audio/mpeg',          // MP3
+                            'audio/wav',           // WAV
+                            'audio/x-wav',         // WAV alternative
+                            'audio/wave',          // WAV alternative
+                            'audio/x-pn-wav',      // WAV alternative
+                            'audio/aac',           // AAC
+                            'audio/ogg',           // OGG
                         ])
                         ->minFiles(2)
                         ->maxFiles(30)
