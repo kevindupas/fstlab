@@ -29,6 +29,13 @@ class ContactUser extends Page
     public ?Experiment $experiment = null;
     public ?array $data = [];
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        /** @var \App\Models\User */
+        $user = Auth::user();
+        return $user?->hasRole('supervisor') ?? false;
+    }
+
     public function mount(): void
     {
         // Récupérer les IDs depuis la query string

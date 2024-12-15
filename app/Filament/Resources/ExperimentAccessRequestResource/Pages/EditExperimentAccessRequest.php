@@ -22,6 +22,7 @@ class EditExperimentAccessRequest extends EditRecord
                     $record->status === 'approved'
                 )
             );
+            $this->redirect($this->getResource()::getUrl('index'));
         }
 
 
