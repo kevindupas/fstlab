@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'home' => "Accueil",
     'dashboard' => "Tableau de bord",
     'admin_contact' => "Contacter l'admistrateur",
     'user_contact' => "Contacter un utilisateur",

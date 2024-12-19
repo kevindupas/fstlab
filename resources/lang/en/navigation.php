@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'home' => "Home",
     'dashboard' => "Dashboard",
     'admin_contact' => "Contact the administrator",
     'user_contact' => "Contact a user",

@@ -14,15 +14,12 @@ class AppServiceProvider extends ServiceProvider
         User::observe(UserObserver::class);
         LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
             $switch
-                ->locales(['fr', 'en', 'es'])
-                // ->renderHook('panels::global-search.before')
-                // ->visible(outsidePanels: true)
-                ->circular()
+                ->locales(['fr', 'en'])
                 ->flags([
                     'fr' => asset('flags/fr.svg'),
                     'en' => asset('flags/um.svg'),
-                    'es' => asset('flags/es.svg'),
-                ]);
+                ])
+                ->visible(outsidePanels: true);
         });
     }
 }

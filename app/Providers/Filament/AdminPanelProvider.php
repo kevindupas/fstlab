@@ -51,7 +51,6 @@ class AdminPanelProvider extends PanelProvider
             $plugins[] = ResourceLockPlugin::make();
         }
 
-
         return $panel
             ->default()
             ->id('admin')
@@ -79,7 +78,7 @@ class AdminPanelProvider extends PanelProvider
                 <div class="flex items-center">
                     <a href="/" class="rounded-lg flex items-center gap-2 px-3 py-2 text-sm font-medium text-black dark:text-white hover:text-primary-500 focus:outline-none">
                         <x-heroicon-o-home class="w-5 h-5" />
-                        Accueil
+                        {{ __("navigation.home") }}
                     </a>
                 </div>
             HTML)
