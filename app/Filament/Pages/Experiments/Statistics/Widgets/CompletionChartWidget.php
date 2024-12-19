@@ -9,7 +9,13 @@ use Leandrocfe\FilamentApexCharts\Widgets\ApexChartWidget;
 class CompletionChartWidget extends ApexChartWidget
 {
     protected static ?string $chartId = 'completionChart';
-    protected static ?string $heading = 'Progression des sessions';
+    // protected static ?string $heading = 'Progression des sessions';
+
+    public function getHeading(): string
+    {
+        return __('filament.pages.experiments_statistics.widgets.completion.heading');
+    }
+
 
     public Experiment $record;
 

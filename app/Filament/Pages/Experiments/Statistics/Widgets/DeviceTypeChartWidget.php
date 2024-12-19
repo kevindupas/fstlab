@@ -9,7 +9,12 @@ use Leandrocfe\FilamentApexCharts\Widgets\ApexChartWidget;
 class DeviceTypeChartWidget extends ApexChartWidget
 {
     protected static ?string $chartId = 'deviceTypeChart';
-    protected static ?string $heading = 'Types d\'appareils';
+    // protected static ?string $heading = 'Types d\'appareils';
+
+    public function getHeading(): string
+    {
+        return __('filament.pages.experiments_statistics.widgets.duration.heading');
+    }
 
     public Experiment $record;
 

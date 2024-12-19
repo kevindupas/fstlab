@@ -29,24 +29,36 @@ class StatsOverviewWidget extends BaseWidget
                 : 0;
 
             return [
-                Stat::make('Total des sessions', $totalSessions)
-                    ->description('Nombre total de sessions')
+                Stat::make(
+                    __('filament.pages.experiments_statistics.widgets.stats.total.label'),
+                    $totalSessions
+                )
+                    ->description(__('filament.pages.experiments_statistics.widgets.stats.total.description'))
                     ->descriptionIcon('heroicon-o-user-group')
                     ->color('primary'),
-                Stat::make('Sessions complétées', $completedSessions)
-                    ->description("$completionPercentage% de complétion")
+                Stat::make(
+                    __('filament.pages.experiments_statistics.widgets.stats.completed.label'),
+                    $completedSessions
+                )
+                    ->description(__('filament.pages.experiments_statistics.widgets.stats.completed.description', [
+                        'percentage' => $completionPercentage
+                    ]))
                     ->descriptionIcon('heroicon-o-check-circle')
                     ->color('success'),
-                Stat::make('Durée moyenne', $this->formatDuration($avgDuration))
-                    ->description('Temps moyen par session')
+                Stat::make(
+                    __('filament.pages.experiments_statistics.widgets.stats.duration.label'),
+                    $this->formatDuration($avgDuration)
+                )
+                    ->description(__('filament.pages.experiments_statistics.widgets.stats.duration.description'))
                     ->descriptionIcon('heroicon-o-clock')
                     ->color('info'),
             ];
         } catch (\Exception $e) {
-            Log::error('Widget Error: ' . $e->getMessage());
-
             return [
-                Stat::make('Erreur', 'Erreur de chargement')
+                Stat::make(
+                    __('filament.pages.experiments_statistics.widgets.stats.error.label'),
+                    __('filament.pages.experiments_statistics.widgets.stats.error.value')
+                )
                     ->description($e->getMessage())
                     ->color('danger'),
             ];

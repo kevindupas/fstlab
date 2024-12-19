@@ -10,7 +10,12 @@ use Carbon\Carbon;
 class ActionsTimelineChartWidget extends ApexChartWidget
 {
     protected static ?string $chartId = 'actionsTimelineChart';
-    protected static ?string $heading = 'Timeline des actions';
+    // protected static ?string $heading = 'Timeline des actions';
+
+    public function getHeading(): string
+    {
+        return __('filament.pages.experiments_statistics.widgets.actions_timeline.heading');
+    }
 
     public Experiment $record;
 
@@ -79,17 +84,17 @@ class ActionsTimelineChartWidget extends ApexChartWidget
             'tooltip' => [
                 'theme' => 'dark',
                 'custom' => <<<'JS'
-                    function({ seriesIndex, dataPointIndex, w }) {
-                        const point = w.globals.initialSeries[seriesIndex].data[dataPointIndex];
-                        return `
-                            <div class="px-3 py-2">
-                                <div class="font-medium">${w.globals.initialSeries[seriesIndex].name}</div>
-                                <div class="text-xs opacity-80">Action: ${point.action}</div>
-                                <div class="text-xs opacity-80">Time: ${point.x}</div>
-                            </div>
-                        `;
-                    }
-                JS,
+                function({ seriesIndex, dataPointIndex, w }) {
+                    const point = w.globals.initialSeries[seriesIndex].data[dataPointIndex];
+                    return `
+                        <div class="px-3 py-2">
+                            <div class="font-medium">${w.globals.initialSeries[seriesIndex].name}</div>
+                            <div class="text-xs opacity-80">${point.action}</div>
+                            <div class="text-xs opacity-80">${point.x}</div>
+                        </div>
+                    `;
+                }
+            JS,
             ],
             'markers' => [
                 'size' => 6,

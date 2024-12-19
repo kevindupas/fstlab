@@ -263,10 +263,206 @@ return [
                 'contact' => 'Contacter l\'expérimentateur',
             ]
         ],
-        'experiments_sessions' => [],
-        'experiments_sessions_details' => [],
-        'experiments_sessions_export' => [],
-        'experiments_statistics' => [],
+        'experiments_sessions' => [
+            'title' => 'Participants pour l\'expérimentation : :name',
+            'columns' => [
+                'participant_number' => 'Identifiant du participant',
+                'status' => 'Statut',
+                'created_at' => 'Date de création',
+                'completed_at' => 'Date de complétion',
+            ],
+            'actions' => [
+                'export' => 'Exporter les données',
+                'details' => 'Détails',
+                'export_all' => 'Exporter tous',
+                'export_selection' => 'Exporter la sélection'
+            ],
+            'notifications' => [
+                'no_completed_sessions' => 'Aucune session complétée à exporter',
+                'no_selection_completed' => 'Aucune session complétée sélectionnée'
+            ],
+            'access_denied' => 'Vous n\'avez pas accès à cette expérience',
+            'csv_headers' => [
+                'participant' => 'Participant',
+                'created_at' => 'Date création',
+                'completed_at' => 'Date complétion',
+                'duration' => 'Durée (s)',
+                'browser' => 'Navigateur',
+                'system' => 'Système',
+                'device' => 'Appareil',
+                'screen_dimensions' => 'Dimensions écran',
+                'feedback' => 'Feedback',
+                'group' => [
+                    'name' => 'Groupe :number - Nom',
+                    'comment' => 'Groupe :number - Commentaire',
+                    'media' => 'Groupe :number - Médias',
+                    'media_interactions' => 'Groupe :number - :media - Interactions',
+                    'media_position' => 'Groupe :number - :media - Position'
+                ]
+            ]
+        ],
+        'experiments_sessions_export' => [
+            'title' => 'Exporter les données de la session - :participant',
+            'access_denied' => 'Seul le créateur peut exporter les données.',
+            'tabs' => [
+                'title' => 'Export Options',
+                'basic_info' => 'Informations basiques',
+                'group_data' => 'Données des groupes',
+                'action_log' => 'Journal des actions'
+            ],
+            'fields' => [
+                'basic_fields' => [
+                    'label' => 'Sélectionnez les champs à exporter',
+                    'options' => [
+                        'participant_number' => 'Identifiant du participant',
+                        'created_at' => 'Date de création',
+                        'completed_at' => 'Date de complétion',
+                        'duration' => 'Durée (secondes)',
+                        'browser' => 'Navigateur',
+                        'operating_system' => 'Système d\'exploitation',
+                        'device_type' => 'Type d\'appareil',
+                        'screen_dimensions' => 'Dimensions de l\'écran',
+                        'feedback' => 'Feedback'
+                    ]
+                ],
+                'group_fields' => [
+                    'label' => 'Sélectionnez les informations de groupe à exporter',
+                    'options' => [
+                        'group_names' => 'Noms des groupes',
+                        'group_comments' => 'Commentaires des groupes',
+                        'media_positions' => 'Positions finales des médias',
+                        'media_interactions' => 'Nombre d\'interactions par média',
+                        'group_compositions' => 'Composition des groupes'
+                    ]
+                ],
+                'action_fields' => [
+                    'label' => 'Sélectionnez les actions à exporter',
+                    'options' => [
+                        'moves' => 'Déplacements',
+                        'sounds' => 'Écoutes de sons',
+                        'images' => 'Visualisations d\'images'
+                    ]
+                ],
+                'time_format' => [
+                    'label' => 'Format du temps',
+                    'options' => [
+                        'timestamp' => 'Timestamp',
+                        'readable' => 'Format lisible (HH:mm:ss)',
+                        'elapsed' => 'Temps écoulé (secondes)'
+                    ]
+                ]
+            ],
+            'csv' => [
+                'participant' => 'Participant',
+                'created_at' => 'Date création',
+                'completed_at' => 'Date complétion',
+                'duration' => 'Durée (s)',
+                'browser' => 'Navigateur',
+                'system' => 'Système',
+                'device' => 'Appareil',
+                'screen' => 'Dimensions écran',
+                'feedback' => 'Feedback',
+                'group_prefix' => 'Groupe :number',
+                'name' => 'Nom',
+                'comment' => 'Commentaire',
+                'media' => 'Médias',
+                'interactions' => 'Interactions',
+                'position' => 'Position',
+                'position_format' => 'X::x, Y::y',
+                'time' => 'Temps',
+                'type' => 'Type',
+                'position_x' => 'Position X',
+                'position_y' => 'Position Y',
+                'action_types' => [
+                    'move' => 'Déplacement',
+                    'sound' => 'Lecture son',
+                    'image' => 'Vue image',
+                ],
+            ]
+        ],
+        'experiments_sessions_details' => [
+            'access_denied' => 'Vous n\'avez pas accès aux détails de cette session.',
+            'title' => 'Détails de la session - :participant',
+            'sections' => [
+                'participant' => 'Informations du participant',
+                'technical' => 'Informations techniques',
+                'feedback' => 'Feedback et Notes'
+            ],
+            'fields' => [
+                'participant_number' => 'Nom',
+                'created_at' => 'Date de participation',
+                'duration' => 'Durée',
+                'browser' => 'Navigateur',
+                'operating_system' => 'Système d\'exploitation',
+                'device_type' => 'Type d\'appareil',
+                'screen_width' => 'Largeur d\'écran',
+                'screen_height' => 'Hauteur d\'écran',
+                'feedback' => 'Feedback du participant',
+                'errors' => 'Erreurs rapportées',
+                'examiner_notes' => 'Notes de l\'examinateur'
+            ],
+            'time' => [
+                'seconds' => 'secondes'
+            ],
+            'na' => 'N/A',
+            'error_format' => 'Erreur :type à :time',
+            'actions' => [
+                'add_note' => 'Ajouter/Modifier la note'
+            ],
+            'notifications' => [
+                'note_saved' => 'Note enregistrée avec succès'
+            ],
+            'breadcrumbs' => [
+                'participants' => 'Participants pour l\'expérimentation : :name',
+                'details' => 'Détails de la session - :participant'
+            ]
+        ],
+        'experiments_statistics' => [
+            'title' => 'Statistiques pour l\'expérimentation : :name',
+            'widgets' => [
+                'actions_timeline' => [
+                    'heading' => 'Timeline des actions',
+                    'session' => 'Session',
+                    'action' => 'Action',
+                    'time' => 'Temps'
+                ],
+                'completion' => [
+                    'heading' => 'Progression des sessions',
+                    'sessions' => 'Sessions'
+                ],
+                'device_type' => [
+                    'heading' => 'Types d\'appareils',
+                    'total' => 'Total'
+                ],
+                'duration' => [
+                    'heading' => 'Distribution des durées',
+                    'duration' => 'Durée',
+                    'min' => 'Min',
+                    'q1' => 'Q1',
+                    'median' => 'Médiane',
+                    'q3' => 'Q3',
+                    'max' => 'Max'
+                ],
+                'stats' => [
+                    'total' => [
+                        'label' => 'Total des sessions',
+                        'description' => 'Nombre total de sessions'
+                    ],
+                    'completed' => [
+                        'label' => 'Sessions complétées',
+                        'description' => ':percentage% de complétion'
+                    ],
+                    'duration' => [
+                        'label' => 'Durée moyenne',
+                        'description' => 'Temps moyen par session'
+                    ],
+                    'error' => [
+                        'label' => 'Erreur',
+                        'value' => 'Erreur de chargement'
+                    ]
+                ]
+            ]
+        ],
     ],
     'resources' => [
         'my_experiment' => [
@@ -345,7 +541,6 @@ return [
                 'media_image_sound_helper' => 'Formats acceptés : JPG, JPEG, PNG, GIF, WebP, MP3, WAV, AAC, OGG (max 20Mo)',
                 'documents' => 'Documents',
                 'documents_helper' => 'Formats acceptés : PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, CSV (max 20Mo)',
-
             ],
             'table' => [
                 'columns' => [
@@ -404,7 +599,6 @@ return [
                     'success' => 'Export réalisé avec succès'
                 ]
             ],
-
             'notifications' => [
                 'created' => 'Expérimentation créée avec succès',
                 'updated' => 'Expérimentation mise à jour avec succès',
@@ -412,7 +606,6 @@ return [
                 'session_updated' => 'État de la session mis à jour avec succès',
                 'export_success' => 'Export réalisé avec succès'
             ],
-
             'messages' => [
                 'no_active_session' => 'Aucune session active'
             ]

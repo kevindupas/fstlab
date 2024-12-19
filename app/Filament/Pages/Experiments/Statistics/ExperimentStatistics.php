@@ -28,7 +28,6 @@ class ExperimentStatistics extends Page
     public function mount(Experiment $record): void
     {
         $this->record = $record;
-        Log::info('ExperimentStatistics::mount', ['record' => $record]);
     }
 
     protected function getHeaderWidgets(): array
@@ -57,6 +56,8 @@ class ExperimentStatistics extends Page
 
     public function getTitle(): string | Htmlable
     {
-        return new HtmlString('Statistiques pour l\'expérimentation : ' . $this->record->name);
+        return new HtmlString(__('filament.pages.experiments_statistics.title', [
+            'name' => $this->record->name
+        ]));
     }
 }

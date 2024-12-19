@@ -36,7 +36,7 @@ class ExperimentSessionDetails extends Page
         $this->record = $record;
 
         if (!$this->canAccessExperiment($this->record->experiment)) {
-            abort(403, 'Vous n\'avez pas accès aux détails de cette session.');
+            abort(403, __('filament.pages.experiments_sessions_details.access_denied'));
         }
 
         $this->isCreator = $this->record->experiment->created_by === Auth::id();
@@ -48,58 +48,61 @@ class ExperimentSessionDetails extends Page
         return $infolist
             ->record($this->record)
             ->schema([
-                Section::make('Informations du participant')
+                Section::make(__('filament.pages.experiments_sessions_details.sections.participant'))
                     ->schema([
                         Grid::make(3)
                             ->schema([
                                 TextEntry::make('participant_number')
-                                    ->label('Nom')
+                                    ->label(__('filament.pages.experiments_sessions_details.fields.participant_number'))
                                     ->weight(FontWeight::Bold),
                                 TextEntry::make('created_at')
-                                    ->label('Date de participation')
+                                    ->label(__('filament.pages.experiments_sessions_details.fields.created_at'))
                                     ->dateTime('d/m/Y H:i')
                                     ->weight(FontWeight::Bold),
                                 TextEntry::make('duration')
-                                    ->label('Durée')
-                                    ->formatStateUsing(fn($state) => number_format($state / 1000, 2) . ' secondes')
+                                    ->label(__('filament.pages.experiments_sessions_details.fields.duration'))
+                                    ->formatStateUsing(fn($state) => number_format($state / 1000, 2) . ' ' . __('filament.pages.experiments_sessions_details.time.seconds'))
                                     ->weight(FontWeight::Bold),
                             ]),
                     ]),
 
-                Section::make('Informations techniques')
+                Section::make(__('filament.pages.experiments_sessions_details.sections.technical'))
                     ->schema([
                         Grid::make(3)
                             ->schema([
                                 TextEntry::make('browser')
-                                    ->label('Navigateur'),
+                                    ->label(__('filament.pages.experiments_sessions_details.fields.browser')),
                                 TextEntry::make('operating_system')
-                                    ->label('Système d\'exploitation'),
+                                    ->label(__('filament.pages.experiments_sessions_details.fields.operating_system')),
                                 TextEntry::make('device_type')
-                                    ->label('Type d\'appareil'),
+                                    ->label(__('filament.pages.experiments_sessions_details.fields.device_type')),
                                 TextEntry::make('screen_width')
-                                    ->label('Largeur d\'écran'),
+                                    ->label(__('filament.pages.experiments_sessions_details.fields.screen_width')),
                                 TextEntry::make('screen_height')
-                                    ->label('Hauteur d\'écran'),
+                                    ->label(__('filament.pages.experiments_sessions_details.fields.screen_height')),
                             ]),
                     ]),
 
-                Section::make('Feedback et Notes')
+                Section::make(__('filament.pages.experiments_sessions_details.sections.feedback'))
                     ->schema([
                         TextEntry::make('feedback')
-                            ->label('Feedback du participant')
-                            ->formatStateUsing(fn ($state) => $state ?: 'N/A'),
+                            ->label(__('filament.pages.experiments_sessions_details.fields.feedback'))
+                            ->formatStateUsing(fn($state) => $state ?: __('filament.pages.experiments_sessions_details.na')),
                         TextEntry::make('errors_log')
-                            ->label('Erreurs rapportées')
+                            ->label(__('filament.pages.experiments_sessions_details.fields.errors'))
                             ->formatStateUsing(function ($state) {
                                 if (!$state) return null;
                                 $errors = json_decode($state);
                                 if (empty($errors)) return null;
                                 return collect($errors)->map(function ($error) {
                                     $time = \Carbon\Carbon::createFromTimestampMs($error->time)->format('H:i:s');
-                                    return "Erreur {$error->type} à {$time}";
+                                    return __('filament.pages.experiments_sessions_details.error_format', [
+                                        'type' => $error->type,
+                                        'time' => $time
+                                    ]);
                                 })->join('<br>');
                             })
-                            ->hidden(fn ($state) => !$state || empty(json_decode($state)))
+                            ->hidden(fn($state) => !$state || empty(json_decode($state)))
                             ->html()
                     ]),
             ]);
@@ -130,10 +133,10 @@ class ExperimentSessionDetails extends Page
 
         return [
             Action::make('addNote')
-                ->label('Ajouter/Modifier la note')
+                ->label(__('filament.pages.experiments_sessions_details.actions.add_note'))
                 ->form([
                     Textarea::make('notes')
-                        ->label('Notes de l\'examinateur')
+                        ->label(__('filament.pages.experiments_sessions_details.fields.examiner_notes'))
                         ->default(fn() => $this->record->notes)
                         ->required(),
                 ])
@@ -143,7 +146,7 @@ class ExperimentSessionDetails extends Page
                     ]);
 
                     Notification::make()
-                        ->title('Note enregistrée avec succès')
+                        ->title(__('filament.pages.experiments_sessions_details.notifications.note_saved'))
                         ->success()
                         ->send();
                 })
@@ -156,13 +159,19 @@ class ExperimentSessionDetails extends Page
     {
         return [
             ExperimentSessions::getUrl(['record' => $this->record->experiment->id]) =>
-            "Participants pour l'expérimentation : {$this->record->experiment->name}",
-            '#' => "Détails de la session - {$this->record->participant_number}"
+            __('filament.pages.experiments_sessions_details.breadcrumbs.participants', [
+                'name' => $this->record->experiment->name
+            ]),
+            '#' => __('filament.pages.experiments_sessions_details.breadcrumbs.details', [
+                'participant' => $this->record->participant_number
+            ])
         ];
     }
 
     public function getTitle(): string | Htmlable
     {
-        return new HtmlString("Détails de la session - {$this->record->participant_number}");
+        return new HtmlString(__('filament.pages.experiments_sessions_details.title', [
+            'participant' => $this->record->participant_number
+        ]));
     }
 }

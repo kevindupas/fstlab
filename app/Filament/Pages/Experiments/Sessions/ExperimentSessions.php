@@ -45,19 +45,12 @@ class ExperimentSessions extends Page implements HasTable
 
     public function mount(Experiment $record): void
     {
-
         if (!$this->canAccessExperiment($record)) {
-            abort(403, 'Vous n\'avez pas accès à cette expérience.');
+            abort(403, __('filament.pages.experiments_sessions.access_denied'));
         }
 
         $this->record = $record;
     }
-
-    public function getExperiment(): Experiment
-    {
-        return $this->record;
-    }
-
 
     public function table(Table $table): Table
     {
@@ -71,7 +64,7 @@ class ExperimentSessions extends Page implements HasTable
             ->query($baseQuery)
             ->columns([
                 TextColumn::make('participant_number')
-                    ->label('Identifiant du participant')
+                    ->label(__('filament.pages.experiments_sessions.columns.participant_number'))
                     ->searchable()
                     ->sortable(),
                 IconColumn::make('status')
@@ -83,48 +76,47 @@ class ExperimentSessions extends Page implements HasTable
                         'success' => fn($state): bool => $state === 'completed',
                         'warning' => fn($state): bool => $state === 'created',
                     ])
-                    ->label('Statut')
+                    ->label(__('filament.pages.experiments_sessions.columns.status'))
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->label('Date de création')
+                    ->label(__('filament.pages.experiments_sessions.columns.created_at'))
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
                 TextColumn::make('completed_at')
-                    ->label('Date de complétion')
+                    ->label(__('filament.pages.experiments_sessions.columns.completed_at'))
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
             ])
             ->actions([
                 Action::make('export')
-                    ->label('Exporter les données')
+                    ->label(__('filament.pages.experiments_sessions.actions.export'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('success')
-                    ->hidden(fn (ExperimentSession $record): bool => $record->status !== 'completed')
-                    ->url(fn (ExperimentSession $record): string =>
+                    ->hidden(fn(ExperimentSession $record): bool => $record->status !== 'completed')
+                    ->url(fn(ExperimentSession $record): string =>
                     ExperimentSessionExport::getUrl(['record' => $record->id])),
 
                 Action::make('details')
-                    ->label('Détails')
-                    ->hidden(fn (ExperimentSession $record): bool => $record->status !== 'completed')
+                    ->label(__('filament.pages.experiments_sessions.actions.details'))
+                    ->hidden(fn(ExperimentSession $record): bool => $record->status !== 'completed')
                     ->url(fn(ExperimentSession $record): string =>
                     ExperimentSessionDetails::getUrl(['record' => $record]))
                     ->icon('heroicon-o-eye')
             ])
             ->headerActions([
                 Action::make('exportAll')
-                    ->label('Exporter tous')
+                    ->label(__('filament.pages.experiments_sessions.actions.export_all'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('success')
-                    ->hidden(fn () => $baseQuery->count() === 0)
+                    ->hidden(fn() => $baseQuery->count() === 0)
                     ->requiresConfirmation()
                     ->action(function () use ($baseQuery) {
-                        // On récupère uniquement les sessions complétées pour l'export
                         $completedRecords = $baseQuery->where('status', 'completed')->get();
 
                         if ($completedRecords->isEmpty()) {
                             Notification::make()
                                 ->warning()
-                                ->title('Aucune session complétée à exporter')
+                                ->title(__('filament.pages.experiments_sessions.notifications.no_completed_sessions'))
                                 ->send();
                             return;
                         }
@@ -132,21 +124,19 @@ class ExperimentSessions extends Page implements HasTable
                         return $this->exportSessions($completedRecords);
                     })
             ])
-
             ->bulkActions([
                 BulkAction::make('exportSelection')
-                    ->label('Exporter la sélection')
+                    ->label(__('filament.pages.experiments_sessions.actions.export_selection'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->requiresConfirmation()
                     ->deselectRecordsAfterCompletion()
                     ->action(function (Collection $records) {
-                        // Filtrer les sessions non complétées si jamais
                         $completedRecords = $records->filter(fn($record) => $record->status === 'completed');
 
                         if ($completedRecords->isEmpty()) {
                             Notification::make()
                                 ->warning()
-                                ->title('Aucune session complétée sélectionnée')
+                                ->title(__('filament.pages.experiments_sessions.notifications.no_selection_completed'))
                                 ->send();
                             return;
                         }
@@ -183,40 +173,41 @@ class ExperimentSessions extends Page implements HasTable
 
     protected function prepareSessionData(ExperimentSession $session): array
     {
-        // On prépare les données de base que vous voulez toujours exporter
         $baseData = [
-            'Participant' => $session->participant_number,
-            'Date création' => $session->created_at->format('Y-m-d H:i:s'),
-            'Date complétion' => $session->completed_at?->format('Y-m-d H:i:s'),
-            'Durée (s)' => number_format($session->duration / 1000, 2),
-            'Navigateur' => $session->browser,
-            'Système' => $session->operating_system,
-            'Appareil' => $session->device_type,
-            'Dimensions écran' => "{$session->screen_width}x{$session->screen_height}",
-            'Feedback' => $session->feedback,
+            __('filament.pages.experiments_sessions.csv.participant') => $session->participant_number,
+            __('filament.pages.experiments_sessions.csv.created_at') => $session->created_at->format('Y-m-d H:i:s'),
+            __('filament.pages.experiments_sessions.csv.completed_at') => $session->completed_at?->format('Y-m-d H:i:s'),
+            __('filament.pages.experiments_sessions.csv.duration') => number_format($session->duration / 1000, 2),
+            __('filament.pages.experiments_sessions.csv.browser') => $session->browser,
+            __('filament.pages.experiments_sessions.csv.system') => $session->operating_system,
+            __('filament.pages.experiments_sessions.csv.device') => $session->device_type,
+            __('filament.pages.experiments_sessions.csv.screen_dimensions') => "{$session->screen_width}x{$session->screen_height}",
+            __('filament.pages.experiments_sessions.csv.feedback') => $session->feedback,
         ];
 
         $groupData = json_decode($session->group_data, true);
 
-        // Ajout des données de groupe
         foreach ($groupData as $groupIndex => $group) {
-            $groupPrefix = "Groupe " . ($groupIndex + 1);
-            $baseData["{$groupPrefix} - Nom"] = $group['name'];
-            $baseData["{$groupPrefix} - Commentaire"] = $group['comment'] ?? '';
+            $groupNumber = $groupIndex + 1;
+            $baseData[__('filament.pages.experiments_sessions.csv.group_name', ['number' => $groupNumber])] = $group['name'];
+            $baseData[__('filament.pages.experiments_sessions.csv.group_comment', ['number' => $groupNumber])] = $group['comment'] ?? '';
 
-            // Ajout des médias du groupe
             $mediaNames = collect($group['elements'])
                 ->map(fn($element) => basename($element['url']))
                 ->join(', ');
-            $baseData["{$groupPrefix} - Médias"] = $mediaNames;
+            $baseData[__('filament.pages.experiments_sessions.csv.group_media', ['number' => $groupNumber])] = $mediaNames;
 
-            // Ajout des interactions et positions
             foreach ($group['elements'] as $element) {
                 $mediaName = basename($element['url']);
-                $baseData["{$groupPrefix} - {$mediaName} - Interactions"] = $element['interactions'] ?? 0;
-                $baseData["{$groupPrefix} - {$mediaName} - Position"] =
-                    "X:" . number_format($element['x'], 2) .
-                    ", Y:" . number_format($element['y'], 2);
+                $baseData[__('filament.pages.experiments_sessions.csv.group_media_interactions', [
+                    'number' => $groupNumber,
+                    'media' => $mediaName
+                ])] = $element['interactions'] ?? 0;
+
+                $baseData[__('filament.pages.experiments_sessions.csv.group_media_position', [
+                    'number' => $groupNumber,
+                    'media' => $mediaName
+                ])] = "X:" . number_format($element['x'], 2) . ", Y:" . number_format($element['y'], 2);
             }
         }
 
@@ -225,7 +216,7 @@ class ExperimentSessions extends Page implements HasTable
 
     public function getTitle(): string | Htmlable
     {
-        return new HtmlString('Participants pour l\'expérimentation' . ' : ' . $this->record->name);
+        return new HtmlString(__('filament.pages.experiments_sessions.title', ['name' => $this->record->name]));
     }
 
     protected function authorizeAccess(): void

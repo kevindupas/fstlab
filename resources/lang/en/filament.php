@@ -193,79 +193,278 @@ return [
             ],
         ],
         'experiment_details' => [
-            'title' => 'Experiment Details',
-            'section_experiment' => [
-                'heading' => 'Experiment Information',
-                'description' => 'Details and configuration of the experiment',
-                'column' => [
-                    'name' => 'Name',
-                    'created_by' => 'Created by',
-                    'created_at' => 'Created on',
-                    'type' => 'Type',
-                    'status' => 'Status',
-                    'start' => 'Started',
-                    'pause' => 'Paused',
-                    'stop' => 'Stopped',
-                    'test' => 'In Test',
-                    'none' => 'None',
-                    'sound' => 'Sound',
-                    'image' => 'Image',
-                    'link' => 'Link',
-                    'doi' => 'DOI',
+            'title' => "Experiment Details",
+            'information_section' => [
+                'title' => "Experiment Information",
+                'description' => "Details and configuration of the experiment",
+                'name' => "Name",
+                'created_by' => "Created By",
+                'created_at' => "Created On",
+                'doi' => "DOI",
+                'link' => "Link",
+                'type' => [
+                    'label' => 'Type',
+                    'options' => [
+                        'image' => 'Image',
+                        'sound' => 'Sound',
+                        'image_sound' => 'Image and Sound',
+                    ]
                 ],
-            ],
-            'section_description' => [
-                'heading' => 'Description',
-                'description' => 'Detailed description of the experiment',
-            ],
-        ],
-        'experiments_sessions' => [],
-        'experiments_sessions_details' => [],
-        'experiments_sessions_export' => [],
-        'experiments_statistics' => [],
-    ],
-    'resources' => [
-        'experiment-access-request' => [
-            'label' => 'Access Request',
-            'plural' => 'Access Requests',
-            'navigation_label' => 'Access Requests',
-            'form' => [
                 'status' => [
                     'label' => 'Status',
                     'options' => [
-                        'pending' => 'Pending',
-                        'approved' => 'Approved',
-                        'rejected' => 'Rejected',
+                        'start' => 'Started',
+                        'pause' => 'Paused',
+                        'stop' => 'Stopped',
+                        'test' => 'In Test',
+                        'none' => 'None',
                     ]
                 ],
-                'response_message' => [
-                    'label' => 'Response Message',
-                    'helper_text' => 'Please explain the reason for rejection',
-                ],
-                'request_message' => [
-                    'label' => 'Request Message',
-                ],
-                'experiment' => [
-                    'label' => 'Experiment',
-                ],
-                'user' => [
-                    'label' => 'Requester',
-                ],
             ],
-            'table' => [
-                'columns' => [
-                    'experiment' => 'Experiment',
-                    'user' => 'Requester',
-                    'type' => 'Type',
-                    'type_options' => [
-                        'access' => 'Experiment Access',
-                        'results' => 'Results Access',
-                    ],
-                    'status' => 'Status',
-                    'created_at' => 'Request Date',
+            'description_section' => [
+                'title' => "Description",
+                'description' => "Detailed description of the experiment",
+                'label' => "Description",
+            ],
+            'instruction_section' => [
+                'title' => "Instructions",
+                'description' => "Instructions for participants",
+                'label' => "Instructions",
+            ],
+            'settings_section' => [
+                'title' => "Visual Settings",
+                'description' => "Configuration of visual elements",
+                'button_size' => "Button Size",
+                'button_color' => "Button Color",
+            ],
+            'medias_section' => [
+                'title' => "Media",
+                'description' => "Media files used in the experiment",
+                'medias' => "Media",
+                'images' => "Images",
+                'sounds' => "Sounds",
+            ],
+            'documents_section' => [
+                'title' => "Documents",
+                'description' => "Supplementary documents",
+                'documents' => "Documents",
+            ],
+            'ban_action' => [
+                'label' => 'Ban Experimenter',
+                'reason' => 'Reason for Ban',
+                'helper' => 'Explain why you are banning this experimenter',
+                'modalHeading' => 'Ban Experimenter',
+                'modalDescription' => 'This action is irreversible. The experimenter and all their secondary experimenters will no longer have access to the platform.',
+            ],
+            'notification' => [
+                'banned' => 'Experimenter successfully banned',
+            ],
+            'action' => [
+                'contact' => 'Contact Experimenter',
+            ],
+        ],
+        'experiments_sessions' => [
+            'title' => 'Participants for the experiment: :name',
+            'columns' => [
+                'participant_number' => 'Participant ID',
+                'status' => 'Status',
+                'created_at' => 'Creation Date',
+                'completed_at' => 'Completion Date',
+            ],
+            'actions' => [
+                'export' => 'Export data',
+                'details' => 'Details',
+                'export_all' => 'Export all',
+                'export_selection' => 'Export selection',
+            ],
+            'notifications' => [
+                'no_completed_sessions' => 'No completed sessions to export',
+                'no_selection_completed' => 'No completed sessions selected',
+            ],
+            'access_denied' => 'You do not have access to this experiment',
+            'csv_headers' => [
+                'participant' => 'Participant',
+                'created_at' => 'Creation Date',
+                'completed_at' => 'Completion Date',
+                'duration' => 'Duration (s)',
+                'browser' => 'Browser',
+                'system' => 'System',
+                'device' => 'Device',
+                'screen_dimensions' => 'Screen Dimensions',
+                'feedback' => 'Feedback',
+                'group' => [
+                    'name' => 'Group :number - Name',
+                    'comment' => 'Group :number - Comment',
+                    'media' => 'Group :number - Media',
+                    'media_interactions' => 'Group :number - :media - Interactions',
+                    'media_position' => 'Group :number - :media - Position',
                 ],
             ],
         ],
+        'experiments_sessions_export' => [
+            'title' => 'Export session data - :participant',
+            'access_denied' => 'Only the creator can export the data.',
+            'tabs' => [
+                'title' => 'Export Options',
+                'basic_info' => 'Basic Information',
+                'group_data' => 'Group Data',
+                'action_log' => 'Action Log',
+            ],
+            'fields' => [
+                'basic_fields' => [
+                    'label' => 'Select fields to export',
+                    'options' => [
+                        'participant_number' => 'Participant ID',
+                        'created_at' => 'Creation Date',
+                        'completed_at' => 'Completion Date',
+                        'duration' => 'Duration (seconds)',
+                        'browser' => 'Browser',
+                        'operating_system' => 'Operating System',
+                        'device_type' => 'Device Type',
+                        'screen_dimensions' => 'Screen Dimensions',
+                        'feedback' => 'Feedback',
+                    ],
+                ],
+                'group_fields' => [
+                    'label' => 'Select group information to export',
+                    'options' => [
+                        'group_names' => 'Group Names',
+                        'group_comments' => 'Group Comments',
+                        'media_positions' => 'Final Media Positions',
+                        'media_interactions' => 'Number of interactions per media',
+                        'group_compositions' => 'Group Compositions',
+                    ],
+                ],
+                'action_fields' => [
+                    'label' => 'Select actions to export',
+                    'options' => [
+                        'moves' => 'Movements',
+                        'sounds' => 'Sound Playback',
+                        'images' => 'Image Views',
+                    ],
+                ],
+                'time_format' => [
+                    'label' => 'Time Format',
+                    'options' => [
+                        'timestamp' => 'Timestamp',
+                        'readable' => 'Readable Format (HH:mm:ss)',
+                        'elapsed' => 'Elapsed Time (seconds)',
+                    ],
+                ],
+            ],
+            'csv' => [
+                'participant' => 'Participant',
+                'created_at' => 'Creation Date',
+                'completed_at' => 'Completion Date',
+                'duration' => 'Duration (s)',
+                'browser' => 'Browser',
+                'system' => 'System',
+                'device' => 'Device',
+                'screen' => 'Screen Dimensions',
+                'feedback' => 'Feedback',
+                'group_prefix' => 'Group :number',
+                'name' => 'Name',
+                'comment' => 'Comment',
+                'media' => 'Media',
+                'interactions' => 'Interactions',
+                'position' => 'Position',
+                'position_format' => 'X::x, Y::y',
+                'time' => 'Time',
+                'type' => 'Type',
+                'position_x' => 'Position X',
+                'position_y' => 'Position Y',
+                'action_types' => [
+                    'move' => 'Movement',
+                    'sound' => 'Sound Playback',
+                    'image' => 'Image View',
+                ],
+            ],
+        ],
+        'experiments_sessions_details' => [
+            'access_denied' => 'You do not have access to this session\'s details.',
+            'title' => 'Session Details - :participant',
+            'sections' => [
+                'participant' => 'Participant Information',
+                'technical' => 'Technical Information',
+                'feedback' => 'Feedback and Notes',
+            ],
+            'fields' => [
+                'participant_number' => 'Name',
+                'created_at' => 'Participation Date',
+                'duration' => 'Duration',
+                'browser' => 'Browser',
+                'operating_system' => 'Operating System',
+                'device_type' => 'Device Type',
+                'screen_width' => 'Screen Width',
+                'screen_height' => 'Screen Height',
+                'feedback' => 'Participant Feedback',
+                'errors' => 'Reported Errors',
+                'examiner_notes' => 'Examiner Notes',
+            ],
+            'time' => [
+                'seconds' => 'seconds',
+            ],
+            'na' => 'N/A',
+            'error_format' => 'Error :type at :time',
+            'actions' => [
+                'add_note' => 'Add/Edit Note',
+            ],
+            'notifications' => [
+                'note_saved' => 'Note successfully saved',
+            ],
+            'breadcrumbs' => [
+                'participants' => 'Participants for the experiment: :name',
+                'details' => 'Session Details - :participant',
+            ],
+        ],
+        'experiments_statistics' => [
+            'title' => 'Statistics for the experiment: :name',
+            'widgets' => [
+                'actions_timeline' => [
+                    'heading' => 'Actions Timeline',
+                    'session' => 'Session',
+                    'action' => 'Action',
+                    'time' => 'Time',
+                ],
+                'completion' => [
+                    'heading' => 'Session Progression',
+                    'sessions' => 'Sessions',
+                ],
+                'device_type' => [
+                    'heading' => 'Device Types',
+                    'total' => 'Total',
+                ],
+                'duration' => [
+                    'heading' => 'Duration Distribution',
+                    'duration' => 'Duration',
+                    'min' => 'Min',
+                    'q1' => 'Q1',
+                    'median' => 'Median',
+                    'q3' => 'Q3',
+                    'max' => 'Max',
+                ],
+                'stats' => [
+                    'total' => [
+                        'label' => 'Total Sessions',
+                        'description' => 'Total number of sessions',
+                    ],
+                    'completed' => [
+                        'label' => 'Completed Sessions',
+                        'description' => ':percentage% completion',
+                    ],
+                    'duration' => [
+                        'label' => 'Average Duration',
+                        'description' => 'Average time per session',
+                    ],
+                    'error' => [
+                        'label' => 'Error',
+                        'value' => 'Loading error',
+                    ],
+                ],
+            ],
+        ],
+    ],
+    'resources' => [
         'my_experiment' => [
             'navigation_label' => 'My Experiments',
             'navigation_group' => 'Experiments',
@@ -411,6 +610,47 @@ return [
                 'no_active_session' => 'No active session',
             ]
         ],
+        'experiment-access-request' => [
+            'label' => 'Access Request',
+            'plural' => 'Access Requests',
+            'navigation_label' => 'Access Requests',
+            'form' => [
+                'status' => [
+                    'label' => 'Status',
+                    'options' => [
+                        'pending' => 'Pending',
+                        'approved' => 'Approved',
+                        'rejected' => 'Rejected',
+                    ]
+                ],
+                'response_message' => [
+                    'label' => 'Response Message',
+                    'helper_text' => 'Please explain the reason for rejection',
+                ],
+                'request_message' => [
+                    'label' => 'Request Message',
+                ],
+                'experiment' => [
+                    'label' => 'Experiment',
+                ],
+                'user' => [
+                    'label' => 'Requester',
+                ],
+            ],
+            'table' => [
+                'columns' => [
+                    'experiment' => 'Experiment',
+                    'user' => 'Requester',
+                    'type' => 'Type',
+                    'type_options' => [
+                        'access' => 'Experiment Access',
+                        'results' => 'Results Access',
+                    ],
+                    'status' => 'Status',
+                    'created_at' => 'Request Date',
+                ],
+            ],
+        ],
         'users' => [
             'title' => "User",
             'table' => [
@@ -510,6 +750,82 @@ return [
                 'details' => "Details",
                 'delete' => "Delete user"
             ]
+        ],
+        'pending_registration' => [
+            'title' => "Registration Requests",
+            'form' => [
+                'name' => "Name",
+                'email' => "Email",
+                'university' => "University",
+                'registration_reason' => "Reason for Registration",
+                'banned_reason' => "Reason for Banning",
+                'status' => [
+                    'approved' => "Approved",
+                    'rejected' => "Rejected",
+                ],
+                'rejected_reason' => [
+                    'label' => "Reason for Rejection",
+                    'placeholder' => "Reason for rejection",
+                    'helper' => "Explain the reason for rejecting the registration request",
+                ],
+            ],
+            'table' => [
+                'name' => 'Name',
+                'email' => 'Email',
+                'university' => 'University',
+                'created_at' => 'Request Date',
+                'status' => [
+                    'label' => 'Status',
+                    'pending' => 'Pending',
+                ],
+            ],
+            'notification' => [
+                'rejected_reason' => 'Main account unbanned:',
+                'rejected' => 'User successfully unbanned',
+            ],
+            'action' => [
+                'create' => "Add a User",
+                'contact' => 'Contact',
+                'show_experiment' => 'View Experiments',
+                'details' => "Details",
+                'delete' => "Delete User",
+            ],
+        ],
+        'rejected_user' => [
+            'title' => "Rejected Users",
+            'form' => [
+                'name' => "Name",
+                'email' => "Email",
+                'university' => "University",
+                'registration_reason' => "Reason for Registration",
+                'banned_reason' => "Reason for Banning",
+                'status' => [
+                    'approved' => "Approved",
+                    'rejected' => "Rejected",
+                ],
+                'rejected_reason' => "Reason for Rejection",
+            ],
+            'table' => [
+                'name' => 'Name',
+                'email' => 'Email',
+                'university' => 'University',
+                'created_at' => 'Request Date',
+                'status' => [
+                    'label' => 'Status',
+                    'rejected' => 'Rejected',
+                ],
+            ],
+            'notification' => [
+                'rejected_reason' => 'Main account unbanned:',
+                'rejected' => 'User successfully unbanned',
+            ],
+            'action' => [
+                'create' => "Add a User",
+                'contact' => 'Contact',
+                'show_experiment' => 'View Experiments',
+                'details' => "Details",
+                'delete' => "Delete User",
+            ],
         ],
     ],
 ];
