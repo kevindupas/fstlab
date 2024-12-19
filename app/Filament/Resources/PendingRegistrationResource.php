@@ -24,14 +24,9 @@ class PendingRegistrationResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $navigationLabel = 'Demandes d\'inscription';
 
-    public static function getModelLabel(): string
-    {
-        return __('Demande d\'inscription');
-    }
-
     public static function getPluralModelLabel(): string
     {
-        return __('Demandes d\'inscription');
+        return __('navigation.pending_users');
     }
 
     public static function shouldRegisterNavigation(): bool
@@ -56,23 +51,33 @@ class PendingRegistrationResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name')->disabled(),
-                TextInput::make('email')->disabled(),
-                TextInput::make('university')->disabled(),
+                TextInput::make('name')
+                    ->label(__('filament.resources.pending_registration.form.name'))
+                    ->disabled(),
+                TextInput::make('email')
+                    ->label(__('filament.resources.pending_registration.form.email'))
+                    ->disabled(),
+                TextInput::make('university')
+                    ->label(__('filament.resources.pending_registration.form.university'))
+                    ->disabled(),
                 Textarea::make('registration_reason')
+                    ->label(__('filament.resources.pending_registration.form.registration_reason'))
                     ->disabled()
-                    ->label('Motif d\'inscription')->columnSpan('full'),
+                    ->columnSpan('full'),
                 Select::make('status')
                     ->options([
-                        'approved' => 'Approuver',
-                        'rejected' => 'Rejeter',
+                        'approved' => __('filament.resources.pending_registration.form.status.approved'),
+                        'rejected' => __('filament.resources.pending_registration.form.status.rejected'),
                     ])
                     ->required()
                     ->live(),
                 Textarea::make('rejection_reason')
                     ->required(fn(Get $get) => $get('status') === 'rejected')
                     ->visible(fn(Get $get) => $get('status') === 'rejected')
-                    ->label('Motif du refus')->columnSpan('full'),
+                    ->label(__('filament.resources.pending_registration.form.rejected_reason.label'))
+                    ->placeholder(__('filament.resources.pending_registration.form.rejected_reason.placeholder'))
+                    ->helperText(__('filament.resources.pending_registration.form.rejected_reason.helper'))
+                    ->columnSpan('full'),
             ]);
     }
 
@@ -81,16 +86,20 @@ class PendingRegistrationResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Nom'),
+                    ->label(__('filament.resources.pending_registration.table.name')),
                 Tables\Columns\TextColumn::make('email')
-                    ->label('Email'),
+                    ->label(__('filament.resources.pending_registration.table.email')),
                 Tables\Columns\TextColumn::make('university')
-                    ->label('Université'),
+                    ->label(__('filament.resources.pending_registration.table.university')),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Date de demande')
                     ->dateTime(),
                 Tables\Columns\TextColumn::make('status')
-                    ->label(__('filament.resources.my_experiment.table.columns.status'))
+                    ->label(__('filament.resources.pending_registration.table.status.label'))
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'pending' => __('filament.resources.pending_registration.table.status.pending'),
+                        default => $state
+                    })
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'pending' => 'warning',
@@ -125,5 +134,4 @@ class PendingRegistrationResource extends Resource
     {
         return 'warning';
     }
-
 }

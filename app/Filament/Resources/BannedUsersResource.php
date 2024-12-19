@@ -20,16 +20,11 @@ class BannedUsersResource extends Resource
     protected static ?string $model = User::class;
     protected static ?string $navigationGroup = 'Users';
     protected static ?string $navigationIcon = 'heroicon-o-no-symbol';
-    protected static ?string $navigationLabel = 'Utilisateurs bannis';
 
-    public static function getModelLabel(): string
-    {
-        return __('Utilisateur banni');
-    }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Utilisateurs bannis');
+        return __('navigation.banned_user');
     }
 
 
@@ -43,26 +38,37 @@ class BannedUsersResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->where('status', 'banned');
+            ->where('status', 'banned')
+            ->whereHas('roles', function (Builder $query) {
+                $query->where('name', 'principal_experimenter');
+            });
     }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                TextInput::make('name')->disabled(),
-                TextInput::make('email')->disabled(),
-                TextInput::make('university')->disabled(),
+                TextInput::make('name')
+                    ->label(__("filament.resources.banned.form.name"))
+                    ->disabled(),
+                TextInput::make('email')
+                    ->label(__("filament.resources.banned.form.email"))
+                    ->disabled(),
+                TextInput::make('university')
+                    ->label(__("filament.resources.banned.form.university"))
+                    ->disabled(),
                 Textarea::make('registration_reason')
                     ->disabled()
-                    ->label('Motif d\'inscription')->columnSpan('full'),
+                    ->label(__("filament.resources.banned.form.registration_reason"))
+                    ->columnSpan('full'),
                 Textarea::make('banned_reason')
                     ->disabled()
-                    ->label('Motif de bannissement')->columnSpan('full'),
+                    ->label(__("filament.resources.banned.form.banned_reason"))
+                    ->columnSpan('full'),
                 Select::make('status')
                     ->live()
                     ->options([
-                        'approved' => 'Unban',
+                        'approved' => __('filament.resources.banned.form.status.unban'),
                     ])
                     ->required(),
                 Textarea::make('unbanned_reason')
@@ -70,7 +76,10 @@ class BannedUsersResource extends Resource
                     ->visible(fn(Get $get) => $get('status') === 'approved')
                     ->live()
                     ->dehydrated(true)
-                    ->label('Motif du deban')->columnSpan('full'),
+                    ->label(__("filament.resources.banned.form.unbanned_reason.label"))
+                    ->placeholder(__("filament.resources.banned.form.unbanned_reason.placeholder"))
+                    ->helperText(__("filament.resources.banned.form.unbanned_reason.helper"))
+                    ->columnSpan('full'),
             ]);
     }
 
@@ -79,16 +88,22 @@ class BannedUsersResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Nom')->searchable(),
+                    ->label(__('filament.resources.banned.table.name'))
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('email')
-                    ->label('Email')->searchable(),
+                    ->label(__('filament.resources.banned.table.email'))
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('university')
-                    ->label('Université'),
+                    ->label(__('filament.resources.banned.table.university')),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Date de demande')
+                    ->label(__('filament.resources.banned.table.created_at'))
                     ->dateTime(),
                 Tables\Columns\TextColumn::make('status')
-                    ->label(__('filament.resources.my_experiment.table.columns.status'))
+                    ->label(__('filament.resources.banned.table.status.label'))
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'banned' => __('filament.resources.banned.table.status.banned'),
+                        default => $state
+                    })
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'banned' => 'danger',

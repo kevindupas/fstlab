@@ -17,7 +17,7 @@ class ExperimentAccessRequestsWidget extends BaseWidget
 
     public function getTableHeading(): string
     {
-        return 'Mes demandes d\'accès aux expérimentations';
+        return __('filament.widgets.access_requests.heading');
     }
 
     public function table(Table $table): Table
@@ -31,24 +31,24 @@ class ExperimentAccessRequestsWidget extends BaseWidget
             )
             ->columns([
                 Tables\Columns\TextColumn::make('experiment.name')
-                    ->label('Expérimentation')
+                    ->label(__('filament.widgets.access_requests.column.name'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('experiment.creator.name')
-                    ->label('Créateur')
+                    ->label(__('filament.widgets.access_requests.column.created_by'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('type')
                     ->label('Type')
                     ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'results' => 'Résultats',
-                        'pass' => 'Passage',
+                        'results' => __('filament.widgets.access_requests.column.results'),
+                        'pass' => __('filament.widgets.access_requests.column.pass'),
                         default => $state
                     }),
                 Tables\Columns\TextColumn::make('status')
-                    ->label('Statut')
+                    ->label(__('filament.widgets.access_requests.column.status'))
                     ->badge()
                     ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'pending' => 'En attente',
-                        'approved' => 'Approuvée',
+                        'pending' => __('filament.widgets.access_requests.column.pending'),
+                        'approved' => __('filament.widgets.access_requests.column.approved'),
                         default => $state
                     })
                     ->color(fn(string $state): string => match ($state) {
@@ -57,7 +57,7 @@ class ExperimentAccessRequestsWidget extends BaseWidget
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Demandé le')
+                    ->label(__('filament.widgets.access_requests.column.created_at'))
                     ->dateTime()
                     ->sortable(),
             ])
@@ -65,14 +65,14 @@ class ExperimentAccessRequestsWidget extends BaseWidget
                 // Actions uniquement visibles pour les demandes approuvées
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\Action::make('statistics')
-                        ->label('Statistiques')
+                        ->label(__('filament.widgets.access_requests.column.statistics'))
                         ->icon('heroicon-o-chart-pie')
                         ->color('success')
                         ->url(fn($record) => ExperimentStatistics::getUrl(['record' => $record->experiment]))
                         ->visible(fn($record) => $record->status === 'approved'),
 
                     Tables\Actions\Action::make('sessions')
-                        ->label('Sessions')
+                        ->label(__('filament.widgets.access_requests.column.results'))
                         ->icon('heroicon-o-eye')
                         ->url(fn($record) => ExperimentSessions::getUrl(['record' => $record->experiment]))
                         ->visible(fn($record) => $record->status === 'approved'),
@@ -81,7 +81,7 @@ class ExperimentAccessRequestsWidget extends BaseWidget
                     ->icon('heroicon-m-ellipsis-vertical')
                     ->color('gray')
                     ->button()
-                    ->label('Actions')
+                    ->label(__('filament.widgets.access_requests.column.actions'))
             ])
             ->defaultPaginationPageOption(5)
             ->defaultSort('created_at', 'desc');

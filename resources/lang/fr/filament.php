@@ -2,11 +2,105 @@
 
 return [
     'widgets' => [
+        'dashboard_table' => [
+            'experiments' => [
+                'supervisor' => [
+                    'name' => 'Expérimentations',
+                    'description' => 'Total des expérimentations sous votre supervision',
+                ],
+                'principal' => [
+                    'name' => 'Mes expérimentations',
+                    'description' => 'Total de vos expérimentations',
+                ],
+            ],
+            'sessions' => [
+                'supervisor' => [
+                    'name' => 'Sessions',
+                    'description' => 'Nombre total de sessions',
+                ],
+                'principal' => [
+                    'name' => 'Sessions',
+                    'description' => 'Nombre total de sessions',
+                ],
+            ],
+            'users' => [
+                'supervisor' => [
+                    'name' => 'Expérimentateurs',
+                    'description' => 'Expérimentateurs principales',
+                ],
+                'principal' => [
+                    'name' => 'Expérimentateurs',
+                    'description' => 'Expérimentateurs secondaires',
+                ],
+            ],
+            'completions' => [
+                'supervisor' => [
+                    'name' => 'Taux de complétion',
+                    'description' => 'Sessions terminées avec succès'
+                ],
+                'principal' => [
+                    'name' => 'Taux de complétion',
+                    'description' => 'Sessions terminées avec succès'
+                ],
+            ],
+            'sessions_test' => [
+                'supervisor' => [
+                    'name' => 'Sessions Test',
+                    'description' => 'Sessions en cours de test'
+                ],
+                'principal' => [],
+            ],
+            'registrations' => [
+                'supervisor' => [
+                    'name' => 'Demandes d\'inscription',
+                    'description' => 'En attente d\'approbation',
+                ],
+            ],
+            'banned' => [
+                'supervisor' => [
+                    'name' => 'Utilisateurs bannis',
+                    'description' => 'Comptes désactivés',
+                ]
+            ]
+        ],
+        'banned' => [
+            'principal' => [
+                'title' => 'Compte banni',
+                'description' => 'Votre compte a été banni. Si vous pensez qu\'il s\'agit d\'une erreur ou souhaitez faire une demande de débannissement,
+                    vous pouvez contacter l\'administrateur via la page "Contacter l\'administrateur".',
+            ],
+            'secondary' => [
+                'title' => 'Compte banni',
+                'description' => 'L\'expérimentateur principal de votre compte a été banni. L\'accès à vos fonctionnalités est temporairement restreint.
+                    Veuillez contacter l\'administrateur via la page "Contacter l\'administrateur" pour plus d\'informations.',
+            ],
+        ],
+        'access_requests' => [
+            'heading' => 'Expérimentations empruntés',
+            'column' => [
+                'name' => 'Expérimentation',
+                'created_by' => 'Créateur',
+                'type' => 'Type',
+                'results' => 'Résultats',
+                'pass' => 'Passage',
+                'status' => 'Statut',
+                'pending' => 'En attente',
+                'approved' => 'Approuvé',
+                'created_at' => 'Demandé le',
+                'statistics' => 'Statistiques',
+                'sessions' => 'Sessions',
+                'actions' => 'Actions',
+            ],
+        ],
         'experiment_table' => [
-            'columns' => [
+            'column' => [
                 'creator' => 'Créé par',
                 'name' => 'Nom de l\'expérimentation',
                 'status' => 'État',
+                'start' => "Démarré",
+                'pause' => 'En pause',
+                'stop' => 'Arrêté',
+                'test' => 'En test',
                 'sessions_count' => 'Nombre de participants',
                 'created_at' => 'Date de création',
                 'user_role' => 'Votre rôle'
@@ -21,28 +115,93 @@ return [
                 'statistics' => 'Statistiques',
                 'details' => 'Détails'
             ]
-        ]
+        ],
     ],
-    'resources' => [
-        'my_experiment' => [
-            'navigation_label' => 'Mes Expérimentations',
-            'navigation_group' => 'Experiments',
-            'label' => 'Expérimentation',
-            'plural' => 'Mes Expérimentations',
-
-            'form' => [
-                'status' => [
-                    'label' => 'Démarrer l\'expérience ?',
-                    'options' => [
-                        'none' => 'Non',
-                        'start' => 'Oui',
-                    ]
-                ],
-                'link' => [
-                    'label' => 'Lien',
-                    'no_active_session' => 'Aucune session active'
-                ],
+    'pages' => [
+        'auth' => [
+            'register' => [
                 'name' => 'Nom',
+                'email' => [
+                    'label' => 'Email',
+                    'unique' => 'L\'email est déjà utilisé',
+                ],
+                'university' => 'Université',
+                'registration_reason' => [
+                    'label' => 'Pourquoi souhaitez-vous vous inscrire ?',
+                    'helpMessage' => 'Votre description doit faire minimum 50 caractères'
+                ],
+                'orcid' => 'Numéro ORCID',
+                'password' => [
+                    'label' => 'Mot de passe',
+                    'helpMessage' => 'Votre mot de passe doit faire minimum 8 caractères'
+                ],
+                'confirm_password' => [
+                    'label' => 'Confirmer mot de passe',
+                    'helpMessage' => 'Le mot de passe ne correspond pas'
+                ]
+            ],
+        ],
+        'admin_contact' => [
+            'title' => 'Contacter l\'administrateur',
+            'form' => [
+                'subject' => 'Sujet',
+                'options' => [
+                    'unban' => 'Demande de débannissement',
+                    'principal_banned' => 'Principal expérimentateur banni',
+                    'question' => 'Question Générale',
+                    'other' => 'Autre',
+                ],
+                'message' => [
+                    'label' => 'Description de la demande',
+                    'placeholder' => 'Saisissez votre message',
+                ],
+                'submit' => 'Envoyer le message',
+                'success' => 'Message envoyé avec succès'
+            ]
+        ],
+        'user_contact' => [
+            'title' => 'Contacter un utilisateur',
+            'form' => [
+                'user' => 'Utilisateur',
+                'experiment' => 'Expérimentation concernée (optionnel)',
+                'message' => [
+                    'label' => 'Message',
+                    'placeholder' => 'Saisissez votre message',
+                ],
+                'submit' => 'Envoyer le message',
+                'success' => 'Message envoyé avec succès'
+            ]
+        ],
+        'experiment_list' => [
+            'title' => 'Liste des Expérimentations',
+            'column' => [
+                'created_by' => 'Crée par',
+                'name' => 'Nom de l\'expérimentation',
+                'type' => 'Type',
+                'status' => 'Status',
+                'start' => "Démarré",
+                'pause' => 'En pause',
+                'stop' => 'Arrêté',
+                'test' => 'En test',
+                'none' => 'Aucun',
+                'sound' => 'Son',
+                'image' => 'Image',
+                'image_sound' => 'Image et son',
+                'sessions_count' => 'Nombre de sessions',
+                'created_at' => 'Créé le',
+                'action' => 'Voir l\'expérimentation'
+            ]
+        ],
+        'experiment_details' => [
+            'title' => "Détails de l'expérimentation",
+            'information_section' => [
+                'title' => "Informations de l'expérimentation",
+                'description' => "Détails et configuration de l'expérimentation",
+                'name' => "Nom",
+                'created_by' => "Créateur",
+                'created_at' => "Créé le",
+                'doi' => "DOI",
+                'link' => "Lien",
                 'type' => [
                     'label' => 'Type',
                     'options' => [
@@ -51,27 +210,168 @@ return [
                         'image_sound' => 'Image et Son',
                     ]
                 ],
+                'status' => [
+                    'label' => 'Statut',
+                    'options' => [
+                        'start' => 'Démarré',
+                        'pause' => 'En pause',
+                        'stop' => 'Arrêté',
+                        'test' => 'En test',
+                        'none' => 'Aucun',
+                    ]
+                ],
+            ],
+            'description_section' => [
+                'title' => "Description",
+                'description' => "Description détaillée de l'expérimentation",
+                'label' => "Description",
+            ],
+            'instruction_section' => [
+                'title' => "Instructions",
+                'description' => "Instructions pour les participants",
+                'label' => "Instructions",
+            ],
+            'settings_section' => [
+                'title' => "Paramètres visuels",
+                'description' => "Configuration des éléments visuels",
+                'button_size' => "Taille du bouton",
+                "button_color" => "Couleur du bouton"
+            ],
+            'medias_section' => [
+                'title' => "Médias",
+                'description' => "Fichiers médias utilisés dans l'expérimentation",
+                'medias' => "Médias",
+                "images" => "Images",
+                "sounds" => "Sons"
+            ],
+            'documents_section' => [
+                'title' => "Documents",
+                'description' => "Documents complémentaires",
+                'documents' => "Documents"
+            ],
+            'ban_action' => [
+                'label' => 'Bannir l\'expérimentateur',
+                'reason' => 'Raison du bannissement',
+                'helper' => 'Expliquez pourquoi vous bannissez cet expérimentateur',
+                'modalHeading' => 'Bannir l\'expérimentateur',
+                'modalDescription' => 'Cette action est irréversible. L\'expérimentateur et tous ses expérimentateurs secondaires n\'auront plus accès à la plateforme.'
+            ],
+            'notification' => [
+                'banned' => 'Expérimentateur banni avec succès'
+            ],
+            'action' => [
+                'contact' => 'Contacter l\'expérimentateur',
+            ]
+        ],
+        'experiments_sessions' => [],
+        'experiments_sessions_details' => [],
+        'experiments_sessions_export' => [],
+        'experiments_statistics' => [],
+    ],
+    'resources' => [
+        'my_experiment' => [
+            'navigation_label' => 'Mes Expérimentations',
+            'navigation_group' => 'Experiments',
+            'label' => 'Expérimentation',
+            'plural' => 'Mes Expérimentations',
+            'section_base' => [
+                'heading' => 'Configuration de base',
+                'description' => 'Paramètres principaux de votre expérimentation',
+            ],
+            'general_section' => [
+                'heading' => 'Informations générales',
+                'description' => 'Définissez les caractéristiques principales de votre expérience',
+            ],
+            'apparence_section' => [
+                'heading' => 'Apparence',
+                'description' => 'Personnalisez l\'apparence des boutons dans votre expérience',
+            ],
+            'section_description' => [
+                'heading' => 'Contenu',
+                'description' => 'Décrivez votre expérience et fournissez les instructions nécessaires',
+            ],
+            'section_media' => [
+                'heading' => 'Médias',
+                'description' => 'Ajoutez vos fichiers médias (limite de 20Mo par fichier)',
+            ],
+            'section_documents' => [
+                'heading' => 'Documents complémentaires',
+                'description' => 'Ajoutez des documents supplémentaires liés à votre expérience',
+            ],
+            'form' => [
+                'doi' => 'DOI',
+                'doi_placeholder' => 'Saisissez le DOI de votre expérimentation',
+                'doi_helper' => 'Le digital object identifier (DOI) est un mécanisme d\'identification de ressources stable, unique pour votre expérimentation.',
+                'howitworks' => 'Comment ça marche',
+                'howitworks_helper' => 'Si activé, l\'expérimentation en mode "test" sera visible sur la page Comment ça marche ?. Désactivé automatiquement si le status change.',
+                'status' => [
+                    'label' => 'Démarrer l\'expérience ?',
+                    'helper_text' => 'Mode "test" pour essayer sans sauvegarder de résultats. Mode "start" pour démarrer réellement l\'expérience.',
+                    'options' => [
+                        'stop' => 'Ne pas rendre accessible',
+                        'start' => 'Rendre accessible',
+                        'test' => 'Rendre accessible en mode test',
+                    ]
+                ],
+                'link' => 'Lien de l\'expérience',
+                'link_helper' => 'Lien unique pour accéder à votre expérience. Cliquez pour copier.',
+                'link_copied' => "Copié dans le presse-papier",
+                'name' => 'Nom',
+                'name_helper' => 'Donnez un nom unique et descriptif à votre expérimentation',
+                'type' => [
+                    'label' => 'Type de médias',
+                    'helper_text' => 'Choisissez le type de médias pour votre expérience. Cela déterminera les types de fichiers que vous pourrez uploader.',
+                    'options' => [
+                        'image' => 'Images uniquement',
+                        'sound' => 'Sons uniquement',
+                        'image_sound' => 'Images et Sons',
+                    ]
+                ],
                 'button_size' => [
                     'label' => 'Taille du bouton',
-                    'placeholder' => 'Taille du bouton en px'
+                    'helper_text' => 'La taille minimale recommandée est de 60px pour une bonne ergonomie'
                 ],
                 'button_color' => [
-                    'label' => 'Couleur du bouton',
-                    'placeholder' => 'Couleur du bouton'
+                    'label' => 'Couleur des boutons',
+                    'helper_text' => 'Choisissez une couleur visible pour les boutons de sons'
                 ],
                 'description' => 'Description',
-                'media' => 'Médias'
-            ],
+                'description_helper' => 'Décrivez les enjeux de votre expérimentation. Cette description sera visible publiquement.',
+                'instructions' => 'Instructions',
+                'instructions_helper' => 'Fournissez des instructions claires pour les participants.',
+                'media' => 'Médias',
+                'media_sound_helper' => 'Formats audio acceptés : MP3, WAV, AAC, OGG (max 20Mo)',
+                'media_image_helper' => 'Formats image acceptés : JPG, JPEG, PNG, GIF (max 20Mo)',
+                'media_image_sound_helper' => 'Formats acceptés : JPG, JPEG, PNG, GIF, WebP, MP3, WAV, AAC, OGG (max 20Mo)',
+                'documents' => 'Documents',
+                'documents_helper' => 'Formats acceptés : PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, CSV (max 20Mo)',
 
+            ],
             'table' => [
                 'columns' => [
                     'name' => 'Nom',
-                    'type' => 'Type',
-                    'status' => 'État',
+                    'type' => [
+                        'label' => 'Type',
+                        'options' => [
+                            'image' => 'Image',
+                            'sound' => 'Son',
+                            'image_sound' => 'Image et Son',
+                        ]
+                    ],
+                    'status' => [
+                        'label' => 'Statut',
+                        'options' => [
+                            'start' => 'Démarré',
+                            'pause' => 'En pause',
+                            'stop' => 'Arrêté',
+                            'test' => 'En test',
+                            'none' => 'Aucun',
+                        ]
+                    ],
+                    'howitworks' => 'Disponible sur "Comment ça marche ?"',
                     'created_at' => 'Date de création',
                 ]
             ],
-
             'actions' => [
                 'create' => 'Créer une expérimentation',
                 'edit' => 'Modifier',
@@ -88,9 +388,11 @@ return [
                     'start' => 'Démarrer',
                     'pause' => 'Pause',
                     'stop' => 'Arrêter',
+                    'test' => 'Test',
                     'start_desc' => 'Active la session et génère un lien unique s\'il n\'en existe pas. La session devient accessible aux participants.',
                     'pause_desc' => 'Suspend temporairement la session. Le lien reste actif, mais les participants ne peuvent pas continuer la session jusqu\'à sa reprise.',
                     'stop_desc' => 'Termine la session et désactive le lien. Pour réactiver la session, vous devez la redémarrer, ce qui génère un nouveau lien.',
+                    'test_desc' => 'Active la session en mode test. La session est accessible aux participants, mais aucun résultat n\'est sauvegardé.'
                 ],
                 'export' => [
                     'label' => 'Exporter',
@@ -155,6 +457,183 @@ return [
                     'created_at' => 'Date de demande',
                 ],
             ],
+        ],
+        'users' => [
+            'title' => "Utilisateur",
+            'table' => [
+                'name' => "Nom",
+                'email' => "Email",
+                'university' => "Université",
+                'status' => [
+                    'label' => "Status",
+                    'approved' => "Approuvé"
+                ],
+                'role' => [
+                    'label' => 'Rôle',
+                    'options' => [
+                        'supervisor' => 'Superviseur',
+                        'principal_experimenter' => 'Expérimentateur principal',
+                        'secondary_experimenter' => 'Expérimentateur secondaire',
+                    ]
+                ]
+            ],
+            'actions' => [
+                'create' => "Ajouter un utilisateur",
+                'contact' => 'Contact',
+                'show_experiment' => 'Voir les expérimentations',
+                'details' => "Détails",
+                'delete' => "Supprimer l'utilisateur"
+            ],
+            'form' => [
+                'name' => "Nom",
+                'email' => "Email",
+                'university' => "Université",
+                'role' => [
+                    'label' => 'Rôle',
+                    'options' => [
+                        'supervisor' => 'Superviseur',
+                        'principal_experimenter' => 'Expérimentateur principal',
+                        'secondary_experimenter' => 'Expérimentateur secondaire',
+                    ]
+                ],
+                'registration_reason' => "Motif d'inscription",
+                'banned_reason' => "Motif de bannissement",
+                'status' => [
+                    'label' => 'Status',
+                    'options' => [
+                        'approved' => 'Approuvé',
+                        'banned' => 'Bannir',
+                    ]
+                ],
+                'section' => [
+                    'history_section' => "Historique des actions",
+                    'history_section_description' => "Historique des différentes actions effectuées sur ce compte",
+                    'registration_reason' => "Motif d'inscription",
+                    'rejection_reason' => "Motif du rejet",
+                    'banned_reason' => "Motif de bannissement",
+                    'unbanned_reason' => "Motif de débannissement",
+                ],
+            ],
+            'notification' => [
+                'banned_reason' => 'Compte principal banni :',
+                'banned' => 'Utilisateur banni avec succès',
+            ]
+
+        ],
+        'banned' => [
+            'title' => "Utilisateurs bannis",
+            'form' => [
+                'name' => "Nom",
+                'email' => "Email",
+                'university' => "Université",
+                'registration_reason' => "Motif d'inscription",
+                'banned_reason' => "Motif de bannissement",
+                'status' => [
+                    'unban' => "Débannir"
+                ],
+                'unbanned_reason' => [
+                    'label' => "Motif du débannissement",
+                    "placeholder" => "Raison du débannissement",
+                    'helper' => "Une fois le débannissement enregistré, le compte principal reçoit un email. Les comptes secondaires qu'il a créé sont aussi débanni et reçoivent aussi un email"
+                ],
+            ],
+            'table' => [
+                'name' => 'Nom',
+                'email' => 'Email',
+                'university' => 'Université',
+                'created_at' => 'Date de demande',
+                'status' => [
+                    'label' => 'Statut',
+                    'banned' => 'Banni',
+                ],
+            ],
+            'notification' => [
+                'unbanned_reason' => 'Compte principal débanni :',
+                'unbanned' => 'Utilisateur débanni avec succès'
+            ],
+            'action' => [
+                'create' => "Ajouter un utilisateur",
+                'contact' => 'Contact',
+                'show_experiment' => 'Voir les expérimentations',
+                'details' => "Détails",
+                'delete' => "Supprimer l'utilisateur"
+            ]
+        ],
+        'pending_registration' => [
+            'title' => "Demandes D'inscription",
+            'form' => [
+                'name' => "Nom",
+                'email' => "Email",
+                'university' => "Université",
+                'registration_reason' => "Motif d'inscription",
+                'banned_reason' => "Motif de bannissement",
+                'status' => [
+                    'approved' => "Approuvé",
+                    'rejected' => "Rejeté",
+                ],
+                'rejected_reason' => [
+                    'label' => "Motif du rejet",
+                    "placeholder" => "Raison du rejet",
+                    'helper' => "Expliquez la raison du rejet de la demande d'inscription"
+                ],
+            ],
+            'table' => [
+                'name' => 'Nom',
+                'email' => 'Email',
+                'university' => 'Université',
+                'created_at' => 'Date de demande',
+                'status' => [
+                    'label' => 'Statut',
+                    'pending' => 'En Attente',
+                ],
+            ],
+            'notification' => [
+                'rejected_reason' => 'Compte principal débanni :',
+                'rejected' => 'Utilisateur débanni avec succès'
+            ],
+            'action' => [
+                'create' => "Ajouter un utilisateur",
+                'contact' => 'Contact',
+                'show_experiment' => 'Voir les expérimentations',
+                'details' => "Détails",
+                'delete' => "Supprimer l'utilisateur"
+            ]
+        ],
+        'rejected_user' => [
+            'title' => "Utilisateur rejetés",
+            'form' => [
+                'name' => "Nom",
+                'email' => "Email",
+                'university' => "Université",
+                'registration_reason' => "Motif d'inscription",
+                'banned_reason' => "Motif de bannissement",
+                'status' => [
+                    'approved' => "Approuvé",
+                    'rejected' => "Rejeté",
+                ],
+                'rejected_reason' => "Motif du rejet",
+            ],
+            'table' => [
+                'name' => 'Nom',
+                'email' => 'Email',
+                'university' => 'Université',
+                'created_at' => 'Date de demande',
+                'status' => [
+                    'label' => 'Statut',
+                    'rejected' => 'Rejeté',
+                ],
+            ],
+            'notification' => [
+                'rejected_reason' => 'Compte principal débanni :',
+                'rejected' => 'Utilisateur débanni avec succès'
+            ],
+            'action' => [
+                'create' => "Ajouter un utilisateur",
+                'contact' => 'Contact',
+                'show_experiment' => 'Voir les expérimentations',
+                'details' => "Détails",
+                'delete' => "Supprimer l'utilisateur"
+            ]
         ],
         'experiment' => [
             'actions' => [

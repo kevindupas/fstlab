@@ -75,9 +75,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->renderHook(
                 'panels::global-search.after',
-                fn (): string => Blade::render(<<<HTML
+                fn(): string => Blade::render(<<<HTML
                 <div class="flex items-center">
-                    <a href="/" class="bg-green-400 flex items-center gap-2 px-3 py-2 text-sm font-medium text-black dark:text-white hover:text-primary-500 focus:outline-none">
+                    <a href="/" class="rounded-lg flex items-center gap-2 px-3 py-2 text-sm font-medium text-black dark:text-white hover:text-primary-500 focus:outline-none">
                         <x-heroicon-o-home class="w-5 h-5" />
                         Accueil
                     </a>

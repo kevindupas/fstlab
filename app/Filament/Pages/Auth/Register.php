@@ -24,46 +24,56 @@ class Register extends BaseRegister
                 $this->makeForm()
                     ->schema([
                         TextInput::make('name')
-                            ->label('Nom complet')
+                            ->label(__('filament.pages.auth.register.name'))
                             ->required()
-                            ->maxLength(255)
-                            ->rules(['required', 'string', 'max:255']),
+                            ->maxLength(50)
+                            ->rules(['required', 'string', 'max:50']),
 
                         TextInput::make('email')
-                            ->label('Email')
+                            ->label(__('filament.pages.auth.register.email.label'))
                             ->email()
                             ->required()
                             ->unique('users')
+                            ->validationMessages([
+                                'unique' => __('filament.pages.auth.register.email.unique'),
+                            ])
                             ->rules(['required', 'email', 'max:255', 'unique:users']),
 
                         TextInput::make('university')
-                            ->label('Université')
+                            ->label(__('filament.pages.auth.register.university'))
                             ->required()
                             ->maxLength(255)
                             ->rules(['required', 'string', 'max:255']),
 
                         Textarea::make('registration_reason')
-                            ->label('Pourquoi souhaitez-vous vous inscrire ?')
+                            ->label(__('filament.pages.auth.register.registration_reason.label'))
                             ->required()
                             ->minLength(50)
+                            ->helperText(__('filament.pages.auth.register.registration_reason.helpMessage'))
                             ->rules(['required', 'string', 'min:50']),
 
                         TextInput::make('orcid')
-                            ->label('Numéro ORCID')
-                            ->maxLength(255),
-                        // ->rules(['nullable', 'string', 'max:255']),
+                            ->label(__('filament.pages.auth.register.orcid'))
+                            ->maxLength(25)
+                            ->rules(['nullable', 'string', 'max:25']),
 
                         TextInput::make('password')
-                            ->label('Mot de passe')
+                            ->label(__('filament.pages.auth.register.password.label'))
                             ->password()
                             ->required()
-                            ->rules(['required', 'string', Password::defaults()])
-                            ->same('password_confirmation'),
+                            ->validationMessages([
+                                'attributes' => __('filament.pages.auth.register.password.helpMessage'),
+                            ])
+                            ->rules(['required', 'string', Password::defaults()]),
 
                         TextInput::make('password_confirmation')
-                            ->label('Confirmation du mot de passe')
+                            ->label(__('filament.pages.auth.register.confirm_password.label'))
                             ->password()
                             ->required()
+                            ->validationMessages([
+                                'same' => __('filament.pages.auth.register.confirm_password.helpMessage'),
+                            ])
+                            ->same('password')
                             ->rules(['required', 'string'])
                             ->dehydrated(false),
                     ])
@@ -77,6 +87,7 @@ class Register extends BaseRegister
             'name' => $this->name,
             'email' => $this->email,
             'university' => $this->university,
+            'orcid' => $this->orcid,
             'registration_reason' => $this->registration_reason,
             'password' => $this->password,
             'password_confirmation' => $this->password_confirmation,

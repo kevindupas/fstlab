@@ -4,8 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\RejectedUsersResource\Pages;
 use App\Models\User;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -24,14 +22,9 @@ class RejectedUsersResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-user-minus';
     protected static ?string $navigationLabel = 'Utilisateurs rejetés';
 
-    public static function getModelLabel(): string
-    {
-        return __('Utilisateur rejeté');
-    }
-
     public static function getPluralModelLabel(): string
     {
-        return __('Utilisateurs rejetés');
+        return __('navigation.rejected_user');
     }
 
     public static function shouldRegisterNavigation(): bool
@@ -51,23 +44,29 @@ class RejectedUsersResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name')->disabled(),
-                TextInput::make('email')->disabled(),
-                TextInput::make('university')->disabled(),
+                TextInput::make('name')
+                    ->label(__('filament.resources.rejected_user.form.name'))
+                    ->disabled(),
+                TextInput::make('email')
+                    ->label(__('filament.resources.rejected_user.form.email'))
+                    ->disabled(),
+                TextInput::make('university')
+                    ->label(__('filament.resources.rejected_user.form.university'))
+                    ->disabled(),
                 Textarea::make('registration_reason')
                     ->disabled()
-                    ->label('Motif d\'inscription')
+                    ->label(__('filament.resources.rejected_user.form.registration_reason'))
                     ->columnSpan('full'),
                 Select::make('status')
                     ->options([
-                        'approved' => 'Approuver',
-                        'rejected' => 'Rejeter',
+                        'approved' => __('filament.resources.rejected_user.form.status.approved'),
+                        'rejected' => __('filament.resources.rejected_user.form.status.rejected'),
                     ])
                     ->required(),
                 Textarea::make('rejection_reason')
                     ->required(fn(Get $get) => $get('status') === 'rejected')
                     ->visible(fn(Get $get) => $get('status') === 'rejected')
-                    ->label('Motif du refus')->disabled()->columnSpan('full'),
+                    ->label(__('filament.resources.rejected_user.form.rejected_reason'))->disabled()->columnSpan('full'),
             ]);
     }
 
@@ -76,16 +75,20 @@ class RejectedUsersResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Nom'),
+                    ->label(__('filament.resources.rejected_user.table.name')),
                 Tables\Columns\TextColumn::make('email')
-                    ->label('Email'),
+                    ->label(__('filament.resources.rejected_user.table.email')),
                 Tables\Columns\TextColumn::make('university')
-                    ->label('Université'),
+                    ->label(__('filament.resources.rejected_user.table.university')),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Date de demande')
+                    ->label(__('filament.resources.rejected_user.table.created_at'))
                     ->dateTime(),
                 Tables\Columns\TextColumn::make('status')
-                    ->label(__('filament.resources.my_experiment.table.columns.status'))
+                    ->label(__('filament.resources.rejected_user.table.status.label'))
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'rejected' => __('filament.resources.rejected_user.table.status.rejected'),
+                        default => $state
+                    })
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'rejected' => 'danger',

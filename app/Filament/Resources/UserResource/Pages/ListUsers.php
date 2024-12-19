@@ -13,7 +13,7 @@ class ListUsers extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->label("Ajouter un utilisateur"),
+            Actions\CreateAction::make()->label(__('filament.resources.users.actions.create')),
         ];
     }
 }

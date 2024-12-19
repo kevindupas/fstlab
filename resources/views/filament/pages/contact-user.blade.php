@@ -4,7 +4,7 @@
 
         <div class="flex justify-end mt-6">
             <x-filament::button type="submit">
-                Envoyer
+                {{__('filament.pages.admin_contact.form.submit')}}
             </x-filament::button>
         </div>
     </form>

@@ -2,10 +2,8 @@
 
 namespace App\Filament\Pages\Experiments\Lists;
 
-use App\Filament\Pages\ContactUser;
 use App\Filament\Pages\Experiments\Details\ExperimentDetails;
 use App\Models\Experiment;
-use App\Models\User;
 use App\Traits\HasExperimentAccess;
 use Filament\Actions\Action;
 use Filament\Pages\Page;
@@ -13,9 +11,11 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\HtmlString;
 
 class ExperimentsList extends Page implements HasTable
 {
@@ -23,13 +23,19 @@ class ExperimentsList extends Page implements HasTable
     use HasExperimentAccess;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
-    protected static ?string $navigationLabel = 'Liste des Expérimentations';
     protected static ?string $slug = 'experiments-list';
     protected static ?int $navigationSort = 1;
 
     protected static string $view = 'filament.pages.experiments.lists.experiments-list';
 
-    protected static ?string $title = "Liste des Expérimentations";
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.pages.experiment_list.title');
+    }
+    public function getTitle(): string | Htmlable
+    {
+        return new HtmlString(__('filament.pages.experiment_list.title'));
+    }
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -81,41 +87,57 @@ class ExperimentsList extends Page implements HasTable
             })
             ->columns([
                 Tables\Columns\TextColumn::make('creator.name')
-                    ->label('Créateur')
+                    ->label(__('filament.pages.experiment_list.column.created_by'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Nom')
+                    ->label(__('filament.pages.experiment_list.column.name'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('type')
-                    ->label('Type')
+                    ->label(__('filament.pages.experiment_list.column.type'))
                     ->badge()
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'sound' => __('filament.pages.experiment_list.column.sound'),
+                        'image' => __('filament.pages.experiment_list.column.image'),
+                        'image_sound' => __('filament.pages.experiment_list.column.image_sound'),
+                        default => $state
+                    })
                     ->color(fn(string $state): string => match ($state) {
                         'sound' => 'success',
                         'image' => 'info',
                         'image_sound' => 'warning',
                     }),
                 Tables\Columns\TextColumn::make('status')
-                    ->label('Statut')
+                    ->label(__('filament.pages.experiment_list.column.status'))
                     ->badge()
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'start' => __('filament.pages.experiment_list.column.start'),
+                        'pause' => __('filament.pages.experiment_list.column.pause'),
+                        'stop' => __('filament.pages.experiment_list.column.stop'),
+                        'test' => __('filament.pages.experiment_list.column.test'),
+                        'none' => __('filament.pages.experiment_list.column.none'),
+                        default => $state
+                    })
                     ->colors([
                         'success' => 'start',
                         'warning' => 'pause',
                         'danger' => 'stop',
-                        'info' => 'none',
-                    ]),
+                        'info' => 'test',
+                        'gray' => 'none'
+                    ])
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('sessions_count')
-                    ->label('Nombre de sessions')
+                    ->label(__('filament.pages.experiment_list.column.sessions_count'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Créé le')
+                    ->label(__('filament.pages.experiment_list.column.created_at'))
                     ->dateTime()
                     ->sortable(),
             ])
             ->actions([
                 Tables\Actions\Action::make('view')
-                    ->label('Voir l\'expérimentation')
+                    ->label(__('filament.pages.experiment_list.column.action'))
                     ->icon('heroicon-o-eye')
                     ->url(fn(Experiment $record): string =>
                     ExperimentDetails::getUrl(['record' => $record]))

@@ -13,7 +13,7 @@ class ListMyExperiments extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->label(__('filament.resources.experiment.actions.create')),
+            Actions\CreateAction::make()->label(__('filament.resources.my_experiment.actions.create')),
         ];
     }
 }

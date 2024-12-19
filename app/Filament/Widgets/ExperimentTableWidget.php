@@ -70,65 +70,73 @@ class ExperimentTableWidget extends BaseWidget
             ->columns([
                 // Colonne du créateur uniquement visible pour les supervisors
                 Tables\Columns\TextColumn::make('creator.name')
-                    ->label(__('filament.widgets.experiment_table.columns.creator'))
+                    ->label(__('filament.widgets.experiment_table.column.creator'))
                     ->searchable()
                     ->sortable()
                     ->visible(fn() => $user->hasRole('supervisor')),
 
                 Tables\Columns\TextColumn::make('name')
-                    ->label(__('filament.widgets.experiment_table.columns.name'))
+                    ->label(__('filament.widgets.experiment_table.column.name'))
                     ->searchable()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('status')
-                    ->label(__('filament.widgets.experiment_table.columns.status'))
+                    ->label(__('filament.widgets.experiment_table.column.status'))
                     ->badge()
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'start' => __('filament.widgets.experiment_table.column.start'),
+                        'pause' => __('filament.widgets.experiment_table.column.pause'),
+                        'stop' => __('filament.widgets.experiment_table.column.stop'),
+                        'test' => __('filament.widgets.experiment_table.column.test'),
+                        default => $state
+                    })
                     ->colors([
                         'success' => 'start',
                         'warning' => 'pause',
                         'danger' => 'stop',
+                        'info' => 'test'
                     ])
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('sessions_count')
-                    ->label(__('filament.widgets.experiment_table.columns.sessions_count'))
+                    ->label(__('filament.widgets.experiment_table.column.sessions_count'))
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('filament.widgets.experiment_table.columns.created_at'))
+                    ->label(__('filament.widgets.experiment_table.column.created_at'))
                     ->date()
                     ->sortable(),
 
                 // Colonne du rôle uniquement visible pour les supervisors
-                Tables\Columns\TextColumn::make('user_role')
-                    ->label(__('filament.widgets.experiment_table.columns.user_role'))
-                    ->state(function (Experiment $record): string {
-                        /** @var \App\Models\User */
-                        $user = Auth::user();
-                        if ($user->hasRole('supervisor')) {
-                            return 'supervisor';
-                        }
-                        if ($record->created_by === $user->id) {
-                            return 'creator';
-                        }
-                        if (
-                            $user->hasRole('principal_experimenter') &&
-                            $user->createdUsers()->where('id', $record->created_by)->exists()
-                        ) {
-                            return 'manager';
-                        }
-                        return 'observer';
-                    })
-                    ->formatStateUsing(fn(string $state) => __("filament.widgets.experiment_table.roles.$state"))
-                    ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'supervisor' => 'warning',
-                        'creator' => 'success',
-                        'manager' => 'primary',
-                        'observer' => 'info',
-                        default => 'gray'
-                    })
-                    ->visible(fn() => $user->hasRole('supervisor')),
+//                Tables\Columns\TextColumn::make('user_role')
+//                    ->label(__('filament.widgets.experiment_table.columns.user_role'))
+//                    ->state(function (Experiment $record): string {
+//                        /** @var \App\Models\User */
+//                        $user = Auth::user();
+//                        if ($user->hasRole('supervisor')) {
+//                            return 'supervisor';
+//                        }
+//                        if ($record->created_by === $user->id) {
+//                            return 'creator';
+//                        }
+//                        if (
+//                            $user->hasRole('principal_experimenter') &&
+//                            $user->createdUsers()->where('id', $record->created_by)->exists()
+//                        ) {
+//                            return 'manager';
+//                        }
+//                        return 'observer';
+//                    })
+//                    ->formatStateUsing(fn(string $state) => __("filament.widgets.experiment_table.roles.$state"))
+//                    ->badge()
+//                    ->color(fn(string $state): string => match ($state) {
+//                        'supervisor' => 'warning',
+//                        'creator' => 'success',
+//                        'manager' => 'primary',
+//                        'observer' => 'info',
+//                        default => 'gray'
+//                    })
+//                    ->visible(fn() => $user->hasRole('supervisor')),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([

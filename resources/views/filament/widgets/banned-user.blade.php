@@ -6,10 +6,9 @@
                 <x-heroicon-o-x-circle class="w-6 h-6 text-danger-500" />
             </div>
             <div>
-                <h2 class="text-lg font-bold text-danger-900">Compte banni</h2>
+                <h2 class="text-lg font-bold text-danger-900">{{__('filament.widgets.banned.principal.title')}}</h2>
                 <p class="text-danger-600">
-                    Votre compte a été banni. Si vous pensez qu'il s'agit d'une erreur ou souhaitez faire une demande de débannissement,
-                    vous pouvez contacter l'administrateur via la page "Contacter l'administrateur".
+                    {{__('filament.widgets.banned.principal.description')}}
                 </p>
             </div>
         </div>
@@ -19,10 +18,9 @@
                 <x-heroicon-o-x-circle class="w-6 h-6 text-danger-500" />
             </div>
             <div>
-                <h2 class="text-lg font-bold text-danger-900">Accès restreint</h2>
+                <h2 class="text-lg font-bold text-danger-900">{{__('filament.widgets.banned.secondary.title')}}</h2>
                 <p class="text-danger-600">
-                    L'expérimentateur principal de votre compte a été banni. L'accès à vos fonctionnalités est temporairement restreint.
-                    Veuillez contacter l'administrateur via la page "Contacter l'administrateur" pour plus d'informations.
+                    {{__('filament.widgets.banned.secondary.description')}}
                 </p>
             </div>
         </div>

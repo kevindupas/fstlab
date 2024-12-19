@@ -13,16 +13,17 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\HtmlString;
 
 class ContactUser extends Page
 {
     use InteractsWithForms;
 
     protected static bool $shouldRegisterNavigation = true;
-    protected static ?string $slug = 'contact-user';  // Plus simple, pas de paramètres dans le slug
+    protected static ?string $slug = 'contact-user';
     protected static string $view = 'filament.pages.contact-user';
-    protected static ?string $title = "Contacter un utilisateur";
     protected static ?string $navigationIcon = 'heroicon-o-envelope';
 
     public ?User $user = null;
@@ -55,7 +56,7 @@ class ContactUser extends Page
         return $form
             ->schema([
                 Select::make('user_id')
-                    ->label('Expérimentateur')
+                    ->label(__('filament.pages.user_contact.form.user'))
                     ->options(
                         User::role('principal_experimenter')
                             ->where('status', 'approved')
@@ -71,7 +72,7 @@ class ContactUser extends Page
                     ->disabled(fn() => $this->user !== null),
 
                 Select::make('experiment_id')
-                    ->label('Expérimentation concernée (optionnel)')
+                    ->label(__('filament.pages.user_contact.form.experiment'))
                     ->options(function ($get) {
                         $userId = $get('user_id');
                         if ($userId) {
@@ -84,7 +85,8 @@ class ContactUser extends Page
                     ->disabled(fn() => $this->experiment !== null),
 
                 MarkdownEditor::make('message')
-                    ->label('Message')
+                    ->label(__('filament.pages.user_contact.form.message.label'))
+                    ->placeholder(__('filament.pages.user_contact.form.message.placeholder'))
                     ->required()
                     ->columnSpanFull()
                     ->toolbarButtons([
@@ -115,7 +117,7 @@ class ContactUser extends Page
         ));
 
         Notification::make()
-            ->title('Message envoyé')
+            ->title(__('filament.pages.admin_contact.form.success'))
             ->success()
             ->send();
 
@@ -127,6 +129,15 @@ class ContactUser extends Page
         } else {
             $this->form->fill();
         }
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.pages.user_contact.title');
+    }
+    public function getTitle(): string | Htmlable
+    {
+        return new HtmlString(__('filament.pages.user_contact.title'));
     }
 
 }

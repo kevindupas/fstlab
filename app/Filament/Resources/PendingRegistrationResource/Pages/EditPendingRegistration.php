@@ -7,10 +7,17 @@ use App\Notifications\RegistrationApproved;
 use App\Notifications\RegistrationRejected;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Contracts\Support\Htmlable;
 
 class EditPendingRegistration extends EditRecord
 {
     protected static string $resource = PendingRegistrationResource::class;
+
+    public function getTitle(): string | Htmlable
+    {
+        return __('filament.resources.pending_registration.title') . " : " . $this->record->name;
+    }
+
 
     protected function afterSave(): void
     {
@@ -30,7 +37,7 @@ class EditPendingRegistration extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()->label(__('filament.resources.pending_registration.action.delete')),
         ];
     }
 }

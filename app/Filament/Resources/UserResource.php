@@ -2,10 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Pages\ContactUser;
-use App\Filament\Pages\Experiments\Details\ExperimentDetails;
 use App\Filament\Resources\UserResource\Pages;
-use App\Models\Experiment;
 use App\Models\User;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -15,13 +12,13 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
-use Filament\Forms\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
 
 class UserResource extends Resource
 {
@@ -30,16 +27,15 @@ class UserResource extends Resource
     protected static ?string $navigationGroup = 'Users';
     protected static ?int $navigationSort = -1;
     protected static ?string $navigationIcon = 'heroicon-o-user';
-    protected static ?string $navigationLabel = 'Utilisateurs Approuvés';
 
     public static function getModelLabel(): string
     {
-        return __('Utilisateur Approuvé');
+        return __('navigation.approved_user');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Utilisateurs Approuvés');
+        return __('navigation.approved_user');
     }
 
     public static function form(Form $form): Form
@@ -61,30 +57,46 @@ class UserResource extends Resource
         return $form
             ->schema([
                 TextInput::make('name')
+                    ->label(__('filament.resources.users.form.name'))
                     ->required()
                     ->maxLength(255)
                     ->disabled(fn($livewire) => !$livewire instanceof Pages\CreateUser),
                 TextInput::make('email')
+                    ->label(__('filament.resources.users.form.email'))
                     ->email()
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->maxLength(255)
                     ->disabled(fn($livewire) => !$livewire instanceof Pages\CreateUser),
                 TextInput::make('university')
+                    ->label(__('filament.resources.users.form.university'))
                     ->required()
                     ->maxLength(255)
                     ->disabled(fn($livewire) => !$livewire instanceof Pages\CreateUser),
                 Select::make('roles')
-                    // ->multiple(false)
-                    ->relationship('roles', 'name')
-                    ->options($roleOptions)
+                    ->label(__('filament.resources.users.form.role.label'))
+                    ->multiple(false)
+                    ->relationship(
+                        name: 'roles',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn(Builder $query) => $query->whereNot('name', 'supervisor')
+                    )
+                    ->getOptionLabelFromRecordUsing(fn(Role $record) => __('filament.resources.users.form.role.options.' . $record->name))
+                    ->disableOptionWhen(function (string $value) {
+                        $role = Role::where('id', $value)->first();
+                        /** @var \App\Models\User $user */
+                        $user = Auth::user();
+                        return match ($role->name) {
+                            'principal_experimenter' => !$user->hasRole('supervisor'),
+                            'secondary_experimenter' => !$user->hasRole('principal_experimenter'),
+                        };
+                    })
                     ->required()
-                    ->default(fn($record) => $record ? $record->roles->first()->name : null)
                     ->visible(fn() => !empty($roleOptions))
                     ->disabled(fn($livewire) => !$livewire instanceof Pages\CreateUser),
 
                 Textarea::make('registration_reason')
-                    ->label('Motif d\'inscription')
+                    ->label(__('filament.resources.users.form.registration_reason'))
                     ->visible(
                         fn($record, $livewire) =>
                         $livewire instanceof Pages\EditUser &&
@@ -95,10 +107,10 @@ class UserResource extends Resource
                     ->columnSpan('full'),
 
                 Select::make('status')
-                    ->label('Statut')
+                    ->label(__('filament.resources.users.form.status.label'))
                     ->options([
-                        'approved' => "Approuvé",
-                        'banned' => "Bannir",
+                        'approved' => __('filament.resources.users.form.status.options.approved'),
+                        'banned' => __('filament.resources.users.form.status.options.banned'),
                     ])
                     ->required()
                     ->live()
@@ -109,47 +121,47 @@ class UserResource extends Resource
                 Textarea::make('banned_reason')
                     ->required(fn(Get $get) => $get('status') === 'banned')
                     ->visible(fn(Get $get) => $get('status') === 'banned')
-                    ->label('Motif du bannissement')
+                    ->label(__('filament.resources.users.form.banned_reason'))
                     ->live()
                     ->dehydrated(true)
                     ->columnSpan('full'),
 
 
-                Section::make('Historique des actions')
-                    ->description('Historique des différentes actions effectuées sur ce compte')
+                Section::make(__('filament.resources.users.form.section.history_section'))
+                    ->description(__('filament.resources.users.form.section.history_section_description'))
                     ->icon('heroicon-o-clock')
                     ->schema([
                         Grid::make(1)
                             ->schema([
                                 Textarea::make('registration_reason')
-                                    ->label('Motif d\'inscription')
+                                    ->label(__('filament.resources.users.form.section.registration_reason'))
                                     ->visible(fn($record) => filled($record->registration_reason))
                                     ->disabled()
-                                    ->extraAttributes(['class' => 'bg-blue-50']),
+                                    ->extraAttributes(['class' => 'bg-blue-300 dark:bg-blue-300']),
 
                                 Textarea::make('rejection_reason')
-                                    ->label('Motif de rejet')
+                                    ->label(__('filament.resources.users.form.section.rejection_reason'))
                                     ->visible(fn($record) => filled($record->rejection_reason))
                                     ->disabled()
-                                    ->extraAttributes(['class' => 'bg-red-50']),
+                                    ->extraAttributes(['class' => 'bg-red-300 dark:bg-red-300']),
 
                                 Textarea::make('banned_reason')
-                                    ->label('Motif de bannissement')
+                                    ->label(__('filament.resources.users.form.section.banned_reason'))
                                     ->visible(fn($record) => filled($record->banned_reason))
                                     ->disabled()
-                                    ->extraAttributes(['class' => 'bg-red-50']),
+                                    ->extraAttributes(['class' => 'bg-red-300 dark:bg-red-200']),
 
                                 Textarea::make('unbanned_reason')
-                                    ->label('Motif de débannissement')
+                                    ->label(__('filament.resources.users.form.section.unbanned_reason'))
                                     ->visible(fn($record) => filled($record->unbanned_reason))
                                     ->disabled()
-                                    ->extraAttributes(['class' => 'bg-green-50']),
+                                    ->extraAttributes(['class' => 'bg-green-300 dark:bg-green-200']),
 
                             ])
                             ->columnSpan('full'),
                     ])
                     ->collapsible()
-                    ->collapsed(true)
+                    ->collapsed(false)
                     ->visible(
                         fn($record, $livewire) =>
                         !($livewire instanceof Pages\CreateUser) &&
@@ -168,35 +180,44 @@ class UserResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')->searchable()
+                    ->label(__('filament.resources.users.table.name'))
                     ->sortable(),
-                TextColumn::make('email')->searchable()
+                TextColumn::make('email')
+                    ->searchable()
+                    ->label(__('filament.resources.users.table.email'))
                     ->sortable(),
                 TextColumn::make('status')
-                    ->label(__('filament.resources.my_experiment.table.columns.status'))
+                    ->label(__('filament.resources.users.table.status.label'))
                     ->badge()
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'approved' => __('filament.resources.users.table.status.approved'),
+                        default => $state
+                    })
                     ->color(fn(string $state): string => match ($state) {
                         'approved' => 'success',
                         'pending' => 'warning',
                         'banned' => 'danger',
                     }),
                 TextColumn::make('roles')
-                    ->label('Roles')
+                    ->label(__('filament.resources.users.table.role.label'))
                     ->formatStateUsing(function ($state, $record) {
                         return $record->roles->pluck('name')->join(', ');
                     }),
             ])
             ->actions([
                 Tables\Actions\Action::make('contact')
-                    ->label('Contact')
+                    ->label(__('filament.resources.users.actions.contact'))
                     ->icon('heroicon-o-envelope')
                     ->color('warning')
-                    ->url(fn (User $record) => "/admin/contact-user?user={$record->id}"),
+                    ->url(fn(User $record) => "/admin/contact-user?user={$record->id}"),
                 Tables\Actions\Action::make('experiments')
-                    ->label('Voir les expériences')
+                    ->label(__('filament.resources.users.actions.show_experiment'))
                     ->icon('heroicon-o-beaker')
                     ->color('info')
-                    ->url(fn (User $record) => "/admin/experiments-list?filter_user={$record->id}"),
-                EditAction::make()->label('Détails')->icon('heroicon-o-eye'),
+                    ->url(fn(User $record) => "/admin/experiments-list?filter_user={$record->id}"),
+                EditAction::make()
+                    ->label(__('filament.resources.users.actions.details'))
+                    ->icon('heroicon-o-eye'),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
