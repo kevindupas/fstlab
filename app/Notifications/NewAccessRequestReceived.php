@@ -37,16 +37,36 @@ class NewAccessRequestReceived extends Notification
     public function toMail($notifiable): MailMessage
     {
         $requester = $this->request->user;
+        $requestType = match ($this->request->type) {
+            'results' => 'aux résultats',
+            'access' => 'de collaboration complète',
+            'duplicate' => 'de duplication',
+            default => 'd\'accès'
+        };
 
-        return (new MailMessage)
-            ->subject('Nouvelle demande d\'accès aux résultats')
+        $message = (new MailMessage)
+            ->subject("Nouvelle demande $requestType")
             ->greeting('Bonjour ' . $notifiable->name)
-            ->line('Vous avez reçu une nouvelle demande d\'accès aux résultats pour votre expérimentation.')
+            ->line("Vous avez reçu une nouvelle demande $requestType pour votre expérimentation.")
             ->line('Détails de la demande :')
             ->line('Expérimentation : ' . $this->request->experiment->name)
             ->line('Demandeur : ' . $requester->name)
-            ->line('Message : ' . $this->request->request_message)
-            ->action('Gérer la demande', route('filament.admin.resources.experiment-access-requests.edit', $this->request));
+            ->line('Message : ' . $this->request->request_message);
+
+        if ($this->request->type === 'access') {
+            $message->line('Cette collaboration donnera accès :')
+                ->line('- Aux résultats et statistiques')
+                ->line('- À la possibilité de faire passer des sessions')
+                ->line('- Au partage des résultats avec les autres collaborateurs');
+        } elseif ($this->request->type === 'duplicate') {
+            $message->line('En acceptant la duplication :')
+                ->line('- Une copie de votre expérimentation sera créée')
+                ->line('- Le demandeur en sera le nouveau créateur')
+                ->line('- Vous serez référencé comme créateur original')
+                ->line('- Les médias seront dupliqués avec l\'expérimentation');
+        }
+
+        return $message->action('Gérer la demande', route('filament.admin.resources.experiment-access-requests.edit', $this->request));
     }
 
     /**

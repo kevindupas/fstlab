@@ -14,14 +14,7 @@ export function Layout({ children }) {
 
     return (
         <DeviceOrientationCheck>
-            <div
-                className={clsx(
-                    "min-h-full",
-                    "bg-white",
-                    "antialiased",
-                    "font-inter"
-                )}
-            >
+            <div className="min-h-full bg-white antialiased font-inter">
                 {showHeader && <Header />}
                 <div className="flex min-h-full flex-col">{children}</div>
                 {showHeader && <Footer />}

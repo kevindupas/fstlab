@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../Contexts/AuthContext";
 import { useExperiments } from "../Contexts/ExperimentsContext";
 import Modal from "../Components/Modal";
-import { ArrowLeft, Lock } from "lucide-react";
+import { ArrowLeft, Lock, Copy } from "lucide-react";
 import clsx from "clsx";
 import { useTranslation } from "../Contexts/LanguageContext";
 
@@ -11,7 +11,7 @@ function ExperimentDetail() {
     const { id } = useParams();
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, user } = useAuth();
     const { experiments } = useExperiments();
     const [showRequestModal, setShowRequestModal] = useState(false);
     const [requestMessage, setRequestMessage] = useState("");
@@ -19,6 +19,7 @@ function ExperimentDetail() {
 
     // Trouver l'expérience dans le contexte
     const experiment = experiments.find((exp) => exp.id.toString() === id);
+    const isCreator = user && experiment.created_by === user.id;
 
     if (!experiment) {
         return (
@@ -88,9 +89,31 @@ function ExperimentDetail() {
         }
     };
 
+    const getRequestModalTitle = () => {
+        switch (requestType) {
+            case "results":
+                return t("experiment.detail.call_to_result_access");
+            case "duplicate":
+                return t("experiment.detail.call_to_duplicate");
+            default:
+                return t("experiment.detail.call_to_experiment_access");
+        }
+    };
+
+    const getRequestPlaceholder = () => {
+        switch (requestType) {
+            case "results":
+                return t("experiment.detail.placeholderResult");
+            case "duplicate":
+                return t("experiment.detail.placeholderDuplicate");
+            default:
+                return t("experiment.detail.placeholderExperiment");
+        }
+    };
+
     return (
         <div className="bg-white px-6 py-12">
-            <div className="mx-auto max-w-3xl pb-12">
+            <div className="mx-auto max-w-5xl pb-12">
                 <button
                     onClick={() => navigate("/experiments")}
                     className="mb-6 inline-flex items-center text-indigo-600 hover:text-indigo-500"
@@ -103,13 +126,30 @@ function ExperimentDetail() {
                     <h1 className="text-4xl font-bold text-gray-900">
                         {experiment.name}
                     </h1>
-                    <div className="mt-4 flex items-center gap-4">
+                    <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
                         <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-500">Par</span>
+                            <span className="text-sm text-gray-500">
+                                {t("experiment.detail.by")}
+                            </span>
                             <span className="text-sm font-medium text-gray-900">
                                 {experiment.creator_name}
+                                {isCreator && (
+                                    <span className="ml-2 inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
+                                        {t("experiment.detail.you")}
+                                    </span>
+                                )}
                             </span>
                         </div>
+                        {experiment.original_creator_name && (
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-gray-500">
+                                    {t("experiment.detail.original_creator")}
+                                </span>
+                                <span className="text-sm font-medium text-indigo-600">
+                                    {experiment.original_creator_name}
+                                </span>
+                            </div>
+                        )}
                         <div className="flex items-center gap-2">
                             <span className="text-sm text-gray-500">
                                 {experiment.completed_sessions_count}{" "}
@@ -129,8 +169,165 @@ function ExperimentDetail() {
                         </p>
                     </section>
 
+                    <section>
+                        <h2 className="text-2xl font-bold text-gray-900">
+                            {t("experiment.detail.type")}
+                        </h2>
+                        <div className="mt-4">
+                            <span
+                                className={clsx(
+                                    "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium",
+                                    {
+                                        "bg-blue-100 text-blue-700":
+                                            experiment.type === "image",
+                                        "bg-green-100 text-green-700":
+                                            experiment.type === "sound",
+                                        "bg-purple-100 text-purple-700":
+                                            experiment.type === "image_sound",
+                                    }
+                                )}
+                            >
+                                {experiment.type === "image" &&
+                                    t("experiment.detail.type_image")}
+                                {experiment.type === "sound" &&
+                                    t("experiment.detail.type_sound")}
+                                {experiment.type === "image_sound" &&
+                                    t("experiment.detail.type_image_sound")}
+                            </span>
+                        </div>
+                    </section>
+
+                    {experiment.instruction && (
+                        <section>
+                            <h2 className="text-2xl font-bold text-gray-900">
+                                {t("experiment.detail.instructions")}
+                            </h2>
+                            <div
+                                className="mt-4 prose prose-blue max-w-none"
+                                dangerouslySetInnerHTML={{
+                                    __html: experiment.instruction,
+                                }}
+                            />
+                        </section>
+                    )}
+
+                    {experiment.media && (
+                        <>
+                            {/* Section Images */}
+                            {experiment.media.some(
+                                (media) => !media.match(/\.(mp3|wav)$/)
+                            ) && (
+                                <section>
+                                    <h2 className="text-2xl font-bold text-gray-900">
+                                        {t("experiment.detail.images")}
+                                    </h2>
+                                    <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
+                                        {experiment.media
+                                            .filter(
+                                                (media) =>
+                                                    !media.match(/\.(mp3|wav)$/)
+                                            )
+                                            .map((media, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="relative aspect-square group"
+                                                >
+                                                    <img
+                                                        src={media}
+                                                        alt={`Media ${
+                                                            index + 1
+                                                        }`}
+                                                        className="rounded-lg object-cover w-full h-full"
+                                                        draggable="false"
+                                                        style={{
+                                                            WebkitUserSelect:
+                                                                "none",
+                                                            userSelect: "none",
+                                                            pointerEvents:
+                                                                "none",
+                                                        }}
+                                                    />
+                                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity flex items-end rounded-lg">
+                                                        <div className="p-2 w-full text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <p className="text-sm truncate">
+                                                                {media
+                                                                    .split("/")
+                                                                    .pop()}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Section Sons */}
+                            {experiment.media.some((media) =>
+                                media.match(/\.(mp3|wav)$/)
+                            ) && (
+                                <section className="mt-8">
+                                    <h2 className="text-2xl font-bold text-gray-900">
+                                        {t("experiment.detail.sounds")}
+                                    </h2>
+                                    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {experiment.media
+                                            .filter((media) =>
+                                                media.match(/\.(mp3|wav)$/)
+                                            )
+                                            .map((media, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="p-4 border rounded-lg bg-gray-50"
+                                                >
+                                                    <div className="text-sm text-gray-500 mb-2">
+                                                        {media.split("/").pop()}
+                                                    </div>
+                                                    <audio
+                                                        controls
+                                                        controlsList="nodownload"
+                                                        className="w-full"
+                                                    >
+                                                        <source
+                                                            src={media}
+                                                            type="audio/mpeg"
+                                                        />
+                                                    </audio>
+                                                </div>
+                                            ))}
+                                    </div>
+                                </section>
+                            )}
+                        </>
+                    )}
+
+                    {experiment.documents &&
+                        experiment.documents.length > 0 && (
+                            <section>
+                                <h2 className="text-2xl font-bold text-gray-900">
+                                    {t("experiment.detail.documents")}
+                                </h2>
+                                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {experiment.documents.map((doc, index) => (
+                                        <a
+                                            key={index}
+                                            href={doc}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                                        >
+                                            <span className="flex-1 truncate">
+                                                {doc.split("/").pop()}
+                                            </span>
+                                            <ArrowLeft className="h-4 w-4 transform rotate-[-135deg]" />
+                                        </a>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
                     <div className="mt-10 space-y-4">
-                        {!isAuthenticated && (
+                        {!isAuthenticated ? (
                             <div className="rounded-md bg-red-50 p-4">
                                 <p className="text-sm text-red-700">
                                     {t("experiment.detail.isNotAuthenticated")}
@@ -142,42 +339,70 @@ function ExperimentDetail() {
                                     </a>
                                 </p>
                             </div>
+                        ) : isCreator ? (
+                            <></>
+                        ) : (
+                            <div className="flex gap-4 justify-end">
+                                <button
+                                    onClick={() =>
+                                        handleRequestAccess("results")
+                                    }
+                                    disabled={!isAuthenticated}
+                                    className={clsx(
+                                        "rounded-md px-4 py-2 text-sm font-semibold text-white inline-flex items-center",
+                                        isAuthenticated
+                                            ? "bg-blue-600 hover:bg-blue-500"
+                                            : "bg-slate-500 cursor-not-allowed"
+                                    )}
+                                >
+                                    {!isAuthenticated && (
+                                        <Lock className="h-4 w-4 mr-2" />
+                                    )}
+                                    {t(
+                                        "experiment.detail.call_to_result_access"
+                                    )}
+                                </button>
+                                <button
+                                    onClick={() =>
+                                        handleRequestAccess("access")
+                                    }
+                                    disabled={!isAuthenticated}
+                                    className={clsx(
+                                        "rounded-md px-4 py-2 text-sm font-semibold text-white inline-flex items-center",
+                                        isAuthenticated
+                                            ? "bg-green-600 hover:bg-green-500"
+                                            : "bg-slate-500 cursor-not-allowed"
+                                    )}
+                                >
+                                    {!isAuthenticated && (
+                                        <Lock className="h-4 w-4 mr-2" />
+                                    )}
+                                    {t(
+                                        "experiment.detail.call_to_experiment_access"
+                                    )}
+                                </button>
+                                <button
+                                    onClick={() =>
+                                        handleRequestAccess("duplicate")
+                                    }
+                                    disabled={!isAuthenticated}
+                                    className={clsx(
+                                        "rounded-md px-4 py-2 text-sm font-semibold text-white inline-flex items-center",
+                                        isAuthenticated
+                                            ? "bg-purple-600 hover:bg-purple-500"
+                                            : "bg-slate-500 cursor-not-allowed"
+                                    )}
+                                >
+                                    {!isAuthenticated && (
+                                        <Lock className="h-4 w-4 mr-2" />
+                                    )}
+                                    {isAuthenticated && (
+                                        <Copy className="h-4 w-4 mr-2" />
+                                    )}
+                                    {t("experiment.detail.call_to_duplicate")}
+                                </button>
+                            </div>
                         )}
-
-                        <div className="flex gap-4 justify-end">
-                            <button
-                                onClick={() => handleRequestAccess("results")}
-                                disabled={!isAuthenticated}
-                                className={clsx(
-                                    "rounded-md px-4 py-2 text-sm font-semibold text-white inline-flex items-center",
-                                    isAuthenticated
-                                        ? "bg-blue-600 hover:bg-blue-500"
-                                        : "bg-slate-500 cursor-not-allowed"
-                                )}
-                            >
-                                {!isAuthenticated && (
-                                    <Lock className="h-4 w-4 mr-2" />
-                                )}
-                                {t("experiment.detail.call_to_result_access")}
-                            </button>
-                            <button
-                                onClick={() => handleRequestAccess("access")}
-                                disabled={!isAuthenticated}
-                                className={clsx(
-                                    "rounded-md px-4 py-2 text-sm font-semibold text-white inline-flex items-center",
-                                    isAuthenticated
-                                        ? "bg-green-600 hover:bg-green-500"
-                                        : "bg-slate-500 cursor-not-allowed"
-                                )}
-                            >
-                                {!isAuthenticated && (
-                                    <Lock className="h-4 w-4 mr-2" />
-                                )}
-                                {t(
-                                    "experiment.detail.call_to_experiment_access"
-                                )}
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -189,11 +414,7 @@ function ExperimentDetail() {
                     setShowRequestModal(false);
                     setRequestMessage("");
                 }}
-                title={
-                    requestType === "results"
-                        ? t("experiment.detail.call_to_result_access")
-                        : t("experiment.detail.call_to_experiment_access")
-                }
+                title={getRequestModalTitle()}
                 footer={
                     <>
                         <button
@@ -230,13 +451,7 @@ function ExperimentDetail() {
                             rows="4"
                             value={requestMessage}
                             onChange={(e) => setRequestMessage(e.target.value)}
-                            placeholder={
-                                requestType === "results"
-                                    ? t("experiment.detail.placeholderResult")
-                                    : t(
-                                          "experiment.detail.placeholderExperiment"
-                                      )
-                            }
+                            placeholder={getRequestPlaceholder()}
                         />
                         {requestMessage.length < 10 && (
                             <p className="mt-1 text-sm text-red-500">

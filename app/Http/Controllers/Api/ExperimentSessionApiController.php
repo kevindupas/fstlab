@@ -3,35 +3,46 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Experiment;
+use App\Models\ExperimentLink;
 use App\Models\ExperimentSession;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ExperimentSessionApiController extends Controller
 {
 
     protected function resolveExperiment($link)
     {
-        $experiment = Experiment::where('link', $link)->first();
+        $experimentLink = ExperimentLink::with('experiment')
+            ->where('link', $link)
+            ->whereIn('status', ['start', 'pause', 'test'])
+            ->first();
 
-        if (!$experiment) {
+        if (!$experimentLink) {
             return response()->json([
-                'message' => 'No experiment associated with this link.'
+                'message' => 'No active experiment associated with this link.'
             ], 404);
         }
 
-        return $experiment;
+        if ($experimentLink->status === 'pause') {
+            return response()->json([
+                'message' => 'This experiment is currently paused. Please try again later.'
+            ], 403);
+        }
+
+        return $experimentLink;
     }
 
     public function show($link)
     {
-        $experiment = $this->resolveExperiment($link);
-        if (!$experiment) {
+        $experimentLink = $this->resolveExperiment($link);
+        if (!$experimentLink || !$experimentLink->experiment) {
             return response()->json([
                 'message' => 'No experiment associated with this link.'
             ], 404);
         }
 
+        $experiment = $experimentLink->experiment;
         $mediaArray = is_string($experiment->media) ? json_decode($experiment->media, true) : $experiment->media;
         $media = collect($mediaArray)->map(function ($item) use ($experiment) {
             return [
@@ -44,7 +55,10 @@ class ExperimentSessionApiController extends Controller
         });
 
         return response()->json([
-            'experiment' => $experiment,
+            'experiment' => array_merge($experiment->toArray(), [
+                'status' => $experimentLink->status,
+                'link' => $experimentLink->link
+            ]),
             'media' => $media,
             'experiment_id' => $experiment->id,
         ]);
@@ -52,11 +66,12 @@ class ExperimentSessionApiController extends Controller
 
     public function registerParticipant(Request $request, $link)
     {
-
-        $experiment = $this->resolveExperiment($link);
-        if (!$experiment) {
+        $experimentLink = $this->resolveExperiment($link);
+        if (!$experimentLink || !$experimentLink->experiment) {
             return response()->json(['message' => 'Experiment not found.'], 404);
         }
+
+        $experiment = $experimentLink->experiment;
 
         $request->validate([
             'participant_number' => 'required|string|max:255',
@@ -67,7 +82,7 @@ class ExperimentSessionApiController extends Controller
             'screen_height' => 'required|integer',
         ]);
 
-        // Vérification si l'email existe déjà
+        // Vérification si le numéro existe déjà
         $existingSession = ExperimentSession::where('experiment_id', $experiment->id)
             ->where('participant_number', $request->participant_number)
             ->first();
@@ -78,6 +93,7 @@ class ExperimentSessionApiController extends Controller
 
         $session = ExperimentSession::create([
             'experiment_id' => $experiment->id,
+            'experiment_link_id' => $experimentLink->id,
             'participant_number' => $request->participant_number,
             'status' => 'created',
             'started_at' => now(),

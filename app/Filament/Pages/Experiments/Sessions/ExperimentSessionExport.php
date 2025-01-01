@@ -4,14 +4,10 @@ namespace App\Filament\Pages\Experiments\Sessions;
 
 use App\Models\ExperimentSession;
 use App\Traits\HasExperimentAccess;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Pages\Page;
-use Illuminate\Support\Facades\Auth;
 use League\Csv\Writer;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -25,22 +21,40 @@ class ExperimentSessionExport extends Page
     protected static string $view = 'filament.pages.experiments.sessions.experiment-session-export';
 
     public ExperimentSession $record;
+    public ?int $experiment_id = null;
     public ?array $data = [];
 
-    // Ajoutez ces propriétés publiques pour les champs du formulaire
     public ?array $basic_fields = [];
     public ?array $group_fields = [];
-    public ?array $action_fields = [];
-    public ?string $action_time_format = 'readable';
 
-    public function mount(ExperimentSession $record): void
+    public function mount(): void
     {
-        if ($record->experiment->created_by !== Auth::id()) {
-            abort(403, __('filament.pages.experiments_sessions_export.access_denied'));
+
+        // Vérifie si l'enregistrement existe
+        if (!$this->record) {
+            redirect()->route('filament.admin.resources.experiment-sessions.index')->with('error', 'Session not found');
+            return;
         }
 
-        $this->record = $record;
+        $this->experiment_id = $this->record->experiment_id;
         $this->basic_fields = ['participant_number', 'created_at', 'duration'];
+        $this->form->fill();
+
+        // Valeurs par défaut
+        $this->basic_fields = [
+            'participant_number',
+            'experimenter_info',
+            'dates',
+            'duration',
+            'system_info',
+            'feedback'
+        ];
+        $this->group_fields = [
+            'group_names',
+            'group_comments',
+            'media_info'
+        ];
+
         $this->form->fill();
     }
 
@@ -48,64 +62,35 @@ class ExperimentSessionExport extends Page
     {
         return $form
             ->schema([
-                Tabs::make(__('filament.pages.experiments_sessions_export.tabs.title'))
+                Tabs::make('Export Options')
                     ->tabs([
-                        Tabs\Tab::make(__('filament.pages.experiments_sessions_export.tabs.basic_info'))
+                        Tabs\Tab::make('Informations basiques')
                             ->schema([
                                 CheckboxList::make('basic_fields')
-                                    ->label(__('filament.pages.experiments_sessions_export.fields.basic_fields.label'))
+                                    ->label('Sélectionner les champs')
                                     ->options([
-                                        'participant_number' => __('filament.pages.experiments_sessions_export.fields.basic_fields.options.participant_number'),
-                                        'created_at' => __('filament.pages.experiments_sessions_export.fields.basic_fields.options.created_at'),
-                                        'completed_at' => __('filament.pages.experiments_sessions_export.fields.basic_fields.options.completed_at'),
-                                        'duration' => __('filament.pages.experiments_sessions_export.fields.basic_fields.options.duration'),
-                                        'browser' => __('filament.pages.experiments_sessions_export.fields.basic_fields.options.browser'),
-                                        'operating_system' => __('filament.pages.experiments_sessions_export.fields.basic_fields.options.operating_system'),
-                                        'device_type' => __('filament.pages.experiments_sessions_export.fields.basic_fields.options.device_type'),
-                                        'screen_dimensions' => __('filament.pages.experiments_sessions_export.fields.basic_fields.options.screen_dimensions'),
-                                        'feedback' => __('filament.pages.experiments_sessions_export.fields.basic_fields.options.feedback'),
+                                        'participant_number' => 'Numéro du participant',
+                                        'experimenter_info' => 'Informations sur l\'expérimentateur (nom et type)',
+                                        'dates' => 'Dates (création et complétion)',
+                                        'duration' => 'Durée',
+                                        'system_info' => 'Informations système (navigateur, OS, appareil, résolution)',
+                                        'feedback' => 'Feedback',
                                     ])
                                     ->columns(2)
-                                    ->default([
-                                        'participant_number',
-                                        'created_at',
-                                        'duration'
-                                    ]),
+                                    ->helperText('Ces informations seront exportées pour chaque session'),
                             ]),
 
-                        Tabs\Tab::make(__('filament.pages.experiments_sessions_export.tabs.group_data'))
+                        Tabs\Tab::make('Données des groupes')
                             ->schema([
                                 CheckboxList::make('group_fields')
-                                    ->label(__('filament.pages.experiments_sessions_export.fields.group_fields.label'))
+                                    ->label('Sélectionner les données des groupes')
                                     ->options([
-                                        'group_names' => __('filament.pages.experiments_sessions_export.fields.group_fields.options.group_names'),
-                                        'group_comments' => __('filament.pages.experiments_sessions_export.fields.group_fields.options.group_comments'),
-                                        'media_positions' => __('filament.pages.experiments_sessions_export.fields.group_fields.options.media_positions'),
-                                        'media_interactions' => __('filament.pages.experiments_sessions_export.fields.group_fields.options.media_interactions'),
-                                        'group_compositions' => __('filament.pages.experiments_sessions_export.fields.group_fields.options.group_compositions'),
+                                        'group_names' => 'Noms des groupes',
+                                        'group_comments' => 'Commentaires des groupes',
+                                        'media_info' => 'Informations sur les médias (noms, positions, interactions)'
                                     ])
-                                    ->columns(2),
-                            ]),
-
-                        Tabs\Tab::make(__('filament.pages.experiments_sessions_export.tabs.action_log'))
-                            ->schema([
-                                CheckboxList::make('action_fields')
-                                    ->label(__('filament.pages.experiments_sessions_export.fields.action_fields.label'))
-                                    ->options([
-                                        'moves' => __('filament.pages.experiments_sessions_export.fields.action_fields.options.moves'),
-                                        'sounds' => __('filament.pages.experiments_sessions_export.fields.action_fields.options.sounds'),
-                                        'images' => __('filament.pages.experiments_sessions_export.fields.action_fields.options.images'),
-                                    ])
-                                    ->columns(2),
-
-                                Select::make('action_time_format')
-                                    ->label(__('filament.pages.experiments_sessions_export.fields.time_format.label'))
-                                    ->options([
-                                        'timestamp' => __('filament.pages.experiments_sessions_export.fields.time_format.options.timestamp'),
-                                        'readable' => __('filament.pages.experiments_sessions_export.fields.time_format.options.readable'),
-                                        'elapsed' => __('filament.pages.experiments_sessions_export.fields.time_format.options.elapsed'),
-                                    ])
-                                    ->default('readable'),
+                                    ->columns(2)
+                                    ->helperText('Ces informations seront exportées pour chaque groupe'),
                             ]),
                     ])
                     ->columnSpanFull(),
@@ -114,226 +99,156 @@ class ExperimentSessionExport extends Page
 
     public function export(): StreamedResponse
     {
+        $sessions = collect([$this->record]);
         $data = $this->form->getState();
-        $csvData = $this->prepareExportData($data);
 
-        return response()->streamDownload(function () use ($csvData) {
+        return response()->streamDownload(function () use ($sessions, $data) {
             $csv = Writer::createFromString();
-            $csv->insertOne(array_keys($csvData[0]));
-            $csv->insertAll($csvData);
+            $csv->setDelimiter(',');
+            $csv->setEnclosure('"');
 
+            // Construction des en-têtes en fonction des sélections
+            $headers = ['session_id'];
+
+            if (in_array('participant_number', $data['basic_fields'])) {
+                $headers[] = 'participant_number';
+            }
+            if (in_array('experimenter_info', $data['basic_fields'])) {
+                $headers[] = 'experimenter_name';
+                $headers[] = 'experimenter_type';
+            }
+            if (in_array('dates', $data['basic_fields'])) {
+                $headers[] = 'created_at';
+                $headers[] = 'completed_at';
+            }
+            if (in_array('duration', $data['basic_fields'])) {
+                $headers[] = 'duration_seconds';
+            }
+            if (in_array('system_info', $data['basic_fields'])) {
+                $headers[] = 'browser';
+                $headers[] = 'system';
+                $headers[] = 'device';
+                $headers[] = 'screen_width';
+                $headers[] = 'screen_height';
+            }
+            if (in_array('feedback', $data['basic_fields'])) {
+                $headers[] = 'feedback';
+            }
+
+            // En-têtes pour les groupes
+            if (!empty($data['group_fields'])) {
+                for ($i = 1; $i <= 3; $i++) {
+                    if (in_array('group_names', $data['group_fields'])) {
+                        $headers[] = "group{$i}_name";
+                    }
+                    if (in_array('group_comments', $data['group_fields'])) {
+                        $headers[] = "group{$i}_comment";
+                    }
+                    if (in_array('media_info', $data['group_fields'])) {
+                        for ($j = 1; $j <= 4; $j++) {
+                            $headers[] = "group{$i}_media{$j}_name";
+                            $headers[] = "group{$i}_media{$j}_interactions";
+                            $headers[] = "group{$i}_media{$j}_x";
+                            $headers[] = "group{$i}_media{$j}_y";
+                        }
+                    }
+                }
+            }
+
+            $csv->insertOne($headers);
+
+            foreach ($sessions as $session) {
+                $row = [(int)$session->id];
+
+                if (in_array('participant_number', $data['basic_fields'])) {
+                    $row[] = (string)$session->participant_number;
+                }
+                if (in_array('experimenter_info', $data['basic_fields'])) {
+                    $row[] = $session->experimentLink?->user?->name ?? 'NA';
+                    $row[] = $this->getExperimenterType($session);
+                }
+                if (in_array('dates', $data['basic_fields'])) {
+                    $row[] = $session->created_at->format('Y-m-d H:i:s');
+                    $row[] = $session->completed_at?->format('Y-m-d H:i:s') ?? 'NA';
+                }
+                if (in_array('duration', $data['basic_fields'])) {
+                    $row[] = number_format($session->duration / 1000, 3, '.', '');
+                }
+                if (in_array('system_info', $data['basic_fields'])) {
+                    $row[] = $session->browser ?? 'NA';
+                    $row[] = $session->operating_system ?? 'NA';
+                    $row[] = $session->device_type ?? 'NA';
+                    $row[] = (string)$session->screen_width;
+                    $row[] = (string)$session->screen_height;
+                }
+                if (in_array('feedback', $data['basic_fields'])) {
+                    $row[] = $this->cleanText($session->feedback);
+                }
+
+                // Données des groupes
+                if (!empty($data['group_fields'])) {
+                    $groupData = json_decode($session->group_data, true) ?? [];
+                    for ($i = 0; $i < 3; $i++) {
+                        $group = $groupData[$i] ?? null;
+
+                        if (in_array('group_names', $data['group_fields'])) {
+                            $row[] = $group ? $this->cleanText($group['name'] ?? 'NA') : 'NA';
+                        }
+                        if (in_array('group_comments', $data['group_fields'])) {
+                            $row[] = $group ? $this->cleanText($group['comment'] ?? 'NA') : 'NA';
+                        }
+                        if (in_array('media_info', $data['group_fields'])) {
+                            $elements = $group ? ($group['elements'] ?? []) : [];
+                            for ($j = 0; $j < 4; $j++) {
+                                $element = $elements[$j] ?? null;
+                                if ($element) {
+                                    $row[] = basename($element['url']);
+                                    $row[] = (int)($element['interactions'] ?? 0);
+                                    $row[] = number_format($element['x'] ?? 0, 3, '.', '');
+                                    $row[] = number_format($element['y'] ?? 0, 3, '.', '');
+                                } else {
+                                    $row[] = 'NA';
+                                    $row[] = '0';
+                                    $row[] = '0.000';
+                                    $row[] = '0.000';
+                                }
+                            }
+                        }
+                    }
+                }
+
+                $csv->insertOne($row);
+            }
+
+            echo "\xEF\xBB\xBF"; // BOM UTF-8
             echo $csv->toString();
-        }, "session-{$this->record->id}-" . date('Y-m-d') . '.csv', [
+        }, "sessions-export-" . date('Y-m-d') . '.csv', [
             'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="sessions-export-' . date('Y-m-d') . '.csv"'
         ]);
     }
 
-    protected function prepareExportData(array $formData): array
+    private function cleanText(?string $text): string
     {
-        $exportData = [];
-        $groupData = json_decode($this->record->group_data, true);
-        $actionsLog = json_decode($this->record->actions_log, true);
+        if (empty($text)) return 'NA';
+        return str_replace(["\n", "\r", ",", ";"], [" ", " ", " ", " "], $text);
+    }
 
-        $orderedColumns = [];
-
-        // 1. Données de base
-        if (!empty($formData['basic_fields'])) {
-            foreach ($formData['basic_fields'] as $field) {
-                switch ($field) {
-                    case 'participant_number':
-                        $orderedColumns[__('filament.pages.experiments_sessions_export.csv.participant')] = '';
-                        break;
-                    case 'created_at':
-                        $orderedColumns[__('filament.pages.experiments_sessions_export.csv.created_at')] = '';
-                        break;
-                    case 'completed_at':
-                        $orderedColumns[__('filament.pages.experiments_sessions_export.csv.completed_at')] = '';
-                        break;
-                    case 'duration':
-                        $orderedColumns[__('filament.pages.experiments_sessions_export.csv.duration')] = '';
-                        break;
-                    case 'browser':
-                        $orderedColumns[__('filament.pages.experiments_sessions_export.csv.browser')] = '';
-                        break;
-                    case 'operating_system':
-                        $orderedColumns[__('filament.pages.experiments_sessions_export.csv.system')] = '';
-                        break;
-                    case 'device_type':
-                        $orderedColumns[__('filament.pages.experiments_sessions_export.csv.device')] = '';
-                        break;
-                    case 'screen_dimensions':
-                        $orderedColumns[__('filament.pages.experiments_sessions_export.csv.screen')] = '';
-                        break;
-                    case 'feedback':
-                        $orderedColumns[__('filament.pages.experiments_sessions_export.csv.feedback')] = '';
-                        break;
-                }
-            }
+    private function getExperimenterType(ExperimentSession $session): string
+    {
+        if (!$session->experimentLink) {
+            return 'NA';
         }
 
-        // 2. Données des groupes
-        if (!empty($formData['group_fields'])) {
-            foreach ($groupData as $groupIndex => $group) {
-                $groupNumber = $groupIndex + 1;
-                $groupPrefix = __('filament.pages.experiments_sessions_export.csv.group_prefix', ['number' => $groupNumber]);
-
-                if (in_array('group_names', $formData['group_fields'])) {
-                    $orderedColumns["{$groupPrefix} - " . __('filament.pages.experiments_sessions_export.csv.name')] = '';
-                }
-                if (in_array('group_comments', $formData['group_fields'])) {
-                    $orderedColumns["{$groupPrefix} - " . __('filament.pages.experiments_sessions_export.csv.comment')] = '';
-                }
-                if (in_array('group_compositions', $formData['group_fields'])) {
-                    $orderedColumns["{$groupPrefix} - " . __('filament.pages.experiments_sessions_export.csv.media')] = '';
-                }
-                if (in_array('media_interactions', $formData['group_fields'])) {
-                    foreach ($group['elements'] as $element) {
-                        $mediaName = basename($element['url']);
-                        $orderedColumns["{$groupPrefix} - {$mediaName} - " . __('filament.pages.experiments_sessions_export.csv.interactions')] = '';
-                    }
-                }
-                if (in_array('media_positions', $formData['group_fields'])) {
-                    foreach ($group['elements'] as $element) {
-                        $mediaName = basename($element['url']);
-                        $orderedColumns["{$groupPrefix} - {$mediaName} - " . __('filament.pages.experiments_sessions_export.csv.position')] = '';
-                    }
-                }
-            }
+        if ($session->experimentLink->is_creator) {
+            return 'creator';
         }
 
-        // 3. Actions
-        if (!empty($formData['action_fields'])) {
-            $orderedColumns[__('filament.pages.experiments_sessions_export.csv.time')] = '';
-            $orderedColumns[__('filament.pages.experiments_sessions_export.csv.type')] = '';
-            $orderedColumns[__('filament.pages.experiments_sessions_export.csv.media')] = '';
-            $orderedColumns[__('filament.pages.experiments_sessions_export.csv.position_x')] = '';
-            $orderedColumns[__('filament.pages.experiments_sessions_export.csv.position_y')] = '';
+        if ($session->experimentLink->is_secondary) {
+            return 'secondary';
         }
 
-        // Création de la ligne avec les données de base
-        $row = array_fill_keys(array_keys($orderedColumns), '');
-
-        // Remplissage des données de base
-        if (!empty($formData['basic_fields'])) {
-            foreach ($formData['basic_fields'] as $field) {
-                switch ($field) {
-                    case 'participant_number':
-                        $row[__('filament.pages.experiments_sessions_export.csv.participant')] = $this->record->participant_number;
-                        break;
-                    case 'created_at':
-                        $row[__('filament.pages.experiments_sessions_export.csv.created_at')] = $this->record->created_at->format('Y-m-d H:i:s');
-                        break;
-                    case 'completed_at':
-                        $row[__('filament.pages.experiments_sessions_export.csv.completed_at')] = $this->record->completed_at->format('Y-m-d H:i:s');
-                        break;
-                    case 'duration':
-                        $row[__('filament.pages.experiments_sessions_export.csv.duration')] = number_format($this->record->duration / 1000, 2);
-                        break;
-                    case 'browser':
-                        $row[__('filament.pages.experiments_sessions_export.csv.browser')] = $this->record->browser;
-                        break;
-                    case 'operating_system':
-                        $row[__('filament.pages.experiments_sessions_export.csv.system')] = $this->record->operating_system;
-                        break;
-                    case 'device_type':
-                        $row[__('filament.pages.experiments_sessions_export.csv.device')] = $this->record->device_type;
-                        break;
-                    case 'screen_dimensions':
-                        $row[__('filament.pages.experiments_sessions_export.csv.screen')] = "{$this->record->screen_width}x{$this->record->screen_height}";
-                        break;
-                    case 'feedback':
-                        $row[__('filament.pages.experiments_sessions_export.csv.feedback')] = $this->record->feedback;
-                        break;
-                }
-            }
-        }
-
-        // Remplissage des données des groupes
-        if (!empty($formData['group_fields'])) {
-            foreach ($groupData as $groupIndex => $group) {
-                $groupNumber = $groupIndex + 1;
-                $groupPrefix = __('filament.pages.experiments_sessions_export.csv.group_prefix', ['number' => $groupNumber]);
-
-                if (in_array('group_names', $formData['group_fields'])) {
-                    $row["{$groupPrefix} - " . __('filament.pages.experiments_sessions_export.csv.name')] = $group['name'];
-                }
-                if (in_array('group_comments', $formData['group_fields'])) {
-                    $row["{$groupPrefix} - " . __('filament.pages.experiments_sessions_export.csv.comment')] = $group['comment'] ?? '';
-                }
-                if (in_array('group_compositions', $formData['group_fields'])) {
-                    $mediaNames = collect($group['elements'])
-                        ->map(fn($element) => basename($element['url']))
-                        ->join(', ');
-                    $row["{$groupPrefix} - " . __('filament.pages.experiments_sessions_export.csv.media')] = $mediaNames;
-                }
-                if (in_array('media_interactions', $formData['group_fields'])) {
-                    foreach ($group['elements'] as $element) {
-                        $mediaName = basename($element['url']);
-                        $row["{$groupPrefix} - {$mediaName} - " . __('filament.pages.experiments_sessions_export.csv.interactions')] = $element['interactions'] ?? 0;
-                    }
-                }
-                if (in_array('media_positions', $formData['group_fields'])) {
-                    foreach ($group['elements'] as $element) {
-                        $mediaName = basename($element['url']);
-                        $row["{$groupPrefix} - {$mediaName} - " . __('filament.pages.experiments_sessions_export.csv.position')] =
-                            __('filament.pages.experiments_sessions_export.csv.position_format', [
-                                'x' => number_format($element['x'], 2),
-                                'y' => number_format($element['y'], 2)
-                            ]);
-                    }
-                }
-            }
-        }
-
-        // Actions
-        if (!empty($formData['action_fields'])) {
-            $actionRows = [];
-            foreach ($actionsLog as $action) {
-                if (
-                    (in_array('moves', $formData['action_fields']) && $action['type'] === 'move') ||
-                    (in_array('sounds', $formData['action_fields']) && $action['type'] === 'sound') ||
-                    (in_array('images', $formData['action_fields']) && $action['type'] === 'image')
-                ) {
-                    $actionRow = $row;
-
-                    switch ($formData['action_time_format']) {
-                        case 'timestamp':
-                            $actionRow[__('filament.pages.experiments_sessions_export.csv.time')] = $action['time'];
-                            break;
-                        case 'readable':
-                            $actionRow[__('filament.pages.experiments_sessions_export.csv.time')] = \Carbon\Carbon::createFromTimestampMs($action['time'])->format('H:i:s.v');
-                            break;
-                        case 'elapsed':
-                            $actionRow[__('filament.pages.experiments_sessions_export.csv.time')] = number_format(
-                                ($action['time'] - strtotime($this->record->created_at) * 1000) / 1000,
-                                3
-                            );
-                            break;
-                    }
-
-                    $actionRow[__('filament.pages.experiments_sessions_export.csv.type')] = match ($action['type']) {
-                        'move' => __('filament.pages.experiments_sessions_export.csv.action_types.move'),
-                        'sound' => __('filament.pages.experiments_sessions_export.csv.action_types.sound'),
-                        'image' => __('filament.pages.experiments_sessions_export.csv.action_types.image'),
-                    };
-
-                    $actionRow[__('filament.pages.experiments_sessions_export.csv.media')] = basename($action['id']);
-
-                    if ($action['type'] === 'move') {
-                        $actionRow[__('filament.pages.experiments_sessions_export.csv.position_x')] = number_format($action['x'], 2);
-                        $actionRow[__('filament.pages.experiments_sessions_export.csv.position_y')] = number_format($action['y'], 2);
-                    }
-
-                    $actionRows[] = $actionRow;
-                }
-            }
-
-            $exportData = !empty($actionRows) ? $actionRows : [$row];
-        } else {
-            $exportData = [$row];
-        }
-
-        return $exportData;
+        return 'collaborator';
     }
 
     public function getTitle(): string

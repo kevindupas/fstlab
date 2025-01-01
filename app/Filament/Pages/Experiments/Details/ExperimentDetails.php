@@ -6,6 +6,7 @@ use App\Filament\Pages\Experiments\Lists\ExperimentsList;
 use App\Models\Experiment;
 use App\Models\User;
 use App\Notifications\UserBanned;
+use App\Traits\HasExperimentAccess;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Infolists\Infolist;
@@ -30,18 +31,31 @@ class ExperimentDetails extends Page
 
     public function mount(Experiment $record): void
     {
-        // Empêcher l'accès aux expérimentations du supervisor
-        if (
-            $record->created_by === Auth::user()->id ||
-            (Auth::user()->hasRole('supervisor') && User::find($record->created_by)->hasRole('supervisor'))
-        ) {
-            $this->redirect(ExperimentsList::getUrl());
+        /** @var \App\Models\User */
+        $user = Auth::user();
+
+        // Vérifier si l'utilisateur a le droit d'accéder
+        $hasAccess =
+            // C'est le créateur
+            $record->created_by === $user->id ||
+            // C'est un compte secondaire du créateur
+            $user->created_by === $record->created_by ||
+            // C'est un superviseur (sauf si l'expérimentation appartient à un autre superviseur)
+            ($user->hasRole('supervisor') && !User::find($record->created_by)->hasRole('supervisor')) ||
+            // C'est un collaborateur qui a accès via les access_requests
+            $record->accessRequests()
+            ->where('user_id', $user->id)
+            ->where('status', 'approved')
+            ->exists();
+
+        if (!$hasAccess) {
+            // Rediriger vers la liste des expérimentations
+            $this->redirect('/admin/experiments');
             return;
         }
 
         $this->record = $record;
     }
-
     public function experimentInfolist(Infolist $infolist): Infolist
     {
         return $infolist
@@ -85,6 +99,12 @@ class ExperimentDetails extends Page
                         TextEntry::make('status')
                             ->label('Statut')
                             ->badge()
+                            ->getStateUsing(function ($record) {
+                                $experimentLink = $record->links()
+                                    ->where('user_id', $record->created_by)
+                                    ->first();
+                                return $experimentLink ? $experimentLink->status : 'stop';
+                            })
                             ->formatStateUsing(fn(string $state): string => match ($state) {
                                 'start' => __('filament.pages.experiment_details.information_section.status.options.start'),
                                 'pause' => __('filament.pages.experiment_details.information_section.status.options.pause'),
@@ -297,6 +317,8 @@ class ExperimentDetails extends Page
 
     protected function getHeaderActions(): array
     {
+        /** @var \App\Models\User */
+        $user = Auth::user();
         return [
             \Filament\Actions\Action::make('banUser')
                 ->label(__('filament.pages.experiment_details.ban_action.label'))
@@ -316,7 +338,7 @@ class ExperimentDetails extends Page
                 ])
                 ->modalHeading(__('filament.pages.experiment_details.ban_action.modalHeading'))
                 ->modalDescription(__('filament.pages.experiment_details.ban_action.modalDescription'))
-                ->visible(fn() => auth()->user()->hasRole('supervisor'))
+                ->visible(fn() => $user->hasRole('supervisor'))
                 ->action(function (array $data) {
                     // Récupérer l'utilisateur qui a créé cette expérimentation
                     $user = User::find($this->record->created_by);
@@ -335,14 +357,72 @@ class ExperimentDetails extends Page
                         ->send();
 
                     // Rediriger vers la liste des expérimentations
-                    $this->redirect(ExperimentsList::getUrl());
+                    $this->redirect('/admin/experiments');
                 }),
-            \Filament\Actions\Action::make('contactUs')
-                ->label(__('filament.pages.experiment_details.action.contact'))
-                ->color('info')
+            \Filament\Actions\Action::make('edit')
+                ->label(__('filament.pages.experiment_details.actions.edit'))
+                ->icon('heroicon-o-pencil')
+                ->color('warning')
+                ->url("/admin/my-experiments/{$this->record->id}/edit")
+                // Visible pour :
+                // - Le créateur
+                // - Les comptes secondaires du créateur
+                // - Les collaborateurs qui ont le droit de configurer (can_configure)
+                ->visible(
+                    fn() =>
+                    $this->record->created_by === $user->id ||
+                        $user->created_by === $this->record->created_by ||
+                        $this->record->users()
+                        ->wherePivot('user_id', $user->id)
+                        ->wherePivot('can_configure', true)
+                        ->exists()
+                ),
+
+            \Filament\Actions\Action::make('contactCreator')
+                ->label(__('filament.pages.experiment_details.actions.contact'))
                 ->icon('heroicon-o-envelope')
-                ->url("/admin/contact-user?user={$this->record->created_by}&experiment={$this->record->id}")
-                ->hidden(fn() => User::find($this->record->created_by)->hasRole('supervisor'))
+                ->url("/admin/contact-principal?experiment={$this->record->id}")
+                // Visible pour :
+                // - Les comptes secondaires
+                // - Les collaborateurs
+                // Mais pas pour :
+                // - Le créateur lui-même
+                // - Le superviseur si c'est une expérimentation d'un superviseur
+                ->visible(
+                    fn() => (
+                        ($user->hasRole('supervisor') !== ($this->record->created_by === $user->id) || $user->hasRole('secondary_experimenter') ||
+                            $this->record->accessRequests()
+                            ->where('user_id', $user->id)
+                            ->where('status', 'approved')
+                            ->exists()
+                        )
+                    )
+                ),
         ];
     }
+
+    // public static function canAccess(): bool
+    // {
+    //     $experimentId = request()->query('record');
+    //     if (!$experimentId) {
+    //         return false;
+    //     }
+
+    //     $experiment = Experiment::find($experimentId);
+    //     if (!$experiment) {
+    //         return false;
+    //     }
+
+    //     // Vérifie si l'utilisateur actuel est un compte secondaire du créateur
+    //     $user = Auth::user();
+    //     $isSecondaryAccount = $user->created_by === $experiment->created_by;
+
+    //     // Utilisation du trait HasExperimentAccess
+    //     $instance = new class {
+    //         use HasExperimentAccess;
+    //     };
+
+    //     // Retourne true si l'utilisateur a accès via HasExperimentAccess OU si c'est un compte secondaire
+    //     return $instance->canAccessExperiment($experiment) || $isSecondaryAccount;
+    // }
 }

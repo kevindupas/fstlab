@@ -8,10 +8,10 @@ import { Button } from "../Components/Button";
 import { ChevronsDown } from "lucide-react";
 import FloatingLanguageButton from "../Components/FloatingLanguageButton";
 import { useTranslation } from "../Contexts/LanguageContext";
-import {useExperimentStatus} from "../Contexts/ExperimentStatusContext.jsx";
+import { useExperimentStatus } from "../Contexts/ExperimentStatusContext.jsx";
 
 const logos = {
-    ut2j: new URL("../../assets/logos/ut2j_logo.png", import.meta.url).href,
+    ut2j: new URL("../../assets/logos/univ.png", import.meta.url).href,
     clle: new URL("../../assets/logos/cnrs.png", import.meta.url),
     anr: new URL("../../assets/logos/MSHS.png", import.meta.url).href,
 };
@@ -119,7 +119,7 @@ export default function Home() {
                                                 <img
                                                     src={company.logo}
                                                     alt={company.name}
-                                                    className="h-28 w-auto"
+                                                    className="h-16 w-auto"
                                                 />
                                             </li>
                                         ))}

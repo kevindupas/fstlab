@@ -93,6 +93,9 @@ return [
             ],
         ],
         'experiment_table' => [
+            'title' => 'My Experiments',
+            'title_secondary_experimenter' => 'Assigned experiments',
+            'title_default' => 'Experiments available',
             'column' => [
                 'creator' => 'Created by',
                 'name' => 'Experiment Name',
@@ -101,6 +104,14 @@ return [
                 'pause' => 'Paused',
                 'stop' => 'Stopped',
                 'test' => 'In Test',
+                'type' => [
+                    'label' => 'Type',
+                    'options' => [
+                        'image' => 'Image',
+                        'sound' => 'Sound',
+                        'image_sound' => 'Image and Sound',
+                    ]
+                ],
                 'sessions_count' => 'Number of Participants',
                 'created_at' => 'Creation Date',
                 'user_role' => 'Your Role',
@@ -114,6 +125,10 @@ return [
             'actions' => [
                 'statistics' => 'Statistics',
                 'details' => 'Details',
+                'edit' => 'Edit',
+                'contact_creator' => 'Contact Creator',
+                'results' => 'Results',
+
             ],
         ],
     ],
@@ -160,6 +175,7 @@ return [
             ],
         ],
         'user_contact' => [
+            'title_secondary_experimenter' => 'Contact my experimenter',
             'title' => 'Contact a User',
             'form' => [
                 'user' => 'User',
@@ -170,26 +186,6 @@ return [
                 ],
                 'submit' => 'Send Message',
                 'success' => 'Message sent successfully',
-            ],
-        ],
-        'experiment_list' => [
-            'title' => 'Experiment List',
-            'column' => [
-                'created_by' => 'Created by',
-                'name' => 'Experiment Name',
-                'type' => 'Type',
-                'status' => 'Status',
-                'start' => 'Started',
-                'pause' => 'Paused',
-                'stop' => 'Stopped',
-                'test' => 'In Test',
-                'none' => 'None',
-                'sound' => 'Sound',
-                'image' => 'Image',
-                'image_sound' => 'Image and Sound',
-                'sessions_count' => 'Number of Sessions',
-                'created_at' => 'Created on',
-                'action' => 'View Experiment',
             ],
         ],
         'experiment_details' => [
@@ -259,8 +255,9 @@ return [
             'notification' => [
                 'banned' => 'Experimenter successfully banned',
             ],
-            'action' => [
+            'actions' => [
                 'contact' => 'Contact Experimenter',
+                'edit' => 'Edit',
             ],
         ],
         'experiments_sessions' => [
@@ -465,6 +462,36 @@ return [
         ],
     ],
     'resources' => [
+        'experiment_list' => [
+            'title' => 'Experiment List',
+            'titleFilter' => 'list of :username experiments',
+            'column' => [
+                'created_by' => 'Created by',
+                'name' => 'Experiment Name',
+                'type' => 'Type',
+                'status' => 'Status',
+                'start' => 'Started',
+                'pause' => 'Paused',
+                'stop' => 'Stopped',
+                'test' => 'In Test',
+                'none' => 'None',
+                'sound' => 'Sound',
+                'image' => 'Image',
+                'image_sound' => 'Image and Sound',
+                'sessions_count' => 'Number of Sessions',
+                'created_at' => 'Created on',
+                'action' => 'View Experiment',
+            ],
+            'tabs' => [
+                'all' => 'All Experiments',
+                'sound' => 'Sound',
+                'image' => 'Image',
+                'image_sound' => 'Image and Sound',
+            ],
+            'actions' => [
+                'clearFilter' => 'Clear Filter',
+            ],
+        ],
         'my_experiment' => [
             'navigation_label' => 'My Experiments',
             'navigation_group' => 'Experiments',
@@ -569,6 +596,10 @@ return [
             ],
             'actions' => [
                 'create' => 'Create an Experiment',
+                'contact' => 'Contact the main experimenter',
+                'results' => 'View Results',
+                'details' => 'Details',
+                'statistics' => 'Statistics',
                 'edit' => 'Edit',
                 'delete' => 'Delete',
                 'more_actions' => 'Actions',
@@ -597,7 +628,15 @@ return [
                     'media_info' => 'Including media will add all associated media files to the export.',
                     'include_media' => 'Include media',
                     'success' => 'Export completed successfully',
-                ]
+                ],
+                'delete' => [
+                    'heading' => 'Definitive deletion',
+                    'desc_issues_delete' => 'This experiment cannot be discontinued because it is shared or has pending requests.',
+                    'confirm_delete' => 'To delete this experiment, please enter the code below.',
+                    'code_confirm' => 'Confirmation code',
+                    'code' => 'Code',
+                    'code_fail' => 'Confirmation code is incorrect',
+                ],
             ],
             'notifications' => [
                 'created' => 'Experiment successfully created',
@@ -615,6 +654,12 @@ return [
             'plural' => 'Access Requests',
             'navigation_label' => 'Access Requests',
             'form' => [
+                'section' => [
+                    'status_title' => 'Request status',
+                    'status_description' => 'Approve or reject request',
+                    'information_title' => 'Request information',
+                    'information_description' => 'Request details',
+                ],
                 'status' => [
                     'label' => 'Status',
                     'options' => [
@@ -631,11 +676,25 @@ return [
                     'label' => 'Request Message',
                 ],
                 'experiment' => [
-                    'label' => 'Experiment',
+                    'label' => 'Name of experiment',
                 ],
                 'user' => [
-                    'label' => 'Requester',
+                    'label' => 'Access request issued by',
                 ],
+                'duplicate' => [
+                    'copy' => 'Copy',
+                    'success' => 'Experiment duplicated successfully',
+                    'error' => 'An error occurred while duplicating the experiment',
+                ],
+                'informations' => [
+                    'information_access' => 'Information on access types',
+                    'result_access' => 'Access to results',
+                    'result_description' => 'Allow access to the results of the experiment',
+                    'experiment_access' => 'Access to the experiment',
+                    'experiment_description' => 'Gives access to results and allows sessions to be run',
+                    'duplicate_access' => 'Duplicate the experiment',
+                    'duplicate_description' => 'Creates a copy of the experiment. Approval is final and cannot be revoked',
+                ]
             ],
             'table' => [
                 'columns' => [
@@ -649,6 +708,26 @@ return [
                     'status' => 'Status',
                     'created_at' => 'Request Date',
                 ],
+                'actions' => [
+                    'information' => 'Information',
+                    'revoke' => 'Revoke access',
+                    'revoke_label' => 'Revocation message',
+                    'revoke_message' => 'Please explain why you are revoking access...',
+                    'revoke_description' => 'Are you sure you want to revoke access? The user will be informed.',
+                    'view' => 'View details',
+                ],
+                'message' => [
+                    'banned' => 'Your account has been banned.',
+                    'banned_secondary' => 'L\'expérimentateur principal de votre compte est banni.',
+                    'no_access' => 'You do not have access to this experiment.',
+                    'no_access_section' => 'You do not have access to this section',
+                ]
+            ],
+            'tabs' => [
+                'all' => 'All Requests',
+                'pending' => 'Pending Requests',
+                'approved' => 'Approved Requests',
+                'revoked' => 'Rejected/Revoked Requests',
             ],
         ],
         'users' => [

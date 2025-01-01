@@ -16,62 +16,68 @@ import Changelog from "./Pages/Changelog";
 import { LanguageProvider } from "./Contexts/LanguageContext";
 import Home from "./Pages/Home";
 import ThankYou from "./Pages/ThankYou";
-import {ExperimentStatusProvider} from "./Contexts/ExperimentStatusContext.jsx";
+import { ExperimentStatusProvider } from "./Contexts/ExperimentStatusContext.jsx";
 import ExperimentError from "./Pages/ExperimentError.jsx";
+import { DisableInspectProvider } from "./Contexts/DisableInspectContext.jsx";
 
 function App() {
     return (
         <Router>
+            {/* <DisableInspectProvider> */}
             <LanguageProvider>
                 <AuthProvider>
                     <ExperimentsProvider>
                         <ExperimentStatusProvider>
-                        <SessionProvider>
-                            <Layout>
-                                <Routes>
-                                    <Route path="/" element={<Home />} />
-                                    <Route
-                                        path="/experiments/"
-                                        element={<ExperimentList />}
-                                    />
-                                    <Route
-                                        path="/how-it-work"
-                                        element={<HowItWork />}
-                                    />
+                            <SessionProvider>
+                                <Layout>
+                                    <Routes>
+                                        <Route path="/" element={<Home />} />
+                                        <Route
+                                            path="/experiments/"
+                                            element={<ExperimentList />}
+                                        />
+                                        <Route
+                                            path="/how-it-work"
+                                            element={<HowItWork />}
+                                        />
 
-                                    <Route
-                                        path="/changelog"
-                                        element={<Changelog />}
-                                    />
+                                        <Route
+                                            path="/changelog"
+                                            element={<Changelog />}
+                                        />
 
-                                    <Route
-                                        path="/login/:sessionId"
-                                        element={<Login />}
-                                    />
-                                    <Route
-                                        path="/experiment-detail/:id"
-                                        element={<ExperimentDetail />}
-                                    />
-                                    <Route
-                                        path="/experiment/:sessionId"
-                                        element={<ExperimentSession />}
-                                    />
-                                    <Route
-                                        path="/results"
-                                        element={<Result />}
-                                    />
-                                    <Route path="/experiment-error" element={<ExperimentError />} />
-                                    <Route
-                                        path="/thank-you"
-                                        element={<ThankYou />}
-                                    />
-                                </Routes>
-                            </Layout>
-                        </SessionProvider>
-                            </ExperimentStatusProvider>
+                                        <Route
+                                            path="/login/:sessionId"
+                                            element={<Login />}
+                                        />
+                                        <Route
+                                            path="/experiment-detail/:id"
+                                            element={<ExperimentDetail />}
+                                        />
+                                        <Route
+                                            path="/experiment/:sessionId"
+                                            element={<ExperimentSession />}
+                                        />
+                                        <Route
+                                            path="/results"
+                                            element={<Result />}
+                                        />
+                                        <Route
+                                            path="/experiment-error"
+                                            element={<ExperimentError />}
+                                        />
+                                        <Route
+                                            path="/thank-you"
+                                            element={<ThankYou />}
+                                        />
+                                    </Routes>
+                                </Layout>
+                            </SessionProvider>
+                        </ExperimentStatusProvider>
                     </ExperimentsProvider>
                 </AuthProvider>
             </LanguageProvider>
+            {/* </DisableInspectProvider> */}
         </Router>
     );
 }

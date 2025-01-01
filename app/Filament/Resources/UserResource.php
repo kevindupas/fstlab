@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
+use App\Notifications\UserDeletionNotification;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Tables\Actions\EditAction;
@@ -12,6 +13,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -37,6 +39,11 @@ class UserResource extends Resource
     {
         return __('navigation.approved_user');
     }
+
+    // public static function getNavigationGroup(): ?string
+    // {
+    //     return __('Utilisateurs');
+    // }
 
     public static function form(Form $form): Form
     {
@@ -177,6 +184,8 @@ class UserResource extends Resource
 
     public static function table(Table $table): Table
     {
+        /** @var \App\Models\User */
+        $user = Auth::user();
         return $table
             ->columns([
                 TextColumn::make('name')->searchable()
@@ -209,18 +218,50 @@ class UserResource extends Resource
                     ->label(__('filament.resources.users.actions.contact'))
                     ->icon('heroicon-o-envelope')
                     ->color('warning')
-                    ->url(fn(User $record) => "/admin/contact-user?user={$record->id}"),
+                    ->url(fn(User $record) => "/admin/contact-user?user={$record->id}")
+                    ->visible(
+                        fn(User $record) =>
+                        $user->hasRole('supervisor') ||
+                            ($record->created_by === Auth::id()) // Visible si c'est un secondaire créé par le principal
+                    ),
                 Tables\Actions\Action::make('experiments')
                     ->label(__('filament.resources.users.actions.show_experiment'))
                     ->icon('heroicon-o-beaker')
                     ->color('info')
-                    ->url(fn(User $record) => "/admin/experiments-list?filter_user={$record->id}"),
+                    ->url(fn(User $record) => "/admin/experiments-list?filter_user={$record->id}")
+                    ->visible(fn() => $user->hasRole('supervisor')),
+                Tables\Actions\Action::make('shared_experiments')
+                    ->label('Expérimentations partagées')
+                    ->icon('heroicon-o-share')
+                    ->color('warning')
+                    ->url(fn(User $record) => "/admin/shared-experiments?filter_user={$record->id}")
+                    ->visible(fn() => $user->hasRole('principal_experimenter')),
                 EditAction::make()
                     ->label(__('filament.resources.users.actions.details'))
                     ->icon('heroicon-o-eye'),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make()
+                    ->requiresConfirmation(false)
+                    ->modalHeading('Supprimer l\'utilisateur')
+                    ->modalDescription('Cette action est irréversible. Veuillez expliquer la raison de la suppression.')
+                    ->form([
+                        Textarea::make('deletion_reason')
+                            ->label('Raison de la suppression')
+                            ->required()
+                            ->maxLength(500)
+                    ])
+                    ->before(function ($record, array $data) {
+                        // Envoyer une notification à l'utilisateur
+                        $record->notify(new UserDeletionNotification($data['deletion_reason']));
+
+                        // Créer une notification dans Filament
+                        Notification::make()
+                            ->title('Utilisateur supprimé')
+                            ->success()
+                            ->body("L'utilisateur a été notifié de la suppression de son compte.")
+                            ->send();
+                    })
             ]);
     }
 

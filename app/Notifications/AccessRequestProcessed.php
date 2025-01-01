@@ -36,19 +36,41 @@ class AccessRequestProcessed extends Notification
      */
     public function toMail($notifiable): MailMessage
     {
+        $requestType = match ($this->request->type) {
+            'results' => 'aux résultats',
+            'access' => 'de collaboration',
+            'duplicate' => 'de duplication',
+            default => 'd\'accès'
+        };
+
         $mail = (new MailMessage)
-            ->subject('Réponse à votre demande d\'accès aux résultats')
+            ->subject("Réponse à votre demande $requestType")
             ->greeting('Bonjour ' . $notifiable->name)
-            ->line('Votre demande d\'accès aux résultats pour l\'expérimentation "' . $this->request->experiment->name . '" a été traitée.');
+            ->line("Votre demande $requestType pour l'expérimentation \"" . $this->request->experiment->name . "\" a été traitée.");
 
         if ($this->isApproved) {
-            return $mail
-                ->line('Votre demande a été approuvée.')
-                ->line('Vous pouvez maintenant accéder aux résultats de l\'expérimentation.')
-                ->action(
-                    'Voir les résultats',
-                    ExperimentSessions::getUrl(['record' => $this->request->experiment_id])
-                );
+            $mail->line('Votre demande a été approuvée.');
+
+            if ($this->request->type === 'access') {
+                $mail->line('Vous pouvez maintenant :')
+                    ->line('- Accéder aux résultats et statistiques')
+                    ->line('- Faire passer des sessions')
+                    ->line('- Partager vos résultats avec les autres collaborateurs');
+            } elseif ($this->request->type === 'duplicate') {
+                $mail->line('La duplication a été effectuée avec succès.')
+                    ->line('Vous trouverez la copie de l\'expérimentation dans votre liste d\'expérimentations.')
+                    ->line('Vous pouvez maintenant :')
+                    ->line('- Modifier la copie selon vos besoins')
+                    ->line('- Commencer à collecter vos propres données')
+                    ->line('- Gérer vos propres collaborateurs');
+            } else {
+                $mail->line('Vous pouvez maintenant accéder aux résultats de l\'expérimentation.');
+            }
+
+            return $mail->action(
+                'Accéder à l\'expérimentation',
+                route('filament.admin.resources.experiment-sessions.index', ['record' => $this->request->experiment_id])
+            );
         }
 
         return $mail

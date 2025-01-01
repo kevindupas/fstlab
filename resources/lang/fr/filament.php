@@ -93,6 +93,9 @@ return [
             ],
         ],
         'experiment_table' => [
+            'title' => 'Mes expérimentations',
+            'title_secondary_experimenter' => 'Expérimentations attribuées',
+            'title_default' => 'Expérimentations disponibles',
             'column' => [
                 'creator' => 'Créé par',
                 'name' => 'Nom de l\'expérimentation',
@@ -101,6 +104,14 @@ return [
                 'pause' => 'En pause',
                 'stop' => 'Arrêté',
                 'test' => 'En test',
+                'type' => [
+                    'label' => 'Type',
+                    'options' => [
+                        'image' => 'Image',
+                        'sound' => 'Son',
+                        'image_sound' => 'Image et Son',
+                    ]
+                ],
                 'sessions_count' => 'Nombre de participants',
                 'created_at' => 'Date de création',
                 'user_role' => 'Votre rôle'
@@ -113,7 +124,10 @@ return [
             ],
             'actions' => [
                 'statistics' => 'Statistiques',
-                'details' => 'Détails'
+                'details' => 'Détails',
+                'edit' => 'Editer',
+                'contact_creator' => 'Contacter le créateur',
+                'results' => 'Résultats',
             ]
         ],
     ],
@@ -160,6 +174,7 @@ return [
             ]
         ],
         'user_contact' => [
+            'title_secondary_experimenter' => 'Contacter l\'expérimentateur principal',
             'title' => 'Contacter un utilisateur',
             'form' => [
                 'user' => 'Utilisateur',
@@ -170,26 +185,6 @@ return [
                 ],
                 'submit' => 'Envoyer le message',
                 'success' => 'Message envoyé avec succès'
-            ]
-        ],
-        'experiment_list' => [
-            'title' => 'Liste des Expérimentations',
-            'column' => [
-                'created_by' => 'Crée par',
-                'name' => 'Nom de l\'expérimentation',
-                'type' => 'Type',
-                'status' => 'Status',
-                'start' => "Démarré",
-                'pause' => 'En pause',
-                'stop' => 'Arrêté',
-                'test' => 'En test',
-                'none' => 'Aucun',
-                'sound' => 'Son',
-                'image' => 'Image',
-                'image_sound' => 'Image et son',
-                'sessions_count' => 'Nombre de sessions',
-                'created_at' => 'Créé le',
-                'action' => 'Voir l\'expérimentation'
             ]
         ],
         'experiment_details' => [
@@ -259,8 +254,9 @@ return [
             'notification' => [
                 'banned' => 'Expérimentateur banni avec succès'
             ],
-            'action' => [
+            'actions' => [
                 'contact' => 'Contacter l\'expérimentateur',
+                'edit' => 'Modifier',
             ]
         ],
         'experiments_sessions' => [
@@ -465,6 +461,36 @@ return [
         ],
     ],
     'resources' => [
+        'experiment_list' => [
+            'title' => 'Liste des Expérimentations',
+            'titleFilter' => 'Liste des expériences de :username',
+            'column' => [
+                'created_by' => 'Crée par',
+                'name' => 'Nom de l\'expérimentation',
+                'type' => 'Type',
+                'status' => 'Status',
+                'start' => "Démarré",
+                'pause' => 'En pause',
+                'stop' => 'Arrêté',
+                'test' => 'En test',
+                'none' => 'Aucun',
+                'sound' => 'Son',
+                'image' => 'Image',
+                'image_sound' => 'Image et son',
+                'sessions_count' => 'Nombre de sessions',
+                'created_at' => 'Créé le',
+                'action' => 'Voir l\'expérimentation'
+            ],
+            'tabs' => [
+                'all' => 'Toutes les expérimentations',
+                'sound' => 'Sons',
+                'image' => 'Images',
+                'image_sound' => 'Image et Son'
+            ],
+            'actions' => [
+                'clearFilter' => 'Effacer le filtre'
+            ]
+        ],
         'my_experiment' => [
             'navigation_label' => 'Mes Expérimentations',
             'navigation_group' => 'Experiments',
@@ -569,6 +595,10 @@ return [
             ],
             'actions' => [
                 'create' => 'Créer une expérimentation',
+                'contact' => 'Contacter l\'expérimentateur principal',
+                'results' => 'Voir les résultats',
+                'details' => 'Détails',
+                'statistics' => 'Statistiques',
                 'edit' => 'Modifier',
                 'delete' => 'Supprimer',
                 'more_actions' => 'Actions',
@@ -590,14 +620,22 @@ return [
                     'test_desc' => 'Active la session en mode test. La session est accessible aux participants, mais aucun résultat n\'est sauvegardé.'
                 ],
                 'export' => [
-                    'label' => 'Exporter',
+                    'label' => 'Exporter l\'expérimentation',
                     'json' => 'Exporter en JSON',
                     'xml' => 'Exporter en XML',
                     'desc' => 'Sélectionnez le format dans lequel vous souhaitez exporter les données de l\'expérience.',
                     'media_info' => 'L\'inclusion des médias ajoutera tous les fichiers médias associés à l\'export.',
                     'include_media' => 'Inclure les médias',
                     'success' => 'Export réalisé avec succès'
-                ]
+                ],
+                'delete' => [
+                    'heading' => 'Suppresion définitivement',
+                    'desc_issues_delete' => 'Cette expérimentation ne peut pas être supprimée car elle est partagée ou a des demandes en attente.',
+                    'confirm_delete' => 'Pour supprimer cette expérimentation, veuillez saisir le code ci-dessous.',
+                    'code_confirm' => 'Code de confirmation',
+                    'code' => 'Code',
+                    'code_fail' => 'Le code de confirmation est incorrect',
+                ],
             ],
             'notifications' => [
                 'created' => 'Expérimentation créée avec succès',
@@ -615,12 +653,19 @@ return [
             'plural' => 'Demandes d\'accès',
             'navigation_label' => 'Demandes d\'accès',
             'form' => [
+                'section' => [
+                    'status_title' => 'Status de la requête',
+                    'status_description' => 'Approuver ou rejeter la demande',
+                    'information_title' => 'Information sur la demande',
+                    'information_description' => 'Détails de la demande',
+                ],
                 'status' => [
                     'label' => 'Statut',
                     'options' => [
                         'pending' => 'En attente',
                         'approved' => 'Approuvée',
                         'rejected' => 'Rejetée',
+                        'revoked' => 'Révoquée',
                     ]
                 ],
                 'response_message' => [
@@ -631,11 +676,25 @@ return [
                     'label' => 'Message de demande',
                 ],
                 'experiment' => [
-                    'label' => 'Expérience',
+                    'label' => 'Nom de l\'expérimentation',
                 ],
                 'user' => [
-                    'label' => 'Demandeur',
+                    'label' => 'Demande d\'accès émise par',
                 ],
+                'duplicate' => [
+                    'copy' => '(Copie)',
+                    'success' => 'Expérience dupliquée avec succès',
+                    'error' => 'Erreur lors de la duplication',
+                ],
+                'informations' => [
+                    'information_access' => 'Information sur les types d\'accès',
+                    'result_access' => 'Accès aux résultats',
+                    'result_description' => 'Permettre l\'accès aux résultats de l\'expérience',
+                    'experiment_access' => 'Accès à l\'expérience',
+                    'experiment_description' => 'Donne accès aux résultats et permet de faire passer des sessions.',
+                    'duplicate_access' => 'Dupliquer l\'expérience',
+                    'duplicate_description' => 'Crée une copie de l\'expérience. L\'approbation est définitive et ne peut être révoquée.',
+                ]
             ],
             'table' => [
                 'columns' => [
@@ -649,6 +708,81 @@ return [
                     'status' => 'Statut',
                     'created_at' => 'Date de demande',
                 ],
+                'actions' => [
+                    'informations' => 'Informations',
+                    'revoke' => 'Révoquer l\'accès',
+                    'revoke_label' => 'Message de révocation',
+                    'revoke_message' => "Veuillez expliquer pourquoi vous révoquez l'accès...",
+                    'revoke_description' => 'Êtes-vous sûr de vouloir révoquer l\'accès ? L\'utilisateur en sera informé.',
+                    'view' => 'Voir les détails',
+                ],
+                'message' => [
+                    'banned' => 'Votre compte est banni.',
+                    'banned_secondary' => 'L\'expérimentateur principal de votre compte est banni.',
+                    'no_access' => 'Vous n\'avez pas accès à cette expérience.',
+                    'no_access_section' => 'Vous n\'avez pas accès à cette section.',
+                ]
+            ],
+            'tabs' => [
+                'all' => 'Toutes les demandes',
+                'pending' => 'Demandes en attente',
+                'approved' => 'Demandes approuvées',
+                'revoked' => 'Demandes rejetées/révoquées',
+            ],
+        ],
+        'borrowed_experiment' => [
+            'label' => 'Expérimentations empruntées',
+            'plural' => 'Expérimentations empruntées',
+            'navigation_label' => 'Expérimentations empruntées',
+            'table' => [
+                'columns' => [
+                    'experiment' => 'Expérimentation',
+                    'created_by' => 'Créateur',
+                    'type_experiments' => [
+                        'label' => 'Type d\'expérimentation',
+                        'options' => [
+                            'image' => 'Image',
+                            'sound' => 'Son',
+                            'image_sound' => 'Image et Son',
+                        ]
+                    ],
+                    'status' => [
+                        'label' => 'Statut',
+                        'options' => [
+                            'start' => 'Démarré',
+                            'pause' => 'En pause',
+                            'stop' => 'Arrêté',
+                            'test' => 'En test',
+                        ]
+                    ],
+                    'type_access' => [
+                        'label' => 'Type d\'accès',
+                        'results' => 'Résultats seulement',
+                        'access' => 'Collaboration Complète'
+                    ],
+                    'access_granted_at' => 'Accès accordé le',
+                ],
+                'actions' => [
+                    'sessions' => 'Gérer les sessions',
+                    'view' => 'Voir les détails',
+                    'statistics' => 'Statistiques',
+                    'results' => 'Résultats',
+                ],
+                'message' => [
+                    'banned' => 'Votre compte est banni.',
+                    'banned_secondary' => 'L\'expérimentateur principal de votre compte est banni.',
+                    'no_access' => 'Vous n\'avez pas accès à cette expérience.',
+                    'no_access_section' => 'Vous n\'avez pas accès à cette section.',
+                ]
+            ],
+            'tabs' => [
+                'all' => 'Toutes les expérimentations',
+                'pending' => 'Résultats seulement',
+                'approved' => 'Collaboration Complète',
+            ],
+            'notifications' => [
+                'no_completed_sessions' => 'Aucune session complétée à exporter',
+                'no_selection_completed' => 'Aucune session complétée sélectionnée'
             ],
         ],
         'users' => [

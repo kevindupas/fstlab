@@ -11,6 +11,7 @@ class ExperimentSession extends Model
 
     protected $fillable = [
         'experiment_id',
+        'experiment_link_id',
         'participant_number',
         'group_data',
         'actions_log',
@@ -40,5 +41,10 @@ class ExperimentSession extends Model
     public function experiment()
     {
         return $this->belongsTo(Experiment::class);
+    }
+
+    public function experimentLink()
+    {
+        return $this->belongsTo(ExperimentLink::class);
     }
 }

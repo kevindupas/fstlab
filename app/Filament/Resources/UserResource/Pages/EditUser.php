@@ -9,6 +9,8 @@ use Filament\Resources\Pages\EditRecord;
 use App\Models\User;
 use Filament\Actions;
 use App\Notifications\UserBanned;
+use App\Notifications\UserDeletionNotification;
+use Filament\Forms\Components\Textarea;
 use Illuminate\Contracts\Support\Htmlable;
 
 class EditUser extends EditRecord
@@ -23,7 +25,28 @@ class EditUser extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make()->label(__('filament.resources.users.actions.delete')),
+            Actions\DeleteAction::make()
+                ->requiresConfirmation(false)
+                ->label(__('filament.resources.users.actions.delete'))
+                ->modalHeading('Supprimer l\'utilisateur')
+                ->modalDescription('Cette action est irréversible. Veuillez expliquer la raison de la suppression.')
+                ->form([
+                    Textarea::make('deletion_reason')
+                        ->label('Raison de la suppression')
+                        ->required()
+                        ->maxLength(500)
+                ])
+                ->before(function ($record, array $data) {
+                    // Envoyer une notification à l'utilisateur
+                    $record->notify(new UserDeletionNotification($data['deletion_reason']));
+
+                    // Créer une notification dans Filament
+                    Notification::make()
+                        ->title('Utilisateur supprimé')
+                        ->success()
+                        ->body("L'utilisateur a été notifié de la suppression de son compte.")
+                        ->send();
+                })
         ];
     }
 

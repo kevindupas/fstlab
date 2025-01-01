@@ -21,6 +21,7 @@ Route::middleware(['web'])->group(function () {
     Route::get('/user/auth-status', [ExperimentApiController::class, 'getAuthStatus']);
     Route::post('/experiment/request-access/{experimentId}', [ExperimentApiController::class, 'requestAccess']);
     Route::post('/experiment/request-results/{experimentId}', [ExperimentApiController::class, 'requestResults']);
+    Route::post('/experiment/request-duplicate/{experimentId}', [ExperimentApiController::class, 'requestDuplicate']);
 });
 
 // Récupérer les données d'une expérience en fonction du token

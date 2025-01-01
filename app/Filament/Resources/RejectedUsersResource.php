@@ -107,11 +107,29 @@ class RejectedUsersResource extends Resource
             ]);
     }
 
-    public static function getRelations(): array
+    public static function canAccess(): bool
     {
-        return [
-            //
-        ];
+        /** @var \App\Models\User */
+        $user = Auth::user();
+
+        if (!$user->hasRole('supervisor')) {
+            abort(403, "Vous n'avez pas accès à cette section.");
+        }
+
+        return true;
+    }
+
+    // Et aussi pour bien s'assurer que même l'accès à la liste est bloqué
+    public static function canViewAny(): bool
+    {
+        /** @var \App\Models\User */
+        $user = Auth::user();
+
+        if (!$user->hasRole('supervisor')) {
+            abort(403, "Vous n'avez pas accès à cette section.");
+        }
+
+        return true;
     }
 
     public static function getPages(): array

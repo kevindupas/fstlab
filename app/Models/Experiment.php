@@ -18,8 +18,7 @@ class Experiment extends Model
         'button_size',
         'button_color',
         'created_by',
-        'status',
-        'link',
+        'original_creator_id',
         'doi',
         'instruction',
         'documents',
@@ -42,6 +41,11 @@ class Experiment extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function originalCreator()
+    {
+        return $this->belongsTo(User::class, 'original_creator_id');
+    }
+
     public function sessions()
     {
         return $this->hasMany(ExperimentSession::class);
@@ -50,5 +54,21 @@ class Experiment extends Model
     public function accessRequests()
     {
         return $this->hasMany(ExperimentAccessRequest::class);
+    }
+
+    public function links()
+    {
+        return $this->hasMany(ExperimentLink::class);
+    }
+
+    public function access_requests_count(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ExperimentAccessRequest::class);
+    }
+
+    public function shared_links_count(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ExperimentLink::class)
+            ->where('user_id', '!=', $this->created_by);
     }
 }

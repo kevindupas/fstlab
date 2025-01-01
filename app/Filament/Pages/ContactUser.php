@@ -7,6 +7,7 @@ use App\Filament\Resources\UserResource;
 use App\Models\Experiment;
 use App\Models\User;
 use App\Notifications\SupervisorMessage;
+use App\Notifications\UserMessage;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -30,55 +31,65 @@ class ContactUser extends Page
     public ?Experiment $experiment = null;
     public ?array $data = [];
 
-    public static function shouldRegisterNavigation(): bool
-    {
-        /** @var \App\Models\User */
-        $user = Auth::user();
-        return $user?->hasRole('supervisor') ?? false;
-    }
-
     public function mount(): void
     {
-        // Récupérer les IDs depuis la query string
         $userId = request()->query('user');
         $experimentId = request()->query('experiment');
 
         $this->user = $userId ? User::find($userId) : null;
         $this->experiment = $experimentId ? Experiment::find($experimentId) : null;
 
+        // Initialiser le formulaire avec les valeurs par défaut
         $this->form->fill([
             'user_id' => $this->user?->id,
             'experiment_id' => $this->experiment?->id,
+            'message' => ''
         ]);
     }
+
     public function form(Form $form): Form
     {
+        /** @var \App\Models\User */
+        $user = Auth::user();
+
         return $form
             ->schema([
                 Select::make('user_id')
                     ->label(__('filament.pages.user_contact.form.user'))
-                    ->options(
-                        User::role('principal_experimenter')
-                            ->where('status', 'approved')
-                            ->pluck('name', 'id')
-                    )
+                    ->options(function () use ($user) {
+                        if ($user->hasRole('supervisor')) {
+                            return User::role('principal_experimenter')
+                                ->where('status', 'approved')
+                                ->pluck('name', 'id');
+                        } else {
+                            // Pour les principaux, montrer leurs comptes secondaires
+                            return User::where('created_by', $user->id)
+                                ->pluck('name', 'id');
+                        }
+                    })
                     ->searchable()
                     ->required()
                     ->live()
                     ->afterStateUpdated(function ($state, $set) {
-                        // Réinitialiser experiment_id quand user_id change
                         $set('experiment_id', null);
                     })
-                    ->disabled(fn() => $this->user !== null),
+                    ->disabled(fn() => $this->user !== null)
+                    ->default(fn() => $this->user?->id),
 
                 Select::make('experiment_id')
                     ->label(__('filament.pages.user_contact.form.experiment'))
-                    ->options(function ($get) {
-                        $userId = $get('user_id');
-                        if ($userId) {
+                    ->options(function ($get) use ($user) {
+                        $userId = $get('user_id') ?? $this->user?->id;
+                        if (!$userId) return [];
+
+                        if ($user->hasRole('supervisor')) {
                             return Experiment::where('created_by', $userId)->pluck('name', 'id');
+                        } else {
+                            // Pour les secondaires, montrer les expériences où ils sont assignés
+                            return Experiment::whereHas('users', function ($query) use ($userId) {
+                                $query->where('users.id', $userId);
+                            })->pluck('name', 'id');
                         }
-                        return [];
                     })
                     ->searchable()
                     ->reactive()
@@ -106,14 +117,25 @@ class ContactUser extends Page
     {
         $data = $this->form->getState();
 
-        $user = User::findOrFail($data['user_id']);
-        $experiment = $data['experiment_id'] ? Experiment::find($data['experiment_id']) : null;
+        $userId = $data['user_id'] ?? $this->user?->id;
+        if (!$userId) {
+            Notification::make()
+                ->title('Erreur')
+                ->danger()
+                ->body('Utilisateur non spécifié')
+                ->send();
+            return;
+        }
 
-        // Envoyer la notification
-        $user->notify(new SupervisorMessage(
+        $user = User::findOrFail($userId);
+        $experiment = isset($data['experiment_id']) ? Experiment::find($data['experiment_id']) : null;
+        $sender = Auth::user();
+
+        // Une seule notification qui s'adapte selon le rôle
+        $user->notify(new UserMessage(
             message: $data['message'],
             experiment: $experiment,
-            supervisor: Auth::user()
+            sender: $sender
         ));
 
         Notification::make()
@@ -121,23 +143,29 @@ class ContactUser extends Page
             ->success()
             ->send();
 
-        // Rediriger selon le contexte
-        if ($this->preSelectedExperiment) {
-            $this->redirect(ExperimentDetails::getUrl(['record' => $this->preSelectedExperiment]));
-        } elseif ($this->preSelectedUser) {
+        if ($this->experiment) {
+            $this->redirect(ExperimentDetails::getUrl(['record' => $this->experiment]));
+        } elseif ($this->user) {
             $this->redirect(UserResource::getUrl());
         } else {
             $this->form->fill();
         }
     }
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        /** @var \App\Models\User */
+        $user = Auth::user();
+        return $user?->hasAnyRole(['supervisor', 'principal_experimenter']) ?? false;
+    }
+
     public static function getNavigationLabel(): string
     {
         return __('filament.pages.user_contact.title');
     }
+
     public function getTitle(): string | Htmlable
     {
         return new HtmlString(__('filament.pages.user_contact.title'));
     }
-
 }

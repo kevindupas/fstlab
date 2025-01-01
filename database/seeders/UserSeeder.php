@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
         // Create supervisor
         $supervisor = User::create([
             'name' => 'Supervisor User',
-            'email' => 'supervisor@example.com',
+            'email' => 'dupas.kevin@gmail.com',
             'password' => Hash::make('password'),
             'university' => 'Supervisory University',
             'registration_reason' => 'Overseeing research operations',
@@ -26,41 +26,41 @@ class UserSeeder extends Seeder
         ]);
         $supervisor->assignRole('supervisor');
 
-        $principals = [];
-        for ($i = 1; $i <= 4; $i++) {
-            $principal = User::create([
-                'name' => "Principal Experimenter $i",
-                'email' => "principal$i@example.com",
-                'password' => Hash::make('password'),
-                'university' => "Principal University $i",
-                'registration_reason' => "Conducting primary research in field $i",
-                'orcid' => null,
-                'status' => 'approved', // Tous approuvés pour le seeding
-                'created_by' => $supervisor->id
-            ]);
-            $principal->assignRole('principal_experimenter');
-            $principals[] = $principal;
-        }
+        // $principals = [];
+        // for ($i = 1; $i <= 1; $i++) {
+        //     $principal = User::create([
+        //         'name' => "Dupas Dev",
+        //         'email' => "dupas.dev@gmail.com",
+        //         'password' => Hash::make('password'),
+        //         'university' => "Principal University $i",
+        //         'registration_reason' => "Conducting primary research in field $i",
+        //         'orcid' => null,
+        //         'status' => 'approved',
+        //         'created_by' => $supervisor->id
+        //     ]);
+        //     $principal->assignRole('principal_experimenter');
+        //     $principals[] = $principal;
+        // }
 
         // Create secondary experimenters
-        for ($i = 1; $i <= 10; $i++) {
-            // Skip if no approved principals
-            if (empty($principals)) break;
+        // for ($i = 1; $i <= 10; $i++) {
+        //     // Skip if no approved principals
+        //     if (empty($principals)) break;
 
-            // Assign secondary experimenters to random approved principal experimenter
-            $principal = $principals[array_rand($principals)];
+        //     // Assign secondary experimenters to random approved principal experimenter
+        //     $principal = $principals[array_rand($principals)];
 
-            $secondary = User::create([
-                'name' => "Secondary Experimenter $i",
-                'email' => "secondary$i@example.com",
-                'password' => Hash::make('password'),
-                'university' => "Secondary University $i",
-                'registration_reason' => "Assisting in research project $i",
-                'orcid' => null,
-                'status' => 'approved',
-                'created_by' => $principal->id
-            ]);
-            $secondary->assignRole('secondary_experimenter');
-        }
+        //     $secondary = User::create([
+        //         'name' => "Secondary Experimenter $i",
+        //         'email' => "secondary$i@example.com",
+        //         'password' => Hash::make('password'),
+        //         'university' => "Secondary University $i",
+        //         'registration_reason' => "Assisting in research project $i",
+        //         'orcid' => null,
+        //         'status' => 'approved',
+        //         'created_by' => $principal->id
+        //     ]);
+        //     $secondary->assignRole('secondary_experimenter');
+        // }
     }
 }

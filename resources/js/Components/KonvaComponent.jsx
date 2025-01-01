@@ -15,7 +15,7 @@ function KonvaComponent({
     groups = [],
     editingGroupIndex,
     onMediaGroupChange,
-    onInteractionsUpdate
+    onInteractionsUpdate,
 }) {
     const [stageSize, setStageSize] = useState({
         width: window.innerWidth,
@@ -35,7 +35,11 @@ function KonvaComponent({
 
         if (item.type === "image_sound") {
             // Si c'est une URL se terminant par une extension de son, c'est un son
-            if (soundExtensions.some(ext => item.url.toLowerCase().endsWith(ext))) {
+            if (
+                soundExtensions.some((ext) =>
+                    item.url.toLowerCase().endsWith(ext)
+                )
+            ) {
                 return item.url;
             }
         }
@@ -48,10 +52,12 @@ function KonvaComponent({
     useEffect(() => {
         if (!mediaArray.length) return;
 
-        const shuffledItems = shuffleWithSeed(mediaArray, 12213).map((item, originalIndex) => ({
-            ...item,
-            originalIndex // Ajouter l'index original à chaque item
-        }));
+        const shuffledItems = shuffleWithSeed(mediaArray, 12213).map(
+            (item, originalIndex) => ({
+                ...item,
+                originalIndex, // Ajouter l'index original à chaque item
+            })
+        );
 
         const arrangedItems = arrangeItemsInGrid(
             shuffledItems,
@@ -93,8 +99,14 @@ function KonvaComponent({
         const item = mediaItems[index];
         const itemSize = parseInt(item.button_size || size);
 
-        const newX = Math.max(0, Math.min(e.target.x(), stageSize.width - itemSize));
-        const newY = Math.max(0, Math.min(e.target.y(), stageSize.height - itemSize));
+        const newX = Math.max(
+            0,
+            Math.min(e.target.x(), stageSize.width - itemSize)
+        );
+        const newY = Math.max(
+            0,
+            Math.min(e.target.y(), stageSize.height - itemSize)
+        );
 
         if (e.target.x() !== newX || e.target.y() !== newY) {
             e.target.position({ x: newX, y: newY });
@@ -108,7 +120,7 @@ function KonvaComponent({
 
         onAction({
             id: item.id,
-            type: 'move',  // Ajout du type pour les déplacements
+            type: "move", // Ajout du type pour les déplacements
             x: newX,
             y: newY,
             time: Date.now(),
@@ -133,26 +145,25 @@ function KonvaComponent({
         e.target.position({ x: newX, y: newY });
     };
 
-
     const handlePlaySound = (url) => {
         if (url) {
             // Gérer le compteur d'interactions
             const newInteractions = {
                 ...mediaInteractions,
-                [url]: (mediaInteractions[url] || 0) + 1
+                [url]: (mediaInteractions[url] || 0) + 1,
             };
             setMediaInteractions(newInteractions);
             onInteractionsUpdate(newInteractions);
 
             // Ajouter l'action au log
-            const item = mediaItems.find(item => item.url === url);
+            const item = mediaItems.find((item) => item.url === url);
             if (item) {
                 onAction({
                     id: item.id,
-                    type: 'sound',
+                    type: "sound",
                     x: item.x,
                     y: item.y,
-                    time: Date.now()
+                    time: Date.now(),
                 });
             }
         }
@@ -186,20 +197,20 @@ function KonvaComponent({
         // Gérer le compteur d'interactions
         const newInteractions = {
             ...mediaInteractions,
-            [url]: (mediaInteractions[url] || 0) + 1
+            [url]: (mediaInteractions[url] || 0) + 1,
         };
         setMediaInteractions(newInteractions);
         onInteractionsUpdate(newInteractions);
 
         // Ajouter l'action au log
-        const item = mediaItems.find(item => item.url === url);
+        const item = mediaItems.find((item) => item.url === url);
         if (item) {
             onAction({
                 id: item.id,
-                type: 'image',
+                type: "image",
                 x: item.x,
                 y: item.y,
-                time: Date.now()
+                time: Date.now(),
             });
         }
 
@@ -260,8 +271,12 @@ function KonvaComponent({
                             size={size}
                             isTablet={isTablet}
                             draggable={!isFinished}
-                            onDragEnd={(e) => !isFinished && handleDragEnd(e, index)}
-                            onDragMove={(e) => !isFinished && handleDragMove(e, index)}
+                            onDragEnd={(e) =>
+                                !isFinished && handleDragEnd(e, index)
+                            }
+                            onDragMove={(e) =>
+                                !isFinished && handleDragMove(e, index)
+                            }
                             onPlaySound={handlePlaySound}
                             onShowImage={handleShowImage}
                             currentSoundUrl={currentSoundUrl}
@@ -269,7 +284,13 @@ function KonvaComponent({
                             isClickable={true}
                             groups={groups}
                             isFinished={isFinished}
-                            cursor={isFinished ? (item.type === "sound" ? "pointer" : "zoom-in") : "move"}
+                            cursor={
+                                isFinished
+                                    ? item.type === "sound"
+                                        ? "pointer"
+                                        : "zoom-in"
+                                    : "move"
+                            }
                         />
                     ))}
                 </Layer>
@@ -283,7 +304,8 @@ function KonvaComponent({
                 <img
                     src={selectedImage}
                     alt="Aperçu"
-                    className="w-full h-auto max-h-[70vh] object-contain"
+                    className="w-full h-auto max-h-[70vh] object-contain cursor-pointer"
+                    onClick={() => setShowImageModal(false)}
                 />
             </Modal>
         </div>

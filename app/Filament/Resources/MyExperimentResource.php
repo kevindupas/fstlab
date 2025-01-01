@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Pages\Experiments\Sessions\ExperimentSessions;
+use App\Filament\Pages\Experiments\Details\ExperimentDetails;
 use App\Filament\Pages\Experiments\Statistics\ExperimentStatistics;
 use App\Models\Experiment;
 use App\Services\ExperimentExportHandler;
@@ -21,7 +21,10 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use App\Filament\Resources\MyExperimentResource\Pages;
 use App\Filament\Resources\MyExperimentResource\RelationManagers\UsersRelationManager;
+use App\Models\ExperimentLink;
 use App\Models\User;
+use Filament\Forms\Components\TextInput;
+use Illuminate\Database\Eloquent\Model;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class MyExperimentResource extends Resource
@@ -49,6 +52,7 @@ class MyExperimentResource extends Resource
 
     public static function form(Form $form): Form
     {
+        /** @var \App\Models\User */
         $user = Auth::user();
         return $form->schema([
             Forms\Components\Section::make(__('filament.resources.my_experiment.section_base.heading'))
@@ -74,38 +78,56 @@ class MyExperimentResource extends Resource
                         ->label(__('filament.resources.my_experiment.form.status.label'))
                         ->helperText(__('filament.resources.my_experiment.form.status.helper_text'))
                         ->default('stop')
+                        ->required()
                         ->live()
-                        ->afterStateUpdated(function ($state, $set, $record) {
-                            if (in_array($state, ['start', 'test'])) {
-                                $link = Str::random(6);
-                                $set('link', $link);
-                            } else {
-                                $set('link', null);
+                        ->afterStateHydrated(function ($component, $state, $record) {
+                            if ($record) {
+                                $experimentLink = ExperimentLink::where('experiment_id', $record->id)
+                                    ->where('user_id', Auth::id())
+                                    ->first();
+
+                                if ($experimentLink) {
+                                    $component->state($experimentLink->status);
+                                }
+                            }
+                        })
+                        ->afterStateUpdated(function ($state, $set, $record, $livewire) {
+                            if (!$state) {
+                                $state = 'stop';
                             }
 
-                            // Désactiver howitwork_page si ce n'est pas en mode test
+                            $linkValue = null;
+                            if ($state === 'test' || $state === 'start') {
+                                $link = Str::random(6);
+                                $livewire->data['link'] = url("/experiment/{$link}");
+                                $livewire->data['temp_link'] = $link;
+                                $linkValue = $link;
+                            }
+
                             if ($state !== 'test') {
                                 $set('howitwork_page', false);
                             }
-                        }),
 
-                    Forms\Components\TextInput::make('link')
-                        ->label(__('filament.resources.my_experiment.form.link'))
-                        ->helperText(__('filament.resources.my_experiment.form.link_helper'))
-                        ->extraAttributes(function ($state) {
-                            return [
-                                'x-on:click' => 'window.navigator.clipboard.writeText("' . $state . '"); $tooltip("' . __('filament.resources.my_experiment.form.link_copied') . '", { timeout: 1500 });',
-                            ];
+                            // Déterminer les flags
+                            $user = Auth::user();
+
+                            // Mise à jour ou création du lien
+                            if ($linkValue || $state === 'stop') {
+                                ExperimentLink::updateOrCreate(
+                                    [
+                                        'experiment_id' => $record ? $record->id : $livewire->record->id,
+                                        'user_id' => $user->id,
+                                    ],
+                                    [
+                                        'status' => $state,
+                                        'link' => $linkValue,
+                                        'is_creator' => true,
+                                        'is_secondary' => false,
+                                        'is_collaborator' => false
+                                    ]
+                                );
+                            }
                         })
-                        ->suffixAction(
-                            Forms\Components\Actions\Action::make('copy')
-                                ->icon('heroicon-m-clipboard')
-                        )
-                        ->visible(fn($get) => in_array($get('status'), ['start', 'test']))
-                        ->default(fn($record) => $record?->link)
-                        ->formatStateUsing(fn($state) => $state ? url("/experiment/" . $state) : '')
-                        ->disabled()
-                        ->columnSpan('full'),
                 ])->collapsible(),
 
             Forms\Components\Section::make(__('filament.resources.my_experiment.general_section.heading'))
@@ -267,6 +289,7 @@ class MyExperimentResource extends Resource
 
     public static function table(Table $table): Table
     {
+        /** @var \App\Models\User */
         $user = Auth::user();
         $isSupevisor = $user->hasRole('supervisor');
         return $table
@@ -295,16 +318,20 @@ class MyExperimentResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('filament.resources.my_experiment.table.columns.status.label'))
                     ->badge()
+                    ->state(function ($record) {
+                        $experimentLink = \App\Models\ExperimentLink::where('experiment_id', $record->id)
+                            ->where('user_id', Auth::id())
+                            ->first();
+                        return $experimentLink ? $experimentLink->status : 'stop';
+                    })
                     ->formatStateUsing(fn(string $state): string => match ($state) {
                         'start' => __('filament.resources.my_experiment.table.columns.status.options.start'),
                         'pause' => __('filament.resources.my_experiment.table.columns.status.options.pause'),
                         'stop' => __('filament.resources.my_experiment.table.columns.status.options.stop'),
                         'test' => __('filament.resources.my_experiment.table.columns.status.options.test'),
-                        'none' => __('filament.resources.my_experiment.table.columns.status.options.none'),
                         default => $state
                     })
                     ->color(fn(string $state): string => match ($state) {
-                        'none' => 'gray',
                         'start' => 'success',
                         'pause' => 'warning',
                         'stop' => 'danger',
@@ -334,9 +361,17 @@ class MyExperimentResource extends Resource
                             Forms\Components\TextInput::make('link')
                                 ->label(__('filament.resources.my_experiment.actions.session_link'))
                                 ->disabled(true)
-                                ->visible(fn($get) => $get('status') !== 'none')
+                                ->visible(fn($get) => $get('experimentStatus') !== 'stop')
                                 ->reactive()
-                                ->default(fn($record) => $record->link ? url("/experiment/{$record->link}") : 'No active session'),
+                                ->default(function ($record) {
+                                    $experimentLink = \App\Models\ExperimentLink::where('experiment_id', $record->id)
+                                        ->where('user_id', Auth::id())
+                                        ->first();
+
+                                    return $experimentLink && $experimentLink->link
+                                        ? url("/experiment/{$experimentLink->link}")
+                                        : 'No active session';
+                                }),
 
                             Forms\Components\ToggleButtons::make('experimentStatus')
                                 ->options([
@@ -357,23 +392,55 @@ class MyExperimentResource extends Resource
                                     'stop' => 'heroicon-o-stop',
                                     'test' => 'heroicon-o-beaker',
                                 ])
-                                ->default(fn($record) => $record->status)
+                                ->default(function ($record) {
+                                    $experimentLink = \App\Models\ExperimentLink::where('experiment_id', $record->id)
+                                        ->where('user_id', Auth::id())
+                                        ->first();
+                                    return $experimentLink ? $experimentLink->status : 'stop';
+                                })
                                 ->reactive()
                                 ->afterStateUpdated(function ($state, $set, $record) {
-                                    if ($state === 'start' && !$record->link) {
-                                        $record->link = Str::random(6);
-                                        $set('link', url("/experiment/{$record->link}"));
-                                    } elseif ($state === 'stop') {
-                                        $record->link = null;
+                                    // Récupérer le lien existant
+                                    $existingLink = \App\Models\ExperimentLink::where('experiment_id', $record->id)
+                                        ->where('user_id', Auth::id())
+                                        ->first();
+
+                                    // Gestion du lien d'expérimentation selon l'état
+                                    $linkValue = match ($state) {
+                                        'start' => $existingLink?->link ?? Str::random(6), // Nouveau lien si pas de lien existant
+                                        'pause' => $existingLink?->link ?? Str::random(6), // Garde le même lien
+                                        'test' => Str::random(6), // Toujours un nouveau lien
+                                        'stop' => null, // Pas de lien
+                                        default => null,
+                                    };
+
+                                    // Mise à jour ou création du lien
+                                    $experimentLink = ExperimentLink::updateOrCreate(
+                                        [
+                                            'experiment_id' => $record->id,
+                                            'user_id' => Auth::id(),
+                                        ],
+                                        [
+                                            'status' => $state,
+                                            'link' => $linkValue,
+                                            'is_creator' => true,
+                                            'is_secondary' => false,
+                                            'is_collaborator' => false
+                                        ]
+                                    );
+
+                                    // Mise à jour de l'affichage
+                                    if ($experimentLink->link) {
+                                        $set('link', url("/experiment/{$experimentLink->link}"));
+                                    } else {
                                         $set('link', 'No active session');
                                     }
 
+                                    // Gestion du howitwork_page
                                     if ($state !== 'test') {
                                         $record->howitwork_page = false;
+                                        $record->save();
                                     }
-
-                                    $record->status = $state;
-                                    $record->save();
                                 }),
                             Placeholder::make('Informations')
                                 ->content(new HtmlString(
@@ -402,56 +469,95 @@ class MyExperimentResource extends Resource
                                 ->success()
                                 ->send();
                         }),
+                    Tables\Actions\Action::make('contact_principal')
+                        ->label(__('filament.resources.my_experiment.actions.contact'))
+                        ->icon('heroicon-o-envelope')
+                        ->url(fn(Experiment $record) => "/admin/contact-principal?experiment={$record->id}")
+                        ->visible(fn() => $user->hasRole('secondary_experimenter')),
                     Tables\Actions\Action::make('export')
                         ->label(__('filament.resources.my_experiment.actions.exports'))
-                        ->color('info')
+                        ->color('gray')
                         ->icon('heroicon-o-cloud-arrow-down')
                         ->modalWidth('xl')
                         ->form([
-                            Forms\Components\Placeholder::make('export_placeholder')
-                                ->content(new HtmlString(__('filament.resources.my_experiment.actions.export_desc')))
+                            Forms\Components\Placeholder::make(__('filament.resources.my_experiment.actions.export.label'))
+                                ->content(new HtmlString(__('filament.resources.my_experiment.actions.export.desc')))
                                 ->columnSpan('full'),
                             Forms\Components\Grid::make()
                                 ->schema([
                                     Forms\Components\Toggle::make('export_json')
-                                        ->label(__('filament.resources.my_experiment.actions.export_json'))
+                                        ->label(__('filament.resources.my_experiment.actions.export.json'))
                                         ->reactive(),
                                     Forms\Components\Toggle::make('export_xml')
-                                        ->label(__('filament.resources.my_experiment.actions.export_xml'))
+                                        ->label(__('filament.resources.my_experiment.actions.export.xml'))
                                         ->reactive(),
                                 ])
                                 ->columns(2),
                             Forms\Components\Placeholder::make('media_export_info')
-                                ->content(new HtmlString(__('filament.resources.my_experiment.actions.media_export_info')))
+                                ->content(new HtmlString(__('filament.resources.my_experiment.actions.export.media_info')))
                                 ->visible(fn($get) => $get('export_json') || $get('export_xml'))
                                 ->columnSpan('full'),
                             Forms\Components\Toggle::make('include_media')
-                                ->label(__('filament.resources.my_experiment.actions.include_media'))
+                                ->label(__('filament.resources.my_experiment.actions.export.include_media'))
                                 ->visible(fn($get) => $get('export_json') || $get('export_xml'))
                                 ->columnSpan('full'),
                         ])
                         ->action(function ($data, Experiment $record) {
                             $handler = new ExperimentExportHandler($record);
                             Notification::make()
-                                ->title(__('filament.resources.my_experiment.notifications.export_success'))
+                                ->title(__('filament.resources.my_experiment.notifications.export.success'))
                                 ->success()
                                 ->send();
                             return $handler->handleExport($data);
                         }),
                     Tables\Actions\Action::make('statistics')
-                        ->label(__('filament.widgets.experiment_table.actions.statistics'))
+                        ->label(__('filament.resources.my_experiment.actions.statistics'))
                         ->color('success')
                         ->icon('heroicon-o-chart-pie')
                         ->url(fn(Experiment $record): string =>
                         ExperimentStatistics::getUrl(['record' => $record])),
-                    Tables\Actions\Action::make('details')
-                        ->label(__('filament.widgets.experiment_table.actions.details'))
-                        ->color('warning')
+
+                    Tables\Actions\Action::make('results')
+                        ->label(__('filament.resources.my_experiment.actions.results'))
+                        ->color('gray')
                         ->icon('heroicon-o-document-magnifying-glass')
+                        ->url(
+                            fn(Experiment $record): string =>
+                            route('filament.admin.resources.experiment-sessions.index', [
+                                'record' => $record->id,
+                            ])
+                        ),
+                    Tables\Actions\Action::make('view')
+                        ->label(__('filament.resources.my_experiment.actions.details'))
+                        ->icon('heroicon-o-eye')
                         ->url(fn(Experiment $record): string =>
-                        ExperimentSessions::getUrl(['record' => $record])),
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
+                        ExperimentDetails::getUrl(['record' => $record])),
+                    Tables\Actions\EditAction::make()->color('warning'),
+                    Tables\Actions\DeleteAction::make()
+                        ->requiresConfirmation(false)
+                        ->modalSubmitActionLabel(__('filament.resources.my_experiment.actions.delete.heading'))
+                        ->modalDescription(
+                            fn($record) =>
+                            $record->access_requests_count()->count() > 0 || $record->shared_links_count()->count() > 0
+                                ? __('filament.resources.my_experiment.actions.delete.desc_issues_delete')
+                                : __('filament.resources.my_experiment.actions.delete.confirm_delete')
+                        )
+                        ->hidden(fn($record) => $record->access_requests_count()->count() > 0 || $record->shared_links_count()->count() > 0)
+                        ->form([
+                            TextInput::make('confirmation_code')
+                                ->label(__('filament.resources.my_experiment.actions.delete.code_confirm'))
+                                ->required()
+                                ->helperText(function () {
+                                    $code = Str::random(6);
+                                    return __('filament.resources.my_experiment.actions.delete.code') . ' : ' . $code;
+                                })
+                                ->rules(['required', 'string', fn($get) => function ($attribute, $value, $fail) use ($get) {
+                                    $code = Str::random(6);
+                                    if ($value !== $code) {
+                                        $fail(__('filament.resources.my_experiment.actions.delete.code_fail'));
+                                    }
+                                }])
+                        ])
                 ])
                     ->dropdown(true)
                     ->icon('heroicon-m-ellipsis-vertical')
@@ -467,7 +573,21 @@ class MyExperimentResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->where('created_by', Auth::id());
+            ->where(function ($query) {
+                $query->where('created_by', Auth::id())
+                    ->orWhereHas('users', function ($q) {
+                        $q->where('user_id', Auth::id())
+                            ->where(function ($q) {
+                                $q->where('can_configure', true)
+                                    ->orWhere('can_pass', true);
+                            });
+                    });
+            });
+    }
+
+    public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
+    {
+        return Auth::id() === $ownerRecord->created_by;
     }
 
     public static function getPages(): array
@@ -484,7 +604,16 @@ class MyExperimentResource extends Resource
         /** @var \App\Models\User */
         $user = Auth::user();
 
-        if ($user && $user->hasAnyPermission('edit_experiment_with_user')) {
+        /** @var \App\Models\Experiment */
+        $record = request()->route('record');
+        $experiment = \App\Models\Experiment::find($record);
+
+        if (
+            $user &&
+            $user->hasRole('principal_experimenter') &&
+            $experiment &&
+            $experiment->created_by === $user->id
+        ) {
             return [
                 UsersRelationManager::class,
             ];
@@ -504,10 +633,7 @@ class MyExperimentResource extends Resource
         }
 
         if ($user->hasRole('secondary_experimenter')) {
-            $principal = User::find($user->created_by);
-            if ($principal && $principal->status === 'banned') {
-                return false;
-            }
+            return false;
         }
 
         return true;
@@ -531,5 +657,30 @@ class MyExperimentResource extends Resource
         }
 
         parent::authorizeAccess();
+    }
+
+    public static function canAccess(): bool
+    {
+        /** @var \App\Models\User */
+        $user = Auth::user();
+
+        if ($user->hasRole('secondary_experimenter')) {
+            abort(403, "En tant que compte secondaire, vous n'avez pas accès à cette section. Utilisez le tableau de bord pour gérer vos expérimentations.");
+        }
+
+        return true;
+    }
+
+    // Et aussi pour bien s'assurer que même l'accès à la liste est bloqué
+    public static function canViewAny(): bool
+    {
+        /** @var \App\Models\User */
+        $user = Auth::user();
+
+        if ($user->hasRole('secondary_experimenter')) {
+            abort(403, "En tant que compte secondaire, vous n'avez pas accès à cette section. Utilisez le tableau de bord pour gérer vos expérimentations.");
+        }
+
+        return true;
     }
 }

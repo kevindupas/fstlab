@@ -14,21 +14,19 @@ class CreateMyExperiment extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['created_by'] = Auth::id();
-
         return $data;
     }
-
-    // protected function getRedirectUrl(): string
-    // {
-    //     // Utiliser la route de l'index de la resource au lieu de pages
-    //     return $this->getResource()::getUrl('index');
-    // }
 
     protected function afterCreate(): void
     {
         $experiment = $this->record;
+        $selectedStatus = $this->data['status'] ?? 'stop';
 
-        $experiment->link = Str::random(6);
-        $experiment->save();
+        \App\Models\ExperimentLink::create([
+            'experiment_id' => $experiment->id,
+            'user_id' => Auth::id(),
+            'link' => $this->data['temp_link'] ?? null,
+            'status' => $selectedStatus
+        ]);
     }
 }
