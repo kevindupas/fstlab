@@ -76,7 +76,7 @@ return [
             ],
         ],
         'access_requests' => [
-            'heading' => 'Expérimentations empruntés',
+            'heading' => 'Expérimentations empruntées',
             'column' => [
                 'name' => 'Expérimentation',
                 'created_by' => 'Créateur',
@@ -112,7 +112,7 @@ return [
                         'image_sound' => 'Image et Son',
                     ]
                 ],
-                'sessions_count' => 'Nombre de participants',
+                'sessions_count' => 'Nombre de résultats',
                 'created_at' => 'Date de création',
                 'user_role' => 'Votre rôle'
             ],
@@ -260,7 +260,7 @@ return [
             ]
         ],
         'experiments_sessions' => [
-            'title' => 'Participants pour l\'expérimentation : :name',
+            'title' => 'Participants pour l\'expérimentation',
             'columns' => [
                 'participant_number' => 'Identifiant du participant',
                 'status' => 'Statut',

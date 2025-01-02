@@ -33,40 +33,32 @@ class NewAccessRequestReceived extends Notification
     /**
      * Get the mail representation of the notification.
      */
-
     public function toMail($notifiable): MailMessage
     {
+        app()->setLocale($notifiable->locale ?? config('app.locale'));
+
         $requester = $this->request->user;
-        $requestType = match ($this->request->type) {
-            'results' => 'aux résultats',
-            'access' => 'de collaboration complète',
-            'duplicate' => 'de duplication',
-            default => 'd\'accès'
-        };
+        $requestType = __("notifications.new_access_request_received.type.{$this->request->type}");
 
         $message = (new MailMessage)
-            ->subject("Nouvelle demande $requestType")
-            ->greeting('Bonjour ' . $notifiable->name)
-            ->line("Vous avez reçu une nouvelle demande $requestType pour votre expérimentation.")
-            ->line('Détails de la demande :')
-            ->line('Expérimentation : ' . $this->request->experiment->name)
-            ->line('Demandeur : ' . $requester->name)
-            ->line('Message : ' . $this->request->request_message);
+            ->subject(__('notifications.new_access_request_received.subject', ['type' => $requestType]))
+            ->greeting(__('notifications.new_access_request_received.greeting', ['name' => $notifiable->name]))
+            ->line(__('notifications.new_access_request_received.line1', ['type' => $requestType]))
+            ->line(__('notifications.new_access_request_received.details'))
+            ->line(__('notifications.new_access_request_received.experiment', ['name' => $this->request->experiment->name]))
+            ->line(__('notifications.new_access_request_received.requester', ['name' => $requester->name]))
+            ->line(__('notifications.new_access_request_received.message', ['message' => $this->request->request_message]));
 
         if ($this->request->type === 'access') {
-            $message->line('Cette collaboration donnera accès :')
-                ->line('- Aux résultats et statistiques')
-                ->line('- À la possibilité de faire passer des sessions')
-                ->line('- Au partage des résultats avec les autres collaborateurs');
+            $message->line(__('notifications.new_access_request_received.access_details'));
         } elseif ($this->request->type === 'duplicate') {
-            $message->line('En acceptant la duplication :')
-                ->line('- Une copie de votre expérimentation sera créée')
-                ->line('- Le demandeur en sera le nouveau créateur')
-                ->line('- Vous serez référencé comme créateur original')
-                ->line('- Les médias seront dupliqués avec l\'expérimentation');
+            $message->line(__('notifications.new_access_request_received.duplicate_details'));
         }
 
-        return $message->action('Gérer la demande', route('filament.admin.resources.experiment-access-requests.edit', $this->request));
+        return $message->action(
+            __('notifications.new_access_request_received.action'),
+            route('filament.admin.resources.experiment-access-requests.edit', $this->request)
+        );
     }
 
     /**

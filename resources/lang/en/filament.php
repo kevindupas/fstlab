@@ -261,7 +261,7 @@ return [
             ],
         ],
         'experiments_sessions' => [
-            'title' => 'Participants for the experiment: :name',
+            'title' => 'Participants for the experiment',
             'columns' => [
                 'participant_number' => 'Participant ID',
                 'status' => 'Status',

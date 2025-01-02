@@ -91,6 +91,7 @@ class Register extends BaseRegister
             'registration_reason' => $this->registration_reason,
             'password' => $this->password,
             'password_confirmation' => $this->password_confirmation,
+            'locale' => substr(request()->server('HTTP_ACCEPT_LANGUAGE'), 0, 2),
         ];
     }
 }

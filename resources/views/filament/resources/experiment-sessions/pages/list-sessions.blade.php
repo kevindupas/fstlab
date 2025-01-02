@@ -120,6 +120,14 @@
         $experiment = \App\Models\Experiment::find($experimentId);
         $isCreator = $experiment?->created_by === auth()->id();
         $isSecondaryAccount = auth()->user()->created_by === $experiment->created_by;
+
+        $hasCollaboratorAccess = $experiment
+            ->accessRequests()
+            ->where('user_id', auth()->id())
+            ->where('type', 'access')
+            ->where('status', 'approved')
+            ->exists();
+
         $currentTab = request()->query('tab');
 
         // Préparation des compteurs avec filtre de recherche si présent
@@ -200,24 +208,26 @@
         @else
             @if (!$isSecondaryAccount)
                 {{-- Affichage des Mes Résultats en premier pour les collaborateurs --}}
-                <a href="{{ url()->current() }}?record={{ $experimentId }}&tab=mine{{ request()->query('search') ? '&search=' . request()->query('search') : '' }}"
-                    @class([
-                        'fi-tabs-item group flex items-center justify-center gap-x-2 rounded-lg px-3 py-2 text-sm font-medium outline-none transition duration-75',
-                        'fi-active fi-tabs-item-active bg-gray-50 dark:bg-white/5' =>
-                            $currentTab === 'mine',
-                        'hover:bg-gray-50 focus-visible:bg-gray-50 dark:hover:bg-white/5 dark:focus-visible:bg-white/5' =>
-                            $currentTab !== 'mine',
-                    ]) role="tab">
-                    <span
-                        class="fi-tabs-item-label transition duration-75 @if ($currentTab === 'mine') text-primary-600 dark:text-primary-400 @else text-gray-500 group-hover:text-gray-700 @endif">
-                        Mes résultats
-                    </span>
+                @if ($hasCollaboratorAccess)
+                    <a href="{{ url()->current() }}?record={{ $experimentId }}&tab=mine{{ request()->query('search') ? '&search=' . request()->query('search') : '' }}"
+                        @class([
+                            'fi-tabs-item group flex items-center justify-center gap-x-2 rounded-lg px-3 py-2 text-sm font-medium outline-none transition duration-75',
+                            'fi-active fi-tabs-item-active bg-gray-50 dark:bg-white/5' =>
+                                $currentTab === 'mine',
+                            'hover:bg-gray-50 focus-visible:bg-gray-50 dark:hover:bg-white/5 dark:focus-visible:bg-white/5' =>
+                                $currentTab !== 'mine',
+                        ]) role="tab">
+                        <span
+                            class="fi-tabs-item-label transition duration-75 @if ($currentTab === 'mine') text-primary-600 dark:text-primary-400 @else text-gray-500 group-hover:text-gray-700 @endif">
+                            Mes résultats
+                        </span>
 
-                    <span
-                        class="fi-badge flex items-center justify-center gap-x-1 rounded-md text-xs font-medium ring-1 ring-inset px-1.5 min-w-[theme(spacing.5)] py-0.5 tracking-tight bg-info-50 text-info-600 ring-info-600/10 dark:bg-info-400/10 dark:text-info-400 dark:ring-info-400/30">
-                        {{ $counts['mine'] }}
-                    </span>
-                </a>
+                        <span
+                            class="fi-badge flex items-center justify-center gap-x-1 rounded-md text-xs font-medium ring-1 ring-inset px-1.5 min-w-[theme(spacing.5)] py-0.5 tracking-tight bg-info-50 text-info-600 ring-info-600/10 dark:bg-info-400/10 dark:text-info-400 dark:ring-info-400/30">
+                            {{ $counts['mine'] }}
+                        </span>
+                    </a>
+                @endif
 
                 {{-- Puis l'onglet des résultats du créateur --}}
                 @if ($creatorQuery->count() > 0)

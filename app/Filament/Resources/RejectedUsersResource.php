@@ -18,9 +18,12 @@ use Illuminate\Support\Facades\Auth;
 class RejectedUsersResource extends Resource
 {
     protected static ?string $model = User::class;
-    protected static ?string $navigationGroup = 'Users';
     protected static ?string $navigationIcon = 'heroicon-o-user-minus';
-    protected static ?string $navigationLabel = 'Utilisateurs rejetés';
+
+    public static function getNavigationGroup(): string
+    {
+        return __('navigation.group.users');
+    }
 
     public static function getPluralModelLabel(): string
     {
@@ -62,6 +65,7 @@ class RejectedUsersResource extends Resource
                         'approved' => __('filament.resources.rejected_user.form.status.approved'),
                         'rejected' => __('filament.resources.rejected_user.form.status.rejected'),
                     ])
+                    ->native(false)
                     ->required(),
                 Textarea::make('rejection_reason')
                     ->required(fn(Get $get) => $get('status') === 'rejected')

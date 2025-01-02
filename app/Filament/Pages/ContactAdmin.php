@@ -56,6 +56,7 @@ class ContactAdmin extends Page
                         'question' => __('filament.pages.admin_contact.form.options.question'),
                         'other' => __('filament.pages.admin_contact.form.options.other'),
                     ])
+                    ->native(false)
                     ->required(),
 
                 MarkdownEditor::make('message')

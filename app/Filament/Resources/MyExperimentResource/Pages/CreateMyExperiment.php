@@ -26,7 +26,10 @@ class CreateMyExperiment extends CreateRecord
             'experiment_id' => $experiment->id,
             'user_id' => Auth::id(),
             'link' => $this->data['temp_link'] ?? null,
-            'status' => $selectedStatus
+            'status' => $selectedStatus,
+            'is_creator' => true,
+            'is_secondary' => false,
+            'is_collaborator' => false
         ]);
     }
 }

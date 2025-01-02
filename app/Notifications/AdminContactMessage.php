@@ -21,7 +21,6 @@ class AdminContactMessage extends Notification
         private string $message
     ) {}
 
-
     /**
      * Get the notification's delivery channels.
      *
@@ -37,17 +36,20 @@ class AdminContactMessage extends Notification
      */
     public function toMail($notifiable): MailMessage
     {
+
+        app()->setLocale($notifiable->locale ?? config('app.locale'));
+
         $emailBuilder = (new MailMessage)
-            ->subject("Nouveau message : {$this->subject}")
-            ->line("Message de : {$this->sender->name} ({$this->sender->email})")
-            ->line("Sujet : {$this->subject}")
-            ->line("Message :")
+            ->subject(__('notifications.admin_contact_message.subject', ['subject' => $this->subject]))
+            ->line(__('notifications.admin_contact_message.line1', ['sender_name' => $this->sender->name, 'sender_email' => $this->sender->email]))
+            ->line(__('notifications.admin_contact_message.line2', ['subject' => $this->subject]))
+            ->line(__('notifications.admin_contact_message.line3'))
             ->line($this->message);
 
         // Si c'est une demande de débannissement, ajouter le lien vers le profil
         if ($this->subject === 'unban' && $this->sender->status === 'banned') {
             $emailBuilder->action(
-                'Gérer l\'utilisateur',
+                __('notifications.admin_contact_message.action'),
                 route('filament.admin.resources.banned-users.edit', ['record' => $this->sender])
             );
         }

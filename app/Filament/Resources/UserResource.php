@@ -26,9 +26,14 @@ class UserResource extends Resource
 {
 
     protected static ?string $model = User::class;
-    protected static ?string $navigationGroup = 'Users';
     protected static ?int $navigationSort = -1;
     protected static ?string $navigationIcon = 'heroicon-o-user';
+
+    public static function getNavigationGroup(): string
+    {
+        return __('navigation.group.users');
+    }
+
 
     public static function getModelLabel(): string
     {
@@ -39,11 +44,6 @@ class UserResource extends Resource
     {
         return __('navigation.approved_user');
     }
-
-    // public static function getNavigationGroup(): ?string
-    // {
-    //     return __('Utilisateurs');
-    // }
 
     public static function form(Form $form): Form
     {
@@ -88,6 +88,7 @@ class UserResource extends Resource
                         titleAttribute: 'name',
                         modifyQueryUsing: fn(Builder $query) => $query->whereNot('name', 'supervisor')
                     )
+                    ->native(false)
                     ->getOptionLabelFromRecordUsing(fn(Role $record) => __('filament.resources.users.form.role.options.' . $record->name))
                     ->disableOptionWhen(function (string $value) {
                         $role = Role::where('id', $value)->first();

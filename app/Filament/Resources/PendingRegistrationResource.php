@@ -20,9 +20,12 @@ use Illuminate\Support\Facades\Auth;
 class PendingRegistrationResource extends Resource
 {
     protected static ?string $model = User::class;
-    protected static ?string $navigationGroup = 'Users';
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
-    protected static ?string $navigationLabel = 'Demandes d\'inscription';
+
+    public static function getNavigationGroup(): string
+    {
+        return __('navigation.group.users');
+    }
 
     public static function getPluralModelLabel(): string
     {
@@ -69,6 +72,7 @@ class PendingRegistrationResource extends Resource
                         'approved' => __('filament.resources.pending_registration.form.status.approved'),
                         'rejected' => __('filament.resources.pending_registration.form.status.rejected'),
                     ])
+                    ->native(false)
                     ->required()
                     ->live(),
                 Textarea::make('rejection_reason')

@@ -19,6 +19,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
@@ -27,27 +28,35 @@ class BorrowedExperimentsResource extends Resource
     protected static ?string $model = ExperimentAccessRequest::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-cloud-arrow-down';
-    protected static ?string $navigationGroup = 'Experiments';
     protected static ?int $navigationSort = 3;
+
+    public static function getNavigationGroup(): string
+    {
+        return __('navigation.group.experiments');
+    }
 
     public static function getNavigationLabel(): string
     {
-        return __('filament.resources.borrowed_experiment.navigation_label');
+        return __('navigation.borrowed_experiments');
     }
 
     public static function getModelLabel(): string
     {
-        return __('filament.resources.borrowed_experiment.label');
+        return __('navigation.borrowed_experiments');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('filament.resources.borrowed_experiment.plural');
+        return __('navigation.borrowed_experiments');
     }
 
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
+            ->select([
+                'experiment_access_requests.*',
+                DB::raw('(SELECT COUNT(*) FROM experiment_sessions WHERE experiment_sessions.experiment_id = experiment_access_requests.experiment_id) as sessions_count')
+            ])
             ->where('status', 'approved')
             ->where('user_id', Auth::id())
             ->with(['experiment', 'experiment.creator', 'experiment.links']);
@@ -116,6 +125,9 @@ class BorrowedExperimentsResource extends Resource
                         'access' => __('filament.resources.borrowed_experiment.table.columns.type_access.access'),
                         default => $state
                     } : ''),
+                Tables\Columns\TextColumn::make('sessions_count')
+                    ->label(__('filament.widgets.experiment_table.column.sessions_count'))
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('filament.resources.borrowed_experiment.table.columns.access_granted_at'))
                     ->dateTime()

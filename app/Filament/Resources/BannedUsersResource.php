@@ -18,9 +18,12 @@ use Illuminate\Support\Facades\Auth;
 class BannedUsersResource extends Resource
 {
     protected static ?string $model = User::class;
-    protected static ?string $navigationGroup = 'Users';
     protected static ?string $navigationIcon = 'heroicon-o-no-symbol';
 
+    public static function getNavigationGroup(): string
+    {
+        return __('navigation.group.users');
+    }
 
     public static function getPluralModelLabel(): string
     {
@@ -67,6 +70,7 @@ class BannedUsersResource extends Resource
                     ->columnSpan('full'),
                 Select::make('status')
                     ->live()
+                    ->native(false)
                     ->options([
                         'approved' => __('filament.resources.banned.form.status.unban'),
                     ])

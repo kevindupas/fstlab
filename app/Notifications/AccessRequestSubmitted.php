@@ -32,36 +32,28 @@ class AccessRequestSubmitted extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $requestType = match ($this->request->type) {
-            'results' => 'aux résultats',
-            'access' => 'de collaboration complète (résultats + sessions)',
-            'duplicate' => 'de duplication d\'expérimentation',
-            default => 'd\'accès'
-        };
+        app()->setLocale($notifiable->locale ?? config('app.locale'));
+
+        $requestType = __("notifications.access_request_submitted.type.{$this->request->type}");
+        $experimentName = $this->request->experiment->name;
 
         $message = (new MailMessage)
-            ->subject("Demande $requestType envoyée")
-            ->greeting('Bonjour ' . $notifiable->name)
-            ->line("Votre demande $requestType a bien été enregistrée.")
-            ->line('Détails de la demande :')
-            ->line('Expérimentation : ' . $this->request->experiment->name)
-            ->line('Message : ' . $this->request->request_message);
+            ->subject(__('notifications.access_request_submitted.subject', ['type' => $requestType]))
+            ->greeting(__('notifications.access_request_submitted.greeting', ['name' => $notifiable->name]))
+            ->line(__('notifications.access_request_submitted.line1', ['type' => $requestType]))
+            ->line(__('notifications.access_request_submitted.details'))
+            ->line(__('notifications.access_request_submitted.experiment', ['name' => $experimentName]))
+            ->line(__('notifications.access_request_submitted.message', ['message' => $this->request->request_message]));
 
         if ($this->request->type === 'access') {
-            $message->line('Cette collaboration vous donnera accès :')
-                ->line('- Aux résultats et statistiques')
-                ->line('- À la possibilité de faire passer des sessions')
-                ->line('- Au partage des résultats avec les autres collaborateurs');
+            $message->line(__('notifications.access_request_submitted.access_details'));
         } elseif ($this->request->type === 'duplicate') {
-            $message->line('Si votre demande est acceptée :')
-                ->line('- Vous recevrez une copie complète de l\'expérimentation')
-                ->line('- Vous en serez le créateur')
-                ->line('- Vous pourrez la modifier selon vos besoins')
-                ->line('- Le créateur original sera référencé sur votre copie');
+            $message->line(__('notifications.access_request_submitted.duplicate_details'));
         }
 
-        return $message->line('Nous vous informerons dès que votre demande aura été traitée.');
+        return $message->line(__('notifications.access_request_submitted.pending'));
     }
+
     /**
      * Get the array representation of the notification.
      *

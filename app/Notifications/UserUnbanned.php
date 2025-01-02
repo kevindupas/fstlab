@@ -34,13 +34,15 @@ class UserUnbanned extends Notification
      */
     public function toMail($notifiable): MailMessage
     {
+        app()->setLocale($notifiable->locale ?? config('app.locale'));
+
         return (new MailMessage)
-            ->subject('Votre compte a été débanni')
+            ->subject(__('notifications.user_unbanned.subject'))
             ->error()
-            ->greeting('Bonjour ' . $notifiable->name)
-            ->line('Votre compte a été débanni de la plateforme.')
-            ->line('Motif du débannissement : ' . $this->reason)
-            ->line('Si vous pensez qu\'il s\'agit d\'une erreur, veuillez contacter l\'administrateur.');
+            ->greeting(__('notifications.user_unbanned.greeting') . ' ' . $notifiable->name)
+            ->line(__('notifications.user_unbanned.line1'))
+            ->line(__('notifications.user_unbanned.line2') . ' ' . $this->reason)
+            ->line(__('notifications.user_unbanned.line3'));
     }
 
     /**

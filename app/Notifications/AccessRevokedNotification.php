@@ -22,11 +22,13 @@ class AccessRevokedNotification extends Notification
 
     public function toMail($notifiable): MailMessage
     {
+        app()->setLocale($notifiable->locale ?? config('app.locale'));
+
         return (new MailMessage)
-            ->subject('Access Revoked to Experiment')
-            ->line('Your access to the experiment "' . $this->accessRequest->experiment->name . '" has been revoked.')
-            ->line('Reason:')
-            ->line($this->accessRequest->response_message)
-            ->line('If you have any questions, please contact the experiment owner.');
+            ->subject(__('notifications.access_revoked_notification.subject'))
+            ->line(__('notifications.access_revoked_notification.line1', ['experiment' => $this->accessRequest->experiment->name]))
+            ->line(__('notifications.access_revoked_notification.line2'))
+            ->line(__('notifications.access_revoked_notification.reason', ['message' => $this->accessRequest->response_message]))
+            ->line(__('notifications.access_revoked_notification.contact'));
     }
 }

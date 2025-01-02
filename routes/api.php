@@ -10,15 +10,17 @@ use Illuminate\Support\Facades\Route;
 Route::get('/translations/{locale}', [TranslationController::class, 'getTranslations']);
 
 // Récupérer la liste des expériences
-Route::get('/experiments', [ExperimentApiController::class, 'index']);
-Route::get('/experiment/{id}', [ExperimentApiController::class, 'show']);
+// Route::get('/experiments', [ExperimentApiController::class, 'index']);
 
 Route::get('/howitwork/experiments', [HowItWorkApiController::class, 'getTestExperiments']);
 
 // api.php
 
 Route::middleware(['web'])->group(function () {
+    Route::get('/experiments', [ExperimentApiController::class, 'index']);
+    Route::get('/experiment/{id}', [ExperimentApiController::class, 'show']);
     Route::get('/user/auth-status', [ExperimentApiController::class, 'getAuthStatus']);
+    Route::get('/experiment/access-status/{experiment}', [ExperimentApiController::class, 'checkAccessStatus']);
     Route::post('/experiment/request-access/{experimentId}', [ExperimentApiController::class, 'requestAccess']);
     Route::post('/experiment/request-results/{experimentId}', [ExperimentApiController::class, 'requestResults']);
     Route::post('/experiment/request-duplicate/{experimentId}', [ExperimentApiController::class, 'requestDuplicate']);

@@ -15,6 +15,7 @@ import { useTranslation } from "../Contexts/LanguageContext";
 import { useAuth } from "../Contexts/AuthContext";
 import FloatingLanguageButton from "../Components/FloatingLanguageButton";
 import clsx from "clsx";
+import { ChartBarIcon } from "lucide-react";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -22,13 +23,15 @@ function ExperimentList() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { experiments, isLoading, error } = useExperiments();
-    const { user } = useAuth();
+    const { isAuthenticated, user } = useAuth();
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [showFilters, setShowFilters] = useState(false);
     const [selectedType, setSelectedType] = useState(null);
     const [sessionsRange, setSessionsRange] = useState({ min: 0, max: 0 });
     const [maxPossibleSessions, setMaxPossibleSessions] = useState(0);
+
+    console.log(experiments);
 
     useEffect(() => {
         if (experiments.length) {
@@ -385,6 +388,24 @@ function ExperimentList() {
                                                             )}
                                                     </span>
                                                 </div>
+                                                {isAuthenticated && (
+                                                    <>
+                                                        {experiment.hasFullAccess && (
+                                                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-50 text-green-700 text-xs font-medium">
+                                                                <CheckCircleIcon className="h-3 w-3" />
+                                                                Accès complet
+                                                            </span>
+                                                        )}
+                                                        {experiment.hasResultsAccess &&
+                                                            !experiment.hasFullAccess && (
+                                                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
+                                                                    <ChartBarIcon className="h-3 w-3" />
+                                                                    Accès
+                                                                    résultats
+                                                                </span>
+                                                            )}
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
 

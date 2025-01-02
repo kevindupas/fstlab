@@ -36,17 +36,19 @@ class ResetPasswordNotification extends Notification
      */
     public function toMail($notifiable): MailMessage
     {
+        app()->setLocale($notifiable->locale ?? config('app.locale'));
+
         $url = URL::signedRoute('filament.admin.auth.password-reset.reset', [
             'email' => $notifiable->email,
             'token' => app('auth.password.broker')->createToken($notifiable),
         ]);
 
         return (new MailMessage)
-            ->subject('Définir votre mot de passe')
-            ->line('Votre compte a été créé avec succès.')
-            ->line('Cliquez sur le bouton ci-dessous pour définir votre mot de passe.')
-            ->action('Définir mon mot de passe', $url)
-            ->line('Si vous n\'avez pas demandé la création de ce compte, aucune action n\'est requise.');
+            ->subject(__('notifications.password_reset.subject'))
+            ->line(__('notifications.password_reset.line1'))
+            ->line(__('notifications.password_reset.line2'))
+            ->action(__('notifications.password_reset.action'), $url)
+            ->line(__('notifications.password_reset.line3'));
     }
 
     /**

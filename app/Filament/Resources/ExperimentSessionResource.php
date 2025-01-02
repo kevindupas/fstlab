@@ -167,9 +167,40 @@ class ExperimentSessionResource extends Resource
         ];
     }
 
-    public function getTitle(): string | Htmlable
+    public static function getNavigationLabel(): string
     {
-        return new HtmlString(__('filament.pages.experiments_sessions.title'));
+        $experimentId = request()->query('record');
+        $experiment = Experiment::find($experimentId);
+        $experimentName = $experiment ? $experiment->name : '';
+
+        return new HtmlString(
+            __('filament.pages.experiments_sessions.title') .
+                ($experimentName ? " : {$experimentName}" : '')
+        );
+    }
+
+    public static function getModelLabel(): string
+    {
+        $experimentId = request()->query('record');
+        $experiment = Experiment::find($experimentId);
+        $experimentName = $experiment ? $experiment->name : '';
+
+        return new HtmlString(
+            __('filament.pages.experiments_sessions.title') .
+                ($experimentName ? " : {$experimentName}" : '')
+        );
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        $experimentId = request()->query('record');
+        $experiment = Experiment::find($experimentId);
+        $experimentName = $experiment ? $experiment->name : '';
+
+        return new HtmlString(
+            __('filament.pages.experiments_sessions.title') .
+                ($experimentName ? " : {$experimentName}" : '')
+        );
     }
 
     public static function canAccess(): bool
@@ -184,16 +215,29 @@ class ExperimentSessionResource extends Resource
             return false;
         }
 
-        // Vérifie si l'utilisateur actuel est un compte secondaire du créateur
         $user = Auth::user();
+
+        // Vérifie si l'utilisateur est un compte secondaire du créateur
         $isSecondaryAccount = $user->created_by === $experiment->created_by;
+
+        // Vérifie si l'utilisateur a une demande d'accès approuvée
+        $hasApprovedAccess = $experiment->accessRequests()
+            ->where('user_id', $user->id)
+            ->where('status', 'approved')
+            ->whereIn('type', ['results', 'access'])
+            ->exists();
 
         // Utilisation du trait HasExperimentAccess
         $instance = new class {
             use HasExperimentAccess;
         };
 
-        // Retourne true si l'utilisateur a accès via HasExperimentAccess OU si c'est un compte secondaire
-        return $instance->canAccessExperiment($experiment) || $isSecondaryAccount;
+        // Retourne true si :
+        // - l'utilisateur a accès via HasExperimentAccess OU
+        // - c'est un compte secondaire OU
+        // - il a une demande d'accès approuvée
+        return $instance->canAccessExperiment($experiment)
+            || $isSecondaryAccount
+            || $hasApprovedAccess;
     }
 }

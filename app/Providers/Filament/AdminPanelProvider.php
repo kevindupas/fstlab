@@ -9,6 +9,7 @@ use App\Filament\Pages\ContactAdmin;
 use App\Filament\Pages\ContactUser;
 use App\Filament\Pages\Experiments\Sessions\ExperimentSessionExport;
 use App\Filament\Pages\Experiments\Sessions\ExperimentSessions;
+use App\Filament\Pages\Profile;
 use App\Filament\Widgets\BannedUserWidget;
 use App\Filament\Widgets\DashboardStatsWidget;
 use App\Filament\Widgets\ExperimentAccessRequestsWidget;
@@ -58,7 +59,7 @@ class AdminPanelProvider extends PanelProvider
             ->login(Login::class)
             ->registration(Register::class)
             ->passwordReset()
-            ->profile()
+            ->profile(Profile::class)
             ->colors([
                 'primary' => Color::Blue,
             ])
@@ -114,6 +115,7 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
                 \App\Http\Middleware\RedirectIfPendingApproval::class,
+                \App\Http\Middleware\SetLocale::class,
             ])
             ->authMiddleware([
                 Authenticate::class,

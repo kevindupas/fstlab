@@ -31,11 +31,13 @@ class RegistrationRejected extends Notification
      */
     public function toMail($notifiable): MailMessage
     {
+        app()->setLocale($notifiable->locale ?? config('app.locale'));
+
         return (new MailMessage)
-            ->subject('Votre inscription a été refusée')
+            ->subject(__('notifications.registration_rejected.subject'))
             ->error()
-            ->line('Votre demande d\'inscription a été refusée.')
-            ->line('Motif : ' . $this->reason);
+            ->line(__('notifications.registration_rejected.line1'))
+            ->line(__('notifications.registration_rejected.line1') . ' : ' . $this->reason);
     }
 
     /**

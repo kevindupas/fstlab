@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\MyExperimentResource\Pages\EditMyExperiment;
 use App\Filament\Resources\SharedExperimentResource\Pages;
 use App\Models\Experiment;
 use Filament\Forms\Form;
@@ -20,14 +21,6 @@ class SharedExperimentResource extends Resource
     protected static ?string $navigationGroup = 'Experiments';
     protected static ?int $navigationSort = -1;
     protected static ?string $slug = 'shared-experiments';
-
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                //
-            ]);
-    }
 
     public static function table(Table $table): Table
     {
@@ -98,6 +91,14 @@ class SharedExperimentResource extends Resource
                 Tables\Columns\IconColumn::make('can_configure')
                     ->label('Peut configurer')
                     ->boolean(),
+            ])
+            ->actions([
+                Tables\Actions\Action::make('edit')
+                    ->label('Editer')
+                    ->color('warning')
+                    ->icon('heroicon-o-pencil')
+                    ->url(fn(Experiment $record): string =>
+                    EditMyExperiment::getUrl(['record' => $record]))
             ]);
     }
 

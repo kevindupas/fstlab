@@ -21,8 +21,15 @@ class ListExperimentSessions extends ListRecords
         $search = request()->query('search');
         $experiment = Experiment::find($experimentId);
 
+        $hasCollaboratorAccess = $experiment->accessRequests()
+            ->where('user_id', Auth::id())
+            ->where('type', 'access')
+            ->where('status', 'approved')
+            ->exists();
+
+
         return parent::table($table)
-            ->modifyQueryUsing(function (Builder $query) use ($experimentId, $tab, $experiment, $search) {
+            ->modifyQueryUsing(function (Builder $query) use ($experimentId, $tab, $experiment, $search, $hasCollaboratorAccess) {
                 if ($experimentId) {
                     $query->where('experiment_id', $experimentId);
 
@@ -41,9 +48,15 @@ class ListExperimentSessions extends ListRecords
                             });
                             break;
                         case 'mine':
-                            $query->whereHas('experimentLink', function ($q) {
-                                $q->where('user_id', Auth::id());
-                            });
+                            // Si l'utilisateur n'a pas l'accès collaborateur, 
+                            // retourner une requête vide
+                            if (!$hasCollaboratorAccess) {
+                                $query->where('id', 0); // Retourne une collection vide
+                            } else {
+                                $query->whereHas('experimentLink', function ($q) {
+                                    $q->where('user_id', Auth::id());
+                                });
+                            }
                             break;
                         case 'collaborators':
                             $query->whereHas('experimentLink', function ($q) use ($experiment) {
@@ -63,5 +76,10 @@ class ListExperimentSessions extends ListRecords
 
                 return $query;
             });
+    }
+
+    public function getBreadcrumbs(): array
+    {
+        return [];
     }
 }

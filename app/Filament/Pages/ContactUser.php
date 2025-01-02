@@ -67,6 +67,7 @@ class ContactUser extends Page
                                 ->pluck('name', 'id');
                         }
                     })
+                    ->native(false)
                     ->searchable()
                     ->required()
                     ->live()

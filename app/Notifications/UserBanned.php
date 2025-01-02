@@ -35,13 +35,15 @@ class UserBanned extends Notification
      */
     public function toMail($notifiable): MailMessage
     {
+        app()->setLocale($notifiable->locale ?? config('app.locale'));
+
         return (new MailMessage)
-            ->subject('Votre compte a été banni')
+            ->subject(__('notifications.user_banned.subject'))
             ->error()
-            ->greeting('Bonjour ' . $notifiable->name)
-            ->line('Votre compte a été banni de la plateforme.')
-            ->line('Motif du bannissement : ' . $this->reason)
-            ->line('Si vous pensez qu\'il s\'agit d\'une erreur, veuillez contacter l\'administrateur.');
+            ->greeting(__('notifications.user_banned.greeting') . ' ' . $notifiable->name)
+            ->line(__('notifications.user_banned.line1'))
+            ->line(__('notifications.user_banned.line2') . ' : ' . $this->reason)
+            ->line(__('notifications.user_banned.line3'));
     }
     /**
      * Get the array representation of the notification.

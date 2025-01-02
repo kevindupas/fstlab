@@ -17,6 +17,7 @@ use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
@@ -34,6 +35,10 @@ class ExperimentAccessRequestsWidget extends BaseWidget
         return $table
             ->query(
                 ExperimentAccessRequest::query()
+                    ->select([
+                        'experiment_access_requests.*',
+                        DB::raw('(SELECT COUNT(*) FROM experiment_sessions WHERE experiment_sessions.experiment_id = experiment_access_requests.experiment_id) as sessions_count')
+                    ])
                     ->where('user_id', Auth::id())
                     ->whereIn('status', ['pending', 'approved'])
                     ->latest()
@@ -41,17 +46,23 @@ class ExperimentAccessRequestsWidget extends BaseWidget
             ->columns([
                 Tables\Columns\TextColumn::make('experiment.name')
                     ->label(__('filament.widgets.access_requests.column.name'))
+                    ->words(3)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('experiment.creator.name')
                     ->label(__('filament.widgets.access_requests.column.created_by'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('type')
-                    ->label('Type')
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'results' => __('filament.widgets.access_requests.column.results'),
-                        'pass' => __('filament.widgets.access_requests.column.pass'),
+                    ->label(__('filament.resources.borrowed_experiment.table.columns.type_access.label'))
+                    ->badge()
+                    ->colors([
+                        'info' => 'access',
+                        'warning' => 'results'
+                    ])
+                    ->formatStateUsing(fn($state): string => $state ? match ($state) {
+                        'results' => __('filament.resources.borrowed_experiment.table.columns.type_access.results'),
+                        'access' => __('filament.resources.borrowed_experiment.table.columns.type_access.access'),
                         default => $state
-                    }),
+                    } : ''),
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('filament.widgets.access_requests.column.status'))
                     ->badge()
@@ -65,6 +76,9 @@ class ExperimentAccessRequestsWidget extends BaseWidget
                         'approved' => 'success',
                         default => 'gray',
                     }),
+                Tables\Columns\TextColumn::make('sessions_count')
+                    ->label(__('filament.widgets.experiment_table.column.sessions_count'))
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('filament.widgets.access_requests.column.created_at'))
                     ->dateTime()

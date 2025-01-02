@@ -25,15 +25,23 @@ use App\Models\ExperimentLink;
 use App\Models\User;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class MyExperimentResource extends Resource
 {
     protected static ?string $model = Experiment::class;
     protected static ?string $navigationIcon = 'heroicon-o-beaker';
-    protected static ?string $navigationGroup = 'Experiments';
     protected static ?int $navigationSort = -2;
     protected static ?string $slug = 'my-experiments';
+
+    // protected static ?string $navigationGroup = null;
+
+    public static function getNavigationGroup(): string
+    {
+        return __('navigation.group.experiments');
+    }
+
 
     public static function getNavigationLabel(): string
     {
@@ -80,9 +88,10 @@ class MyExperimentResource extends Resource
                         ->default('stop')
                         ->required()
                         ->live()
+                        ->native(false)
                         ->afterStateHydrated(function ($component, $state, $record) {
                             if ($record) {
-                                $experimentLink = ExperimentLink::where('experiment_id', $record->id)
+                                $experimentLink = \App\Models\ExperimentLink::where('experiment_id', $record->id)
                                     ->where('user_id', Auth::id())
                                     ->first();
 
@@ -96,38 +105,43 @@ class MyExperimentResource extends Resource
                                 $state = 'stop';
                             }
 
-                            $linkValue = null;
                             if ($state === 'test' || $state === 'start') {
                                 $link = Str::random(6);
                                 $livewire->data['link'] = url("/experiment/{$link}");
                                 $livewire->data['temp_link'] = $link;
-                                $linkValue = $link;
                             }
 
                             if ($state !== 'test') {
                                 $set('howitwork_page', false);
                             }
+                        }),
 
-                            // Déterminer les flags
-                            $user = Auth::user();
+                    Forms\Components\TextInput::make('link')
+                        ->label(__('filament.resources.my_experiment.form.link'))
+                        ->helperText(__('filament.resources.my_experiment.form.link_helper'))
+                        ->extraAttributes(function ($state) {
+                            return [
+                                'x-on:click' => 'window.navigator.clipboard.writeText("' . $state . '"); $tooltip("' . __('filament.resources.my_experiment.form.link_copied') . '", { timeout: 1500 });',
+                            ];
+                        })
+                        ->suffixAction(
+                            Forms\Components\Actions\Action::make('copy')
+                                ->icon('heroicon-m-clipboard')
+                        )
+                        ->visible(fn($get) => in_array($get('status'), ['start', 'test']))
+                        ->afterStateHydrated(function ($component, $state, $record) {
+                            if ($record) {
+                                $experimentLink = \App\Models\ExperimentLink::where('experiment_id', $record->id)
+                                    ->where('user_id', Auth::id())
+                                    ->first();
 
-                            // Mise à jour ou création du lien
-                            if ($linkValue || $state === 'stop') {
-                                ExperimentLink::updateOrCreate(
-                                    [
-                                        'experiment_id' => $record ? $record->id : $livewire->record->id,
-                                        'user_id' => $user->id,
-                                    ],
-                                    [
-                                        'status' => $state,
-                                        'link' => $linkValue,
-                                        'is_creator' => true,
-                                        'is_secondary' => false,
-                                        'is_collaborator' => false
-                                    ]
-                                );
+                                if ($experimentLink && $experimentLink->link) {
+                                    $component->state(url("/experiment/{$experimentLink->link}"));
+                                }
                             }
                         })
+                        ->disabled()
+                        ->columnSpan('full'),
                 ])->collapsible(),
 
             Forms\Components\Section::make(__('filament.resources.my_experiment.general_section.heading'))
@@ -147,6 +161,7 @@ class MyExperimentResource extends Resource
                             'sound' => __('filament.resources.my_experiment.form.type.options.sound'),
                             'image_sound' => __('filament.resources.my_experiment.form.type.options.image_sound'),
                         ])
+                        ->native(false)
                         ->reactive()
                         ->required(),
                 ])->collapsible(),
@@ -173,7 +188,7 @@ class MyExperimentResource extends Resource
             Forms\Components\Section::make(__('filament.resources.my_experiment.section_description.heading'))
                 ->description(__('filament.resources.my_experiment.section_description.description'))
                 ->schema([
-                    Forms\Components\RichEditor::make('description')
+                    Forms\Components\MarkdownEditor::make('description')
                         ->label(__('filament.resources.my_experiment.form.description'))
                         ->helperText(__('filament.resources.my_experiment.form.description_helper'))
                         ->disableToolbarButtons([
@@ -295,6 +310,10 @@ class MyExperimentResource extends Resource
         return $table
             ->query(
                 static::getEloquentQuery()
+                    ->select([
+                        'experiments.*',
+                        DB::raw('(SELECT COUNT(*) FROM experiment_sessions WHERE experiment_sessions.experiment_id = experiments.id) as sessions_count')
+                    ])
             )
             ->columns([
                 Tables\Columns\TextColumn::make('name')
@@ -345,6 +364,9 @@ class MyExperimentResource extends Resource
                     ->falseIcon('heroicon-o-x-circle')
                     ->trueColor('success')
                     ->falseColor('danger'),
+                Tables\Columns\TextColumn::make('sessions_count')
+                    ->label(__('filament.widgets.experiment_table.column.sessions_count'))
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('filament.resources.my_experiment.table.columns.created_at'))
                     ->dateTime()

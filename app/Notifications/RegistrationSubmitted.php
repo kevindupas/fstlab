@@ -34,12 +34,14 @@ class RegistrationSubmitted extends Notification implements ShouldQueue
      */
     public function toMail($notifiable): MailMessage
     {
+        app()->setLocale($notifiable->locale ?? config('app.locale'));
+
         return (new MailMessage)
-            ->subject('Demande d\'inscription enregistrée')
-            ->greeting('Bonjour ' . $notifiable->name)
-            ->line('Votre demande d\'inscription a été enregistrée avec succès.')
-            ->line('Un administrateur va examiner votre demande et vous recevrez une notification dès qu\'elle sera traitée.')
-            ->line('Merci de votre patience !');
+            ->subject(__('notifications.registration_submitted.subject'))
+            ->greeting(__('notifications.registration_submitted.greeting') . ' ' . $notifiable->name)
+            ->line(__('notifications.registration_submitted.line1'))
+            ->line(__('notifications.registration_submitted.line2'))
+            ->line(__('notifications.registration_submitted.line3'));
     }
     /**
      * Get the array representation of the notification.

@@ -25,10 +25,11 @@ class ExperimentAccessRequestResource extends Resource
     protected static ?string $model = ExperimentAccessRequest::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-inbox';
-    // protected static ?string $navigationLabel = 'Demandes d\'accès';
-    protected static ?string $navigationGroup = 'Experiments';
 
-    private const SHOULD_DUPLICATE_DOCUMENTS = false;
+    public static function getNavigationGroup(): string
+    {
+        return __('navigation.group.experiments');
+    }
 
     public static function getModelLabel(): string
     {
@@ -73,70 +74,10 @@ class ExperimentAccessRequestResource extends Resource
                                     $record->status => __("filament.resources.experiment-access-request.form.status.options.{$record->status}")
                                 ];
                             })
+                            ->native(false)
                             ->required()
                             ->live()
-                            ->disabled(fn($record) => !in_array($record->status, ['pending', 'approved']))
-                            ->afterStateUpdated(function ($state, $record, Forms\Set $set) {
-                                if (in_array($state, ['rejected', 'revoked'])) {
-                                    $set('response_message', '');
-                                }
-
-                                // Si la demande est approuvée et que c'est une demande de duplication
-                                if ($state === 'approved' && $record->type === 'duplicate') {
-                                    try {
-                                        $originalExperiment = $record->experiment;
-
-                                        // Créer une nouvelle expérience
-                                        $newExperiment = $originalExperiment->replicate();
-                                        $newExperiment->created_by = $record->user_id;
-                                        $newExperiment->original_creator_id = $originalExperiment->created_by;
-                                        $newExperiment->name = $originalExperiment->name . ' ' . __('filament.resources.experiment-access-request.form.duplicate.copy');
-                                        $newExperiment->doi = null;
-                                        $newExperiment->save();
-
-                                        // Dupliquer les médias (toujours)
-                                        if ($originalExperiment->media) {
-                                            $newMedia = [];
-                                            foreach ($originalExperiment->media as $media) {
-                                                $originalPath = storage_path('app/public/' . $media);
-                                                $newPath = 'experiments/' . Str::random(40) . '.' . pathinfo($media, PATHINFO_EXTENSION);
-                                                Storage::disk('public')->copy($media, $newPath);
-                                                $newMedia[] = $newPath;
-                                            }
-                                            $newExperiment->media = $newMedia;
-                                            $newExperiment->save();
-                                        }
-
-                                        // Dupliquer les documents seulement si la constante est true
-                                        if (self::SHOULD_DUPLICATE_DOCUMENTS && $originalExperiment->documents) {
-                                            $newDocs = [];
-                                            foreach ($originalExperiment->documents as $doc) {
-                                                $originalPath = storage_path('app/public/' . $doc);
-                                                $newPath = 'experiments/documents/' . Str::random(40) . '.' . pathinfo($doc, PATHINFO_EXTENSION);
-                                                Storage::disk('public')->copy($doc, $newPath);
-                                                $newDocs[] = $newPath;
-                                            }
-                                            $newExperiment->documents = $newDocs;
-                                            $newExperiment->save();
-                                        }
-
-                                        $record->delete();
-
-                                        Notification::make()
-                                            ->title(__('filament.resources.experiment-access-request.form.duplicate.success'))
-                                            ->success()
-                                            ->send();
-                                    } catch (\Exception $e) {
-                                        Notification::make()
-                                            ->title(__('filament.resources.experiment-access-request.form.duplicate.error'))
-                                            ->body($e->getMessage())
-                                            ->danger()
-                                            ->send();
-
-                                        $set('status', 'pending');
-                                    }
-                                }
-                            }),
+                            ->disabled(fn($record) => !in_array($record->status, ['pending', 'approved'])),
 
                         Forms\Components\Textarea::make('response_message')
                             ->label(__('filament.resources.experiment-access-request.form.response_message.label'))

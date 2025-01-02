@@ -38,16 +38,18 @@ class NewRegistrationRequest extends Notification
      */
     public function toMail($notifiable): MailMessage
     {
+        app()->setLocale($notifiable->locale ?? config('app.locale'));
+
         return (new MailMessage)
-            ->subject('Nouvelle demande d\'inscription')
-            ->greeting('Bonjour ' . $notifiable->name)
-            ->line('Une nouvelle demande d\'inscription a été soumise.')
-            ->line('Détails du demandeur :')
-            ->line('Nom : ' . $this->newUser->name)
-            ->line('Université : ' . $this->newUser->university)
-            ->line('Email : ' . $this->newUser->email)
-            ->line('Motif : ' . $this->newUser->registration_reason)
-            ->action('Gérer la demande', route('filament.admin.resources.pending-registrations.edit', $this->newUser));
+            ->subject(__('notifications.new_registration_request.subject'))
+            ->greeting(__('notifications.new_registration_request.greeting') . ' ' . $notifiable->name)
+            ->line(__('notifications.new_registration_request.line1'))
+            ->line(__('notifications.new_registration_request.line2'))
+            ->line(__('notifications.new_registration_request.line3') . ' ' . $this->newUser->name)
+            ->line(__('notifications.new_registration_request.line4') . ' ' . $this->newUser->university)
+            ->line(__('notifications.new_registration_request.line5') . ' ' . $this->newUser->email)
+            ->line(__('notifications.new_registration_request.line6') . ' ' . $this->newUser->registration_reason)
+            ->action(__('notifications.new_registration_request.action'), route('filament.admin.resources.pending-registrations.edit', $this->newUser));
     }
 
     /**

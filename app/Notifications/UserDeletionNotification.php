@@ -19,11 +19,15 @@ class UserDeletionNotification extends Notification
 
     public function toMail($notifiable)
     {
+        app()->setLocale($notifiable->locale ?? config('app.locale'));
+
         return (new MailMessage)
-            ->subject('Suppression de votre compte')
-            ->line('Votre compte a été supprimé pour la raison suivante :')
+            ->subject(__('notifications.user_deleted.subject'))
+            ->error()
+            ->greeting(__('notifications.user_deleted.greeting') . ' ' . $notifiable->name)
+            ->line(__('notifications.user_deleted.line1'))
             ->line($this->reason)
-            ->line('Si vous pensez qu\'il s\'agit d\'une erreur, veuillez nous contacter.');
+            ->line(__('notifications.user_deleted.line2'));
     }
 
     public function via($notifiable)

@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Filament\Pages\Experiments\Sessions\ExperimentSessions;
 use App\Models\ExperimentAccessRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -36,49 +35,39 @@ class AccessRequestProcessed extends Notification
      */
     public function toMail($notifiable): MailMessage
     {
-        $requestType = match ($this->request->type) {
-            'results' => 'aux résultats',
-            'access' => 'de collaboration',
-            'duplicate' => 'de duplication',
-            default => 'd\'accès'
-        };
+        app()->setLocale($notifiable->locale ?? config('app.locale'));
+
+        $requestType = __("notifications.access_request_processed.type.{$this->request->type}");
+        $experimentName = $this->request->experiment->name;
 
         $mail = (new MailMessage)
-            ->subject("Réponse à votre demande $requestType")
-            ->greeting('Bonjour ' . $notifiable->name)
-            ->line("Votre demande $requestType pour l'expérimentation \"" . $this->request->experiment->name . "\" a été traitée.");
+            ->subject(__('notifications.access_request_processed.subject', ['type' => $requestType]))
+            ->greeting(__('notifications.access_request_processed.greeting', ['name' => $notifiable->name]))
+            ->line(__('notifications.access_request_processed.line1', ['type' => $requestType, 'experiment' => $experimentName]));
 
         if ($this->isApproved) {
-            $mail->line('Votre demande a été approuvée.');
+            $mail->line(__('notifications.access_request_processed.approved'));
 
             if ($this->request->type === 'access') {
-                $mail->line('Vous pouvez maintenant :')
-                    ->line('- Accéder aux résultats et statistiques')
-                    ->line('- Faire passer des sessions')
-                    ->line('- Partager vos résultats avec les autres collaborateurs');
+                $mail->line(__('notifications.access_request_processed.access_details'));
             } elseif ($this->request->type === 'duplicate') {
-                $mail->line('La duplication a été effectuée avec succès.')
-                    ->line('Vous trouverez la copie de l\'expérimentation dans votre liste d\'expérimentations.')
-                    ->line('Vous pouvez maintenant :')
-                    ->line('- Modifier la copie selon vos besoins')
-                    ->line('- Commencer à collecter vos propres données')
-                    ->line('- Gérer vos propres collaborateurs');
+                $mail->line(__('notifications.access_request_processed.duplicate_details'));
             } else {
-                $mail->line('Vous pouvez maintenant accéder aux résultats de l\'expérimentation.');
+                $mail->line(__('notifications.access_request_processed.results_details'));
             }
 
             return $mail->action(
-                'Accéder à l\'expérimentation',
+                __('notifications.access_request_processed.action'),
                 route('filament.admin.resources.experiment-sessions.index', ['record' => $this->request->experiment_id])
             );
         }
 
         return $mail
             ->error()
-            ->line('Votre demande a été refusée.')
+            ->line(__('notifications.access_request_processed.rejected'))
             ->when(
                 $this->request->response_message,
-                fn($mail) => $mail->line('Motif : ' . $this->request->response_message)
+                fn($mail) => $mail->line(__('notifications.access_request_processed.reason', ['message' => $this->request->response_message]))
             );
     }
 

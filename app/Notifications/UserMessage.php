@@ -25,26 +25,28 @@ class UserMessage extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
+        app()->setLocale($notifiable->locale ?? config('app.locale'));
+
         // Déterminer le type d'expéditeur pour le sujet et le message
         $senderType = $this->sender->hasRole('supervisor')
-            ? 'superviseur'
-            : 'expérimentateur';
+            ? __('notifications.user_message.supervisor')
+            : __('notifications.user_message.researcher');
 
         $mail = (new MailMessage)
-            ->subject("Message du {$senderType}")
-            ->greeting('Bonjour ' . $notifiable->name)
-            ->line("Le {$senderType} {$this->sender->name} vous a envoyé un message :");
+            ->subject(__('notifications.user_message.subject', ['senderType' => $senderType]))
+            ->greeting(__('notifications.user_message.greeting', ['name' => $notifiable->name]))
+            ->line(__('notifications.user_message.line1', ['senderType' => $senderType, 'senderName' => $this->sender->name]));
 
         if ($this->experiment) {
-            $mail->line("Concernant l'expérience : {$this->experiment->name}");
+            $mail->line(__('notifications.user_message.experiment', ['experimentName' => $this->experiment->name]));
         }
 
         return $mail
             ->line($this->message)
             ->line(
                 $this->sender->hasRole('supervisor')
-                    ? 'Vous pouvez répondre via la page "Contacter l\'administrateur" de la plateforme.'
-                    : 'Vous pouvez répondre via la plateforme.'
+                    ? __('notifications.user_message.response_supervisor')
+                    : __('notifications.user_message.response_researcher')
             );
     }
 }

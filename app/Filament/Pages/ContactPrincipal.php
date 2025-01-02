@@ -61,6 +61,7 @@ class ContactPrincipal extends Page
                         })->pluck('name', 'id')
                     )
                     ->searchable()
+                    ->native(false)
                     ->reactive()
                     ->disabled(fn() => $this->experiment !== null),
 

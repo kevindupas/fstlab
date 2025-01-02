@@ -110,33 +110,152 @@ class ExperimentSessionsExportAll extends Page
         $data = $this->form->getState();
 
         return response()->streamDownload(function () use ($sessions, $data) {
-            echo "\xEF\xBB\xBF"; // BOM UTF-8
-
             $csv = Writer::createFromString();
             $csv->setDelimiter(',');
             $csv->setEnclosure('"');
 
-            $allRows = [];
+            // Construction des en-têtes en fonction des sélections
+            $headers = ['session_id'];
+
+            if (in_array('participant_number', $data['basic_fields'])) {
+                $headers[] = 'participant_number';
+            }
+            if (in_array('experimenter_info', $data['basic_fields'])) {
+                $headers[] = 'experimenter_name';
+                $headers[] = 'experimenter_type';
+            }
+            if (in_array('dates', $data['basic_fields'])) {
+                $headers[] = 'created_at';
+                $headers[] = 'completed_at';
+            }
+            if (in_array('duration', $data['basic_fields'])) {
+                $headers[] = 'duration_seconds';
+            }
+            if (in_array('system_info', $data['basic_fields'])) {
+                $headers[] = 'browser';
+                $headers[] = 'system';
+                $headers[] = 'device';
+                $headers[] = 'screen_width';
+                $headers[] = 'screen_height';
+            }
+            if (in_array('feedback', $data['basic_fields'])) {
+                $headers[] = 'feedback';
+            }
+
+            // En-têtes pour les groupes
+            if (!empty($data['group_fields'])) {
+                for ($i = 1; $i <= 3; $i++) {
+                    if (in_array('group_names', $data['group_fields'])) {
+                        $headers[] = "group{$i}_name";
+                    }
+                    if (in_array('group_comments', $data['group_fields'])) {
+                        $headers[] = "group{$i}_comment";
+                    }
+                    if (in_array('media_info', $data['group_fields'])) {
+                        for ($j = 1; $j <= 4; $j++) {
+                            $headers[] = "group{$i}_media{$j}_name";
+                            $headers[] = "group{$i}_media{$j}_interactions";
+                            $headers[] = "group{$i}_media{$j}_x";
+                            $headers[] = "group{$i}_media{$j}_y";
+                        }
+                    }
+                }
+            }
+
+            $csv->insertOne($headers);
+
             foreach ($sessions as $session) {
-                $csvData = $this->prepareExportData($data, $session);
-                $allRows = array_merge($allRows, $csvData);
+                $row = [(int)$session->id];
+
+                if (in_array('participant_number', $data['basic_fields'])) {
+                    $row[] = (string)$session->participant_number;
+                }
+                if (in_array('experimenter_info', $data['basic_fields'])) {
+                    $row[] = $session->experimentLink?->user?->name ?? 'NA';
+                    $row[] = $this->getExperimenterType($session);
+                }
+                if (in_array('dates', $data['basic_fields'])) {
+                    $row[] = $session->created_at->format('Y-m-d H:i:s');
+                    $row[] = $session->completed_at?->format('Y-m-d H:i:s') ?? 'NA';
+                }
+                if (in_array('duration', $data['basic_fields'])) {
+                    $row[] = number_format($session->duration / 1000, 3, '.', '');
+                }
+                if (in_array('system_info', $data['basic_fields'])) {
+                    $row[] = $session->browser ?? 'NA';
+                    $row[] = $session->operating_system ?? 'NA';
+                    $row[] = $session->device_type ?? 'NA';
+                    $row[] = (string)$session->screen_width;
+                    $row[] = (string)$session->screen_height;
+                }
+                if (in_array('feedback', $data['basic_fields'])) {
+                    $row[] = $this->cleanText($session->feedback);
+                }
+
+                // Données des groupes
+                if (!empty($data['group_fields'])) {
+                    $groupData = json_decode($session->group_data, true) ?? [];
+                    for ($i = 0; $i < 3; $i++) {
+                        $group = $groupData[$i] ?? null;
+
+                        if (in_array('group_names', $data['group_fields'])) {
+                            $row[] = $group ? $this->cleanText($group['name'] ?? 'NA') : 'NA';
+                        }
+                        if (in_array('group_comments', $data['group_fields'])) {
+                            $row[] = $group ? $this->cleanText($group['comment'] ?? 'NA') : 'NA';
+                        }
+                        if (in_array('media_info', $data['group_fields'])) {
+                            $elements = $group ? ($group['elements'] ?? []) : [];
+                            for ($j = 0; $j < 4; $j++) {
+                                $element = $elements[$j] ?? null;
+                                if ($element) {
+                                    $row[] = basename($element['url']);
+                                    $row[] = (int)($element['interactions'] ?? 0);
+                                    $row[] = number_format($element['x'] ?? 0, 3, '.', '');
+                                    $row[] = number_format($element['y'] ?? 0, 3, '.', '');
+                                } else {
+                                    $row[] = 'NA';
+                                    $row[] = '0';
+                                    $row[] = '0.000';
+                                    $row[] = '0.000';
+                                }
+                            }
+                        }
+                    }
+                }
+
+                $csv->insertOne($row);
             }
 
-            if (!empty($allRows)) {
-                $csv->insertOne(array_keys($allRows[0]));
-                $csv->insertAll($allRows);
-            }
-
+            echo "\xEF\xBB\xBF"; // BOM UTF-8
             echo $csv->toString();
         }, "all-sessions-export-" . date('Y-m-d') . '.csv', [
             'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
     }
 
-    // protected function prepareExportData(array $formData, ExperimentSession $session): array
-    // {
+    private function cleanText(?string $text): string
+    {
+        if (empty($text)) return 'NA';
+        return str_replace(["\n", "\r", ",", ";"], [" ", " ", " ", " "], $text);
+    }
 
-    // }
+    private function getExperimenterType(ExperimentSession $session): string
+    {
+        if (!$session->experimentLink) {
+            return 'NA';
+        }
+
+        if ($session->experimentLink->is_creator) {
+            return 'creator';
+        }
+
+        if ($session->experimentLink->is_secondary) {
+            return 'secondary';
+        }
+
+        return 'collaborator';
+    }
 
     public function getTitle(): string
     {

@@ -7,6 +7,7 @@ return [
     'user_contact' => "Contacter un utilisateur",
     'my_experiments' => "Mes Expérimentations",
     'access_demand' => "Demandes d'accès",
+    'borrowed_experiments' => "Expérimentations empruntées",
     'share_experiments' => "Expérientations partagés",
     'banned_user' => "Utilisateurs Bannis",
     "pending_users" => "Demandes d'inscription",

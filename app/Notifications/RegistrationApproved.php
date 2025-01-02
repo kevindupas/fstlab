@@ -34,12 +34,14 @@ class RegistrationApproved extends Notification
      */
     public function toMail($notifiable): MailMessage
     {
+        app()->setLocale($notifiable->locale ?? config('app.locale'));
+
         return (new MailMessage)
-            ->subject('Votre inscription a été approuvée')
+            ->subject(__('notifications.registration_approved.subject'))
             ->success()
-            ->line('Votre demande d\'inscription a été approuvée.')
-            ->line('Vous pouvez maintenant vous connecter à l\'application.')
-            ->action('Se connecter', route('filament.admin.auth.login'));
+            ->line(__('notifications.registration_approved.line1'))
+            ->line(__('notifications.registration_approved.line2'))
+            ->action(__('notifications.registration_approved.action'), route('filament.admin.auth.login'));
     }
     /**
      * Get the array representation of the notification.

@@ -1,11 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../Contexts/AuthContext";
 import { useExperiments } from "../Contexts/ExperimentsContext";
 import Modal from "../Components/Modal";
-import { ArrowLeft, Lock, Copy } from "lucide-react";
+import {
+    ArrowLeft,
+    Lock,
+    Copy,
+    ChartBarIcon,
+    CheckCircleIcon,
+} from "lucide-react";
 import clsx from "clsx";
 import { useTranslation } from "../Contexts/LanguageContext";
+import Notification from "../Components/Notification";
 
 function ExperimentDetail() {
     const { id } = useParams();
@@ -16,10 +23,49 @@ function ExperimentDetail() {
     const [showRequestModal, setShowRequestModal] = useState(false);
     const [requestMessage, setRequestMessage] = useState("");
     const [requestType, setRequestType] = useState(null);
+    const [existingAccess, setExistingAccess] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [showNotification, setShowNotification] = useState(false);
 
     // Trouver l'expérience dans le contexte
     const experiment = experiments.find((exp) => exp.id.toString() === id);
     const isCreator = user && experiment.created_by === user.id;
+
+    useEffect(() => {
+        const checkExistingAccess = async () => {
+            try {
+                const response = await fetch(
+                    `/api/experiment/access-status/${id}`
+                );
+                const data = await response.json();
+                setExistingAccess(data);
+                console.log("Access status:", data);
+            } catch (error) {
+                console.error("Error checking access:", error);
+            }
+        };
+
+        // On vérifie si l'utilisateur est authentifié mais n'est pas le créateur
+        // OU s'il a déjà des accès
+        if (isAuthenticated && (!isCreator || existingAccess)) {
+            checkExistingAccess();
+        }
+    }, [id, isAuthenticated, isCreator]);
+
+    // Fonction pour vérifier si un bouton doit être désactivé
+    const isButtonDisabled = (type) => {
+        if (!isAuthenticated) return true;
+        if (user?.isSecondary) return true;
+        if (!existingAccess) return false;
+
+        // Si l'utilisateur a déjà un accès complet, désactiver tous les boutons
+        if (existingAccess.hasFullAccess) return true;
+
+        // Si l'utilisateur a déjà accès aux résultats, désactiver seulement le bouton results
+        if (type === "results" && existingAccess.hasResultsAccess) return true;
+
+        return false;
+    };
 
     if (!experiment) {
         return (
@@ -56,6 +102,7 @@ function ExperimentDetail() {
         }
 
         try {
+            setIsLoading(true);
             const csrfToken = document
                 .querySelector('meta[name="csrf-token"]')
                 ?.getAttribute("content");
@@ -79,13 +126,16 @@ function ExperimentDetail() {
             if (response.ok) {
                 setShowRequestModal(false);
                 setRequestMessage("");
-                // Vous pouvez ajouter une notification de succès ici
+                setShowNotification(true);
+                // Fermer la notification après 5 secondes
+                setTimeout(() => setShowNotification(false), 5000);
             } else {
                 throw new Error("Erreur lors de la demande");
             }
         } catch (error) {
             console.error("Erreur:", error);
-            // Vous pouvez ajouter une notification d'erreur ici
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -156,6 +206,23 @@ function ExperimentDetail() {
                                 {t("experiment.detail.completed_session")}
                             </span>
                         </div>
+                        {isAuthenticated &&
+                            existingAccess?.hasFullAccess &&
+                            !user?.isSecondary && (
+                                <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700">
+                                    <CheckCircleIcon className="h-3 w-3 mr-1" />
+                                    Accès complet
+                                </span>
+                            )}
+                        {isAuthenticated &&
+                            existingAccess?.hasResultsAccess &&
+                            !existingAccess?.hasFullAccess &&
+                            !user?.isSecondary && (
+                                <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
+                                    <ChartBarIcon className="h-3 w-3 mr-1" />
+                                    Accès aux résultats
+                                </span>
+                            )}
                     </div>
                 </div>
 
@@ -343,64 +410,84 @@ function ExperimentDetail() {
                             <></>
                         ) : (
                             <div className="flex gap-4 justify-end">
-                                <button
-                                    onClick={() =>
-                                        handleRequestAccess("results")
-                                    }
-                                    disabled={!isAuthenticated}
-                                    className={clsx(
-                                        "rounded-md px-4 py-2 text-sm font-semibold text-white inline-flex items-center",
-                                        isAuthenticated
-                                            ? "bg-blue-600 hover:bg-blue-500"
-                                            : "bg-slate-500 cursor-not-allowed"
-                                    )}
-                                >
-                                    {!isAuthenticated && (
-                                        <Lock className="h-4 w-4 mr-2" />
-                                    )}
-                                    {t(
-                                        "experiment.detail.call_to_result_access"
-                                    )}
-                                </button>
-                                <button
-                                    onClick={() =>
-                                        handleRequestAccess("access")
-                                    }
-                                    disabled={!isAuthenticated}
-                                    className={clsx(
-                                        "rounded-md px-4 py-2 text-sm font-semibold text-white inline-flex items-center",
-                                        isAuthenticated
-                                            ? "bg-green-600 hover:bg-green-500"
-                                            : "bg-slate-500 cursor-not-allowed"
-                                    )}
-                                >
-                                    {!isAuthenticated && (
-                                        <Lock className="h-4 w-4 mr-2" />
-                                    )}
-                                    {t(
-                                        "experiment.detail.call_to_experiment_access"
-                                    )}
-                                </button>
-                                <button
-                                    onClick={() =>
-                                        handleRequestAccess("duplicate")
-                                    }
-                                    disabled={!isAuthenticated}
-                                    className={clsx(
-                                        "rounded-md px-4 py-2 text-sm font-semibold text-white inline-flex items-center",
-                                        isAuthenticated
-                                            ? "bg-purple-600 hover:bg-purple-500"
-                                            : "bg-slate-500 cursor-not-allowed"
-                                    )}
-                                >
-                                    {!isAuthenticated && (
-                                        <Lock className="h-4 w-4 mr-2" />
-                                    )}
-                                    {isAuthenticated && (
-                                        <Copy className="h-4 w-4 mr-2" />
-                                    )}
-                                    {t("experiment.detail.call_to_duplicate")}
-                                </button>
+                                {user?.isSecondary ? (
+                                    <div className="rounded-md bg-red-50 p-4">
+                                        <p className="text-sm text-red-700">
+                                            <a
+                                                href="/admin/login"
+                                                className="ml-1 font-medium underline hover:text-red-600"
+                                            >
+                                                Les comptes secondaires ne
+                                                peuvent pas faire de demandes
+                                                d'accès
+                                            </a>
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <button
+                                            onClick={() =>
+                                                handleRequestAccess("results")
+                                            }
+                                            disabled={isButtonDisabled(
+                                                "results"
+                                            )}
+                                            className={clsx(
+                                                "rounded-md px-4 py-2 text-sm font-semibold text-white inline-flex items-center",
+                                                !isButtonDisabled("results")
+                                                    ? "bg-blue-600 hover:bg-blue-500"
+                                                    : "bg-slate-500 cursor-not-allowed"
+                                            )}
+                                        >
+                                            {existingAccess?.hasResultsAccess ||
+                                            existingAccess?.hasFullAccess
+                                                ? "Vous avez déjà accès aux résultats"
+                                                : t(
+                                                      "experiment.detail.call_to_result_access"
+                                                  )}
+                                        </button>
+
+                                        <button
+                                            onClick={() =>
+                                                handleRequestAccess("access")
+                                            }
+                                            disabled={isButtonDisabled(
+                                                "access"
+                                            )}
+                                            className={clsx(
+                                                "rounded-md px-4 py-2 text-sm font-semibold text-white inline-flex items-center",
+                                                !isButtonDisabled("access")
+                                                    ? "bg-green-600 hover:bg-green-500"
+                                                    : "bg-slate-500 cursor-not-allowed"
+                                            )}
+                                        >
+                                            {existingAccess?.hasFullAccess
+                                                ? "Vous avez déjà un accès complet"
+                                                : t(
+                                                      "experiment.detail.call_to_experiment_access"
+                                                  )}
+                                        </button>
+
+                                        <button
+                                            onClick={() =>
+                                                handleRequestAccess("duplicate")
+                                            }
+                                            disabled={isButtonDisabled(
+                                                "duplicate"
+                                            )}
+                                            className={clsx(
+                                                "rounded-md px-4 py-2 text-sm font-semibold text-white inline-flex items-center",
+                                                isAuthenticated
+                                                    ? "bg-purple-600 hover:bg-purple-500"
+                                                    : "bg-slate-500 cursor-not-allowed"
+                                            )}
+                                        >
+                                            {t(
+                                                "experiment.detail.call_to_duplicate"
+                                            )}
+                                        </button>
+                                    </>
+                                )}
                             </div>
                         )}
                     </div>
@@ -423,20 +510,47 @@ function ExperimentDetail() {
                                 setShowRequestModal(false);
                                 setRequestMessage("");
                             }}
+                            disabled={isLoading}
                         >
                             {t("experiment.detail.cancel")}
                         </button>
                         <button
                             className={clsx(
-                                "px-4 py-2 text-sm text-white rounded-md",
-                                requestMessage.length >= 10
+                                "px-4 py-2 text-sm text-white rounded-md inline-flex items-center",
+                                requestMessage.length >= 10 && !isLoading
                                     ? "bg-indigo-600 hover:bg-indigo-500"
                                     : "bg-gray-400 cursor-not-allowed"
                             )}
-                            disabled={requestMessage.length < 10}
+                            disabled={requestMessage.length < 10 || isLoading}
                             onClick={handleSubmitRequest}
                         >
-                            {t("experiment.detail.submit")}
+                            {isLoading ? (
+                                <>
+                                    <svg
+                                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        ></circle>
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        ></path>
+                                    </svg>
+                                    Envoi en cours...
+                                </>
+                            ) : (
+                                t("experiment.detail.submit")
+                            )}
                         </button>
                     </>
                 }
@@ -461,6 +575,13 @@ function ExperimentDetail() {
                     </label>
                 </div>
             </Modal>
+            {/* Notification */}
+            <Notification
+                show={showNotification}
+                setShow={setShowNotification}
+                message="Demande envoyée avec succès"
+                description="Vous recevrez une réponse par email"
+            />
         </div>
     );
 }

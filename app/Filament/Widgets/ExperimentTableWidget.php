@@ -82,15 +82,16 @@ class ExperimentTableWidget extends BaseWidget
             ->defaultSort('created_at', 'desc')
             ->columns([
                 // Colonne du créateur uniquement visible pour les supervisors
-                Tables\Columns\TextColumn::make('creator.name')
-                    ->label(__('filament.widgets.experiment_table.column.creator'))
-                    ->searchable()
-                    ->sortable()
-                    ->visible(fn() => $user->hasRole('supervisor')),
+                // Tables\Columns\TextColumn::make('creator.name')
+                //     ->label(__('filament.widgets.experiment_table.column.creator'))
+                //     ->searchable()
+                //     ->sortable()
+                //     ->visible(fn() => $user->hasRole('supervisor')),
 
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('filament.widgets.experiment_table.column.name'))
                     ->searchable()
+                    ->words(3)
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('type')
@@ -316,7 +317,7 @@ class ExperimentTableWidget extends BaseWidget
                         ->visible(function (Experiment $record) {
                             /** @var \App\Models\User */
                             $user = Auth::user();
-                            return $user->hasRole('principal_experimenter') || $user->hasRole('secondary_experimenter') &&
+                            return $user->hasRole('supervisor') || $user->hasRole('principal_experimenter') || $user->hasRole('secondary_experimenter') &&
                                 $record->users()
                                 ->wherePivot('user_id', $user->id)
                                 ->wherePivot('can_configure', true)

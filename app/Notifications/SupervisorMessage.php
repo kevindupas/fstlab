@@ -25,18 +25,20 @@ class SupervisorMessage extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
+        app()->setLocale($notifiable->locale ?? config('app.locale'));
+
         $mail = (new MailMessage)
-            ->subject('Message du superviseur')
-            ->greeting('Bonjour ' . $notifiable->name)
-            ->line("Le superviseur {$this->supervisor->name} vous a envoyé un message :");
+            ->subject(__('notifications.supervisor_message.subject'))
+            ->greeting(__('notifications.supervisor_message.greeting', ['name' => $notifiable->name]))
+            ->line(__('notifications.supervisor_message.line1', ['supervisor' => $this->supervisor->name]));
 
         if ($this->experiment) {
-            $mail->line("Concernant l'expérience : {$this->experiment->name}");
+            $mail->line(__('notifications.supervisor_message.line2', ['experiment' => $this->experiment->name]));
         }
 
         return $mail
             ->line($this->message)
-            ->line('Vous pouvez répondre via la page "Contacter l\'administrateur" de la plateforme.');
+            ->line(__('notifications.supervisor_message.line3'));
     }
 
     public function toArray(object $notifiable): array
