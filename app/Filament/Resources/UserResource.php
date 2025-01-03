@@ -42,7 +42,13 @@ class UserResource extends Resource
 
     public static function getPluralModelLabel(): string
     {
-        return __('navigation.approved_user');
+        /** @var \App\Models\User */
+        $user = Auth::user();
+        if ($user->hasRole('supervisor')) {
+            return __('navigation.approved_user');
+        } elseif ($user->hasRole('principal_experimenter')) {
+            return __('navigation.approved_user_secondary');
+        }
     }
 
     public static function form(Form $form): Form

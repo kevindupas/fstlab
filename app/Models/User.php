@@ -33,7 +33,8 @@ class User extends Authenticatable
         'rejection_reason',
         'banned_reason',
         'unbanned_reason',
-        'locale'
+        'locale',
+        'terms_accepted',
     ];
 
     /**

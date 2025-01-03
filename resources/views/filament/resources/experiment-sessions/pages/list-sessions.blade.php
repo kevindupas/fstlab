@@ -1,28 +1,38 @@
 <x-filament-panels::page>
     {{-- Search Form --}}
-    <form method="GET" action="{{ url()->current() }}" class="mb-4">
-        <input type="hidden" name="record" value="{{ request()->query('record') }}">
-        @if (request()->query('tab'))
-            <input type="hidden" name="tab" value="{{ request()->query('tab') }}">
-        @endif
-        <div class="flex gap-2">
-            <div class="flex-1">
-                <input type="text" name="search" value="{{ request()->query('search') }}"
-                    placeholder="Rechercher un mot (ex: jaune, animal, etc.)"
-                    class="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-            </div>
-            <button type="submit"
-                class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:hover:bg-primary-800">
-                Rechercher
-            </button>
-            @if (request()->query('search'))
-                <a href="{{ url()->current() }}?record={{ request()->query('record') }}{{ request()->query('tab') ? '&tab=' . request()->query('tab') : '' }}"
-                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700">
-                    Réinitialiser
-                </a>
+
+    <x-filament::modal id="search-modal" width="md">
+        <x-slot name="header">
+            {{ __('pages.experiments_sessions.search.modal.search_label') }}
+        </x-slot>
+
+        <form method="GET" action="{{ url()->current() }}" class="space-y-4">
+            <input type="hidden" name="record" value="{{ request()->query('record') }}">
+            @if (request()->query('tab'))
+                <input type="hidden" name="tab" value="{{ request()->query('tab') }}">
             @endif
-        </div>
-    </form>
+
+            <div>
+                <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {{ __('pages.experiments_sessions.search.modal.search_label') }}
+                    <input type="text" name="search" value="{{ request()->query('search') }}"
+                        placeholder="{{ __('pages.experiments_sessions.search.modal.search_placeholder') }}"
+                        class="w-full px-4 py-2 mt-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+
+            <div class="flex justify-end gap-x-3">
+                <x-filament::button type="button" color="gray"
+                    x-on:click="$dispatch('close-modal', { id: 'search-modal' })">
+                    {{ __('pages.experiments_sessions.actions.cancel') }}
+                </x-filament::button>
+
+                <x-filament::button type="submit" color="success">
+                    {{ __('pages.experiments_sessions.search.modal.submit') }}
+                </x-filament::button>
+            </div>
+        </form>
+    </x-filament::modal>
+
 
     @if (request()->query('search'))
         @php
@@ -80,24 +90,25 @@
                         </div>
                         <div class="text-sm text-gray-500 dark:text-gray-400">
                             @if ($count > 0)
-                                Occurrence{{ $count > 1 ? 's' : '' }} de "{{ $searchTerm }}"
-                                trouvée{{ $count > 1 ? 's' : '' }}
+                                {{ $count === 1
+                                    ? __('pages.experiments_sessions.search.results.occurrences_found_singular', ['term' => $searchTerm])
+                                    : __('pages.experiments_sessions.search.results.occurrences_found_plural', ['term' => $searchTerm]) }}
                                 <span class="text-xs">
                                     @if (isset($locations['comments']))
                                         <span
                                             class="inline-flex items-center px-2 py-1 mr-1 rounded-full text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                            {{ $locations['comments'] }} commentaire(s)
+                                            {{ trans_choice('pages.experiments_sessions.search.results.locations.comments', $locations['comments'], ['count' => $locations['comments']]) }}
                                         </span>
                                     @endif
                                     @if (isset($locations['feedback']))
                                         <span
                                             class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                                            {{ $locations['feedback'] }} dans le feedback
+                                            {{ __('pages.experiments_sessions.search.results.locations.feedback') }}
                                         </span>
                                     @endif
                                 </span>
                             @else
-                                Aucune occurrence de "{{ $searchTerm }}" trouvée
+                                {{ __('pages.experiments_sessions.search.results.no_results', ['term' => $searchTerm]) }}
                             @endif
                         </div>
                     </div>
@@ -177,9 +188,8 @@
             ]) role="tab">
             <span
                 class="fi-tabs-item-label transition duration-75 @if (!$currentTab) text-primary-600 dark:text-primary-400 @else text-gray-500 group-hover:text-gray-700 @endif">
-                Tous les résultats
+                {{ __('pages.experiments_sessions.tabs.all.label') }}
             </span>
-
             <span
                 class="fi-badge flex items-center justify-center gap-x-1 rounded-md text-xs font-medium ring-1 ring-inset px-1.5 min-w-[theme(spacing.5)] py-0.5 tracking-tight bg-primary-50 text-primary-600 ring-primary-600/10 dark:bg-primary-400/10 dark:text-primary-400 dark:ring-primary-400/30">
                 {{ $counts['all'] }}
@@ -197,9 +207,8 @@
                 ]) role="tab">
                 <span
                     class="fi-tabs-item-label transition duration-75 @if ($currentTab === 'creator') text-primary-600 dark:text-primary-400 @else text-gray-500 group-hover:text-gray-700 @endif">
-                    Mes résultats (Créateur)
+                    {{ __('pages.experiments_sessions.tabs.creator.label') }}
                 </span>
-
                 <span
                     class="fi-badge flex items-center justify-center gap-x-1 rounded-md text-xs font-medium ring-1 ring-inset px-1.5 min-w-[theme(spacing.5)] py-0.5 tracking-tight bg-success-50 text-success-600 ring-success-600/10 dark:bg-success-400/10 dark:text-success-400 dark:ring-success-400/30">
                     {{ $counts['creator'] }}
@@ -207,7 +216,6 @@
             </a>
         @else
             @if (!$isSecondaryAccount)
-                {{-- Affichage des Mes Résultats en premier pour les collaborateurs --}}
                 @if ($hasCollaboratorAccess)
                     <a href="{{ url()->current() }}?record={{ $experimentId }}&tab=mine{{ request()->query('search') ? '&search=' . request()->query('search') : '' }}"
                         @class([
@@ -219,9 +227,8 @@
                         ]) role="tab">
                         <span
                             class="fi-tabs-item-label transition duration-75 @if ($currentTab === 'mine') text-primary-600 dark:text-primary-400 @else text-gray-500 group-hover:text-gray-700 @endif">
-                            Mes résultats
+                            {{ __('pages.experiments_sessions.tabs.mine.label') }}
                         </span>
-
                         <span
                             class="fi-badge flex items-center justify-center gap-x-1 rounded-md text-xs font-medium ring-1 ring-inset px-1.5 min-w-[theme(spacing.5)] py-0.5 tracking-tight bg-info-50 text-info-600 ring-info-600/10 dark:bg-info-400/10 dark:text-info-400 dark:ring-info-400/30">
                             {{ $counts['mine'] }}
@@ -229,7 +236,6 @@
                     </a>
                 @endif
 
-                {{-- Puis l'onglet des résultats du créateur --}}
                 @if ($creatorQuery->count() > 0)
                     <a href="{{ url()->current() }}?record={{ $experimentId }}&tab=creator{{ request()->query('search') ? '&search=' . request()->query('search') : '' }}"
                         @class([
@@ -241,7 +247,7 @@
                         ]) role="tab">
                         <span
                             class="fi-tabs-item-label transition duration-75 @if ($currentTab === 'creator') text-primary-600 dark:text-primary-400 @else text-gray-500 group-hover:text-gray-700 @endif">
-                            Résultats du créateur
+                            {{ __('pages.experiments_sessions.tabs.creator.label_for_others') }}
                         </span>
                         <span
                             class="fi-badge flex items-center justify-center gap-x-1 rounded-md text-xs font-medium ring-1 ring-inset px-1.5 min-w-[theme(spacing.5)] py-0.5 tracking-tight bg-success-50 text-success-600 ring-success-600/10 dark:bg-success-400/10 dark:text-success-400 dark:ring-success-400/30">
@@ -262,9 +268,8 @@
             ]) role="tab">
             <span
                 class="fi-tabs-item-label transition duration-75 @if ($currentTab === 'collaborators') text-primary-600 dark:text-primary-400 @else text-gray-500 group-hover:text-gray-700 @endif">
-                Autres collaborateurs
+                {{ __('pages.experiments_sessions.tabs.collaborators.label') }}
             </span>
-
             <span
                 class="fi-badge flex items-center justify-center gap-x-1 rounded-md text-xs font-medium ring-1 ring-inset px-1.5 min-w-[theme(spacing.5)] py-0.5 tracking-tight bg-warning-50 text-warning-600 ring-warning-600/10 dark:bg-warning-400/10 dark:text-warning-400 dark:ring-warning-400/30">
                 {{ $counts['collaborators'] }}
@@ -272,7 +277,24 @@
         </a>
     </nav>
 
-    <div class="flex justify-end mb-4">
+    <div class="flex justify-end mb-4 space-x-4">
+        @if (request()->query('search'))
+            <button type="button"
+                onclick="window.location.href='{{ url()->current() }}?record={{ $experimentId }}{{ request()->query('tab') ? '&tab=' . request()->query('tab') : '' }}'""
+                class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700">
+                <x-heroicon-s-x-circle class="h-5 w-5 mr-2" />
+                {{ __('pages.experiments_sessions.actions.reset_filter') }}
+            </button>
+        @endif
+        <button type="button" x-data x-on:click="$dispatch('open-modal', { id: 'search-modal' })"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:bg-green-800 dark:text-green-200 dark:border-green-600 dark:hover:bg-green-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            {{ __('pages.experiments_sessions.actions.search') }}
+        </button>
         @php
             $experimentId = request()->query('record');
             $currentTab = request()->query('tab');
@@ -298,7 +320,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
-            Exporter la liste
+            {{ __('pages.experiments_sessions.buttons.export_list') }}
         </a>
     </div>
 

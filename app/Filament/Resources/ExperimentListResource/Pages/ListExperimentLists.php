@@ -43,7 +43,7 @@ class ListExperimentLists extends ListRecords
     {
         return [
             Actions\Action::make('clearFilter')
-                ->label(__('filament.resources.experiment_list.actions.clearFilter'))
+                ->label(__('actions.clearFilter'))
                 ->icon('heroicon-o-x-mark')
                 ->color('danger')
                 ->url('/admin/experiments-list')

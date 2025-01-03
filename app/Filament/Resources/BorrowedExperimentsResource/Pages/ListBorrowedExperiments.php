@@ -13,13 +13,6 @@ class ListBorrowedExperiments extends ListRecords
 {
     protected static string $resource = BorrowedExperimentsResource::class;
 
-    // protected function getHeaderActions(): array
-    // {
-    //     return [
-    //         Actions\CreateAction::make(),
-    //     ];
-    // }
-
     public function getTabs(): array
     {
         $userId = Auth::id();
@@ -34,7 +27,7 @@ class ListBorrowedExperiments extends ListRecords
                 )
                 ->badgeColor('primary')
                 ->icon('heroicon-o-document-text'),
-            'results' => Tab::make('Résultats seulement')
+            'results' => Tab::make(__('filament.resources.borrowed_experiment.tabs.results'))
                 ->modifyQueryUsing(fn(Builder $query) => $query->where('type', 'results'))
                 ->icon('heroicon-m-document-text')
                 ->badge(
@@ -45,7 +38,7 @@ class ListBorrowedExperiments extends ListRecords
                         ->count()
                 )
                 ->badgeColor('warning'),
-            'access' => Tab::make('Collaborations')
+            'access' => Tab::make(__('filament.resources.borrowed_experiment.tabs.access'))
                 ->modifyQueryUsing(fn(Builder $query) => $query->where('type', 'access'))
                 ->icon('heroicon-m-users')
                 ->badge(

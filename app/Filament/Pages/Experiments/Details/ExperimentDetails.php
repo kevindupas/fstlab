@@ -2,11 +2,9 @@
 
 namespace App\Filament\Pages\Experiments\Details;
 
-use App\Filament\Pages\Experiments\Lists\ExperimentsList;
 use App\Models\Experiment;
 use App\Models\User;
 use App\Notifications\UserBanned;
-use App\Traits\HasExperimentAccess;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Infolists\Infolist;
@@ -24,7 +22,7 @@ class ExperimentDetails extends Page
 
     public function getTitle(): string | Htmlable
     {
-        return new HtmlString(__('filament.pages.experiment_details.title'));
+        return new HtmlString(__('pages.experiment_details.title'));
     }
 
     public Experiment $record;
@@ -61,23 +59,23 @@ class ExperimentDetails extends Page
         return $infolist
             ->record($this->record)
             ->schema([
-                Section::make(__('filament.pages.experiment_details.information_section.title'))
-                    ->description(__('filament.pages.experiment_details.information_section.description'))
+                Section::make(__('pages.experiment_details.information_section.title'))
+                    ->description(__('pages.experiment_details.information_section.description'))
                     ->icon('heroicon-o-information-circle')
                     ->schema([
                         TextEntry::make('name')
-                            ->label(__('filament.pages.experiment_details.information_section.name'))
+                            ->label(__('pages.experiment_details.information_section.name'))
                             ->size(TextEntry\TextEntrySize::Large)
                             ->weight('bold')
                             ->columnSpanFull(),
 
                         TextEntry::make('creator.name')
-                            ->label(__('filament.pages.experiment_details.information_section.created_by'))
+                            ->label(__('pages.experiment_details.information_section.created_by'))
                             ->icon('heroicon-m-user')
                             ->iconColor('primary'),
 
                         TextEntry::make('created_at')
-                            ->label(__('filament.pages.experiment_details.information_section.created_at'))
+                            ->label(__('pages.experiment_details.information_section.created_at'))
                             ->dateTime()
                             ->icon('heroicon-m-calendar'),
 
@@ -85,9 +83,9 @@ class ExperimentDetails extends Page
                             ->label('Type')
                             ->badge()
                             ->formatStateUsing(fn(string $state): string => match ($state) {
-                                'sound' => __('filament.pages.experiment_details.information_section.type.options.sound'),
-                                'image' => __('filament.pages.experiment_details.information_section.type.options.image'),
-                                'image_sound' => __('filament.pages.experiment_details.information_section.type.options.image_sound'),
+                                'sound' => __('pages.experiment_details.information_section.type.options.sound'),
+                                'image' => __('pages.experiment_details.information_section.type.options.image'),
+                                'image_sound' => __('pages.experiment_details.information_section.type.options.image_sound'),
                                 default => $state
                             })
                             ->color(fn(string $state): string => match ($state) {
@@ -106,11 +104,11 @@ class ExperimentDetails extends Page
                                 return $experimentLink ? $experimentLink->status : 'stop';
                             })
                             ->formatStateUsing(fn(string $state): string => match ($state) {
-                                'start' => __('filament.pages.experiment_details.information_section.status.options.start'),
-                                'pause' => __('filament.pages.experiment_details.information_section.status.options.pause'),
-                                'stop' => __('filament.pages.experiment_details.information_section.status.options.stop'),
-                                'test' => __('filament.pages.experiment_details.information_section.status.options.test'),
-                                'none' => __('filament.pages.experiment_details.information_section.status.options.none'),
+                                'start' => __('pages.experiment_details.information_section.status.options.start'),
+                                'pause' => __('pages.experiment_details.information_section.status.options.pause'),
+                                'stop' => __('pages.experiment_details.information_section.status.options.stop'),
+                                'test' => __('pages.experiment_details.information_section.status.options.test'),
+                                'none' => __('pages.experiment_details.information_section.status.options.none'),
                                 default => $state
                             })
                             ->color(fn(string $state): string => match ($state) {
@@ -122,50 +120,50 @@ class ExperimentDetails extends Page
                             }),
 
                         TextEntry::make('link')
-                            ->label(__('filament.pages.experiment_details.information_section.link'))
+                            ->label(__('pages.experiment_details.information_section.link'))
                             ->url(fn($record) => url("/experiment/{$record->link}"))
                             ->openUrlInNewTab()
                             ->visible(fn($record) => $record->link !== null)
                             ->icon('heroicon-m-link'),
 
                         TextEntry::make('doi')
-                            ->label(__('filament.pages.experiment_details.information_section.doi'))
+                            ->label(__('pages.experiment_details.information_section.doi'))
                             ->visible(fn($record) => filled($record->doi))
                             ->icon('heroicon-m-document-text'),
                     ])
                     ->columns(3),
 
-                Section::make(__('filament.pages.experiment_details.description_section.title'))
-                    ->description(__('filament.pages.experiment_details.description_section.description'))
+                Section::make(__('pages.experiment_details.description_section.title'))
+                    ->description(__('pages.experiment_details.description_section.description'))
                     ->icon('heroicon-o-document-text')
                     ->schema([
                         TextEntry::make('description')
-                            ->label(__('filament.pages.experiment_details.description_section.description'))
+                            ->label(__('pages.experiment_details.description_section.description'))
                             ->markdown()
                             ->columnSpanFull(),
                     ])
                     ->collapsible(),
 
-                Section::make(__('filament.pages.experiment_details.instruction_section.title'))
-                    ->description(__('filament.pages.experiment_details.instruction_section.description'))
+                Section::make(__('pages.experiment_details.instruction_section.title'))
+                    ->description(__('pages.experiment_details.instruction_section.description'))
                     ->icon('heroicon-o-clipboard-document-list')
                     ->schema([
                         TextEntry::make('instruction')
-                            ->label(__('filament.pages.experiment_details.instruction_section.description'))
+                            ->label(__('pages.experiment_details.instruction_section.description'))
                             ->markdown()
                             ->columnSpanFull(),
                     ])
                     ->collapsible(),
 
-                Section::make(__('filament.pages.experiment_details.settings_section.title'))
-                    ->description(__('filament.pages.experiment_details.settings_section.description'))
+                Section::make(__('pages.experiment_details.settings_section.title'))
+                    ->description(__('pages.experiment_details.settings_section.description'))
                     ->icon('heroicon-o-adjustments-horizontal')
                     ->schema([
                         TextEntry::make('button_size')
-                            ->label(__('filament.pages.experiment_details.settings_section.button_size'))
+                            ->label(__('pages.experiment_details.settings_section.button_size'))
                             ->suffix('px'),
                         TextEntry::make('button_color')
-                            ->label(__('filament.pages.experiment_details.settings_section.button_color'))
+                            ->label(__('pages.experiment_details.settings_section.button_color'))
                             ->formatStateUsing(fn($state) => new HtmlString("
                                 <div class='flex items-center gap-2'>
                                     <div class='w-6 h-6 rounded border' style='background-color: {$state}'></div>
@@ -181,13 +179,13 @@ class ExperimentDetails extends Page
 
     protected function getMediaSection(): Section
     {
-        return Section::make(__('filament.pages.experiment_details.medias_section.title'))
-            ->description(__('filament.pages.experiment_details.medias_section.description'))
+        return Section::make(__('pages.experiment_details.medias_section.title'))
+            ->description(__('pages.experiment_details.medias_section.description'))
             ->icon('heroicon-o-photo')
             ->collapsible()
             ->schema([
                 TextEntry::make('media')
-                    ->label(__('filament.pages.experiment_details.medias_section.medias'))
+                    ->label(__('pages.experiment_details.medias_section.medias'))
                     ->visible(fn($record) => !empty($record->media))
                     ->formatStateUsing(function ($state) {
                         $mediaFiles = is_string($state) ? explode(',', $state) : $state;
@@ -197,8 +195,8 @@ class ExperimentDetails extends Page
                         $images = $mediaFiles->filter(fn($path) => str_contains($path, '.jpg') || str_contains($path, '.png'));
                         $audio = $mediaFiles->filter(fn($path) => str_contains($path, '.wav') || str_contains($path, '.mp3'));
 
-                        $imagesTranslatable = __('filament.pages.experiment_details.medias_section.images');
-                        $audioTranslatable = __('filament.pages.experiment_details.medias_section.sounds');
+                        $imagesTranslatable = __('pages.experiment_details.medias_section.images');
+                        $audioTranslatable = __('pages.experiment_details.medias_section.sounds');
 
                         $html = '';
 
@@ -271,7 +269,7 @@ class ExperimentDetails extends Page
 
                 // Documents section
                 TextEntry::make('documents')
-                    ->label(__('filament.pages.experiment_details.documents_section.title'))
+                    ->label(__('pages.experiment_details.documents_section.title'))
                     ->columnSpanFull()
                     ->visible(fn($record) => !empty($record->documents))
                     ->formatStateUsing(function ($state) {
@@ -321,7 +319,7 @@ class ExperimentDetails extends Page
         $user = Auth::user();
         return [
             \Filament\Actions\Action::make('banUser')
-                ->label(__('filament.pages.experiment_details.ban_action.label'))
+                ->label(__('pages.experiment_details.ban_action.label'))
                 ->color('danger')
                 ->icon('heroicon-o-user')
                 ->hidden(
@@ -331,13 +329,13 @@ class ExperimentDetails extends Page
                 ->requiresConfirmation()
                 ->form([
                     \Filament\Forms\Components\Textarea::make('banned_reason')
-                        ->label(__('filament.pages.experiment_details.ban_action.reason'))
+                        ->label(__('pages.experiment_details.ban_action.reason'))
                         ->required()
                         ->minLength(10)
-                        ->helperText(__('filament.pages.experiment_details.ban_action.helper')),
+                        ->helperText(__('pages.experiment_details.ban_action.helper')),
                 ])
-                ->modalHeading(__('filament.pages.experiment_details.ban_action.modalHeading'))
-                ->modalDescription(__('filament.pages.experiment_details.ban_action.modalDescription'))
+                ->modalHeading(__('pages.experiment_details.ban_action.modalHeading'))
+                ->modalDescription(__('pages.experiment_details.ban_action.modalDescription'))
                 ->visible(fn() => $user->hasRole('supervisor'))
                 ->action(function (array $data) {
                     // Récupérer l'utilisateur qui a créé cette expérimentation
@@ -352,7 +350,7 @@ class ExperimentDetails extends Page
                     $user->notify(new UserBanned($data['banned_reason']));
 
                     Notification::make()
-                        ->title(__('filament.pages.experiment_details.notification.banned'))
+                        ->title(__('pages.experiment_details.notification.banned'))
                         ->success()
                         ->send();
 
@@ -360,7 +358,7 @@ class ExperimentDetails extends Page
                     $this->redirect('/admin/experiments');
                 }),
             \Filament\Actions\Action::make('edit')
-                ->label(__('filament.pages.experiment_details.actions.edit'))
+                ->label(__('pages.experiment_details.actions.edit'))
                 ->icon('heroicon-o-pencil')
                 ->color('warning')
                 ->url("/admin/my-experiments/{$this->record->id}/edit")
@@ -379,25 +377,36 @@ class ExperimentDetails extends Page
                 ),
 
             \Filament\Actions\Action::make('contactCreator')
-                ->label(__('filament.pages.experiment_details.actions.contact'))
+                ->label(__('pages.experiment_details.actions.contact'))
                 ->icon('heroicon-o-envelope')
                 ->url("/admin/contact-principal?experiment={$this->record->id}")
-                // Visible pour :
-                // - Les comptes secondaires
-                // - Les collaborateurs
-                // Mais pas pour :
-                // - Le créateur lui-même
-                // - Le superviseur si c'est une expérimentation d'un superviseur
-                ->visible(
-                    fn() => (
-                        ($user->hasRole('supervisor') !== ($this->record->created_by === $user->id) || $user->hasRole('secondary_experimenter') ||
-                            $this->record->accessRequests()
-                            ->where('user_id', $user->id)
-                            ->where('status', 'approved')
-                            ->exists()
-                        )
-                    )
-                ),
+                ->visible(function () use ($user) {
+                    // Si c'est le créateur, on cache toujours le bouton
+                    if ($this->record->created_by === $user->id) {
+                        return false;
+                    }
+
+                    // Visible pour le compte supervisor
+                    if ($user->hasRole('supervisor')) {
+                        return true;
+                    }
+
+                    // Visible pour les comptes secondaires
+                    if ($user->hasRole('secondary_experimenter')) {
+                        return true;
+                    }
+
+                    // Visible pour les collaborateurs approuvés
+                    if ($this->record->accessRequests()
+                        ->where('user_id', $user->id)
+                        ->where('status', 'approved')
+                        ->exists()
+                    ) {
+                        return true;
+                    }
+
+                    return false;
+                })
         ];
     }
 

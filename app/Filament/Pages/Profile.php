@@ -3,7 +3,6 @@
 namespace App\Filament\Pages;
 
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Pages\Auth\EditProfile as BaseEditProfile;
 
@@ -19,7 +18,8 @@ class Profile extends BaseEditProfile
                 $this->getPasswordFormComponent(),
                 $this->getPasswordConfirmationFormComponent(),
                 Select::make('locale')
-                    ->label(__('profile.language'))
+                    ->label(__('pages.auth.profile.language'))
+                    ->helperText(__('pages.auth.profile.helper_text'))
                     ->options([
                         'fr' => 'Français',
                         'en' => 'English',
@@ -39,6 +39,6 @@ class Profile extends BaseEditProfile
             app()->setLocale($data['locale']);
         }
 
-        $this->notify('success', __('filament-panels::pages/profile.notifications.saved'));
+        $this->notify('success', __('pages.auth.profile.notifications.saved'));
     }
 }

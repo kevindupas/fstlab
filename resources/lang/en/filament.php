@@ -1,193 +1,9 @@
 <?php
 
-return [
-    'widgets' => [
-        'dashboard_table' => [
-            'experiments' => [
-                'supervisor' => [
-                    'name' => 'Experiments',
-                    'description' => 'Total experiments under your supervision',
-                ],
-                'principal' => [
-                    'name' => 'My Experiments',
-                    'description' => 'Total of your experiments',
-                ],
-            ],
-            'sessions' => [
-                'supervisor' => [
-                    'name' => 'Sessions',
-                    'description' => 'Total number of sessions',
-                ],
-                'principal' => [
-                    'name' => 'Sessions',
-                    'description' => 'Total number of sessions',
-                ],
-            ],
-            'users' => [
-                'supervisor' => [
-                    'name' => 'Experimenters',
-                    'description' => 'Main experimenters',
-                ],
-                'principal' => [
-                    'name' => 'Experimenters',
-                    'description' => 'Secondary experimenters',
-                ],
-            ],
-            'completions' => [
-                'supervisor' => [
-                    'name' => 'Completion Rate',
-                    'description' => 'Sessions successfully completed',
-                ],
-                'principal' => [
-                    'name' => 'Completion Rate',
-                    'description' => 'Sessions successfully completed',
-                ],
-            ],
-            'sessions_test' => [
-                'supervisor' => [
-                    'name' => 'Test Sessions',
-                    'description' => 'Sessions currently in test',
-                ],
-                'principal' => [],
-            ],
-            'registrations' => [
-                'supervisor' => [
-                    'name' => 'Registration Requests',
-                    'description' => 'Pending approval',
-                ],
-            ],
-            'banned' => [
-                'supervisor' => [
-                    'name' => 'Banned Users',
-                    'description' => 'Disabled accounts',
-                ],
-            ],
-        ],
-        'banned' => [
-            'principal' => [
-                'title' => 'Banned Account',
-                'description' => 'Your account has been banned. If you think this is a mistake or wish to appeal the ban, 
-                you can contact the administrator via the "Contact Administrator" page.',
-            ],
-            'secondary' => [
-                'title' => 'Banned Account',
-                'description' => 'The principal experimenter of your account has been banned. Your access is temporarily restricted. 
-                Please contact the administrator via the "Contact Administrator" page for further information.',
-            ],
-        ],
-        'access_requests' => [
-            'heading' => 'Borrowed Experiments',
-            'column' => [
-                'name' => 'Experiment',
-                'created_by' => 'Creator',
-                'type' => 'Type',
-                'results' => 'Results',
-                'pass' => 'Pass',
-                'status' => 'Status',
-                'pending' => 'Pending',
-                'approved' => 'Approved',
-                'created_at' => 'Requested on',
-                'statistics' => 'Statistics',
-                'sessions' => 'Sessions',
-                'actions' => 'Actions',
-            ],
-        ],
-        'experiment_table' => [
-            'title' => 'My Experiments',
-            'title_secondary_experimenter' => 'Assigned experiments',
-            'title_default' => 'Experiments available',
-            'column' => [
-                'creator' => 'Created by',
-                'name' => 'Experiment Name',
-                'status' => 'Status',
-                'start' => 'Started',
-                'pause' => 'Paused',
-                'stop' => 'Stopped',
-                'test' => 'In Test',
-                'type' => [
-                    'label' => 'Type',
-                    'options' => [
-                        'image' => 'Image',
-                        'sound' => 'Sound',
-                        'image_sound' => 'Image and Sound',
-                    ]
-                ],
-                'sessions_count' => 'Number of Participants',
-                'created_at' => 'Creation Date',
-                'user_role' => 'Your Role',
-            ],
-            'roles' => [
-                'supervisor' => 'Supervisor',
-                'creator' => 'Creator',
-                'manager' => 'Manager',
-                'observer' => 'Observer',
-            ],
-            'actions' => [
-                'statistics' => 'Statistics',
-                'details' => 'Details',
-                'edit' => 'Edit',
-                'contact_creator' => 'Contact Creator',
-                'results' => 'Results',
+declare(strict_types=1);
 
-            ],
-        ],
-    ],
+return [
     'pages' => [
-        'auth' => [
-            'register' => [
-                'name' => 'Name',
-                'email' => [
-                    'label' => 'Email',
-                    'unique' => 'This email is already in use',
-                ],
-                'university' => 'University',
-                'registration_reason' => [
-                    'label' => 'Why do you want to register?',
-                    'helpMessage' => 'Your description must be at least 50 characters long',
-                ],
-                'orcid' => 'ORCID Number',
-                'password' => [
-                    'label' => 'Password',
-                    'helpMessage' => 'Your password must be at least 8 characters long',
-                ],
-                'confirm_password' => [
-                    'label' => 'Confirm Password',
-                    'helpMessage' => 'Passwords do not match',
-                ],
-            ],
-        ],
-        'admin_contact' => [
-            'title' => 'Contact Administrator',
-            'form' => [
-                'subject' => 'Subject',
-                'options' => [
-                    'unban' => 'Unban Request',
-                    'principal_banned' => 'Principal Experimenter Banned',
-                    'question' => 'General Question',
-                    'other' => 'Other',
-                ],
-                'message' => [
-                    'label' => 'Request Description',
-                    'placeholder' => 'Enter your message',
-                ],
-                'submit' => 'Send Message',
-                'success' => 'Message sent successfully',
-            ],
-        ],
-        'user_contact' => [
-            'title_secondary_experimenter' => 'Contact my experimenter',
-            'title' => 'Contact a User',
-            'form' => [
-                'user' => 'User',
-                'experiment' => 'Related Experiment (optional)',
-                'message' => [
-                    'label' => 'Message',
-                    'placeholder' => 'Enter your message',
-                ],
-                'submit' => 'Send Message',
-                'success' => 'Message sent successfully',
-            ],
-        ],
         'experiment_details' => [
             'title' => "Experiment Details",
             'information_section' => [
@@ -468,29 +284,32 @@ return [
             'column' => [
                 'created_by' => 'Created by',
                 'name' => 'Experiment Name',
-                'type' => 'Type',
-                'status' => 'Status',
-                'start' => 'Started',
-                'pause' => 'Paused',
-                'stop' => 'Stopped',
-                'test' => 'In Test',
-                'none' => 'None',
-                'sound' => 'Sound',
-                'image' => 'Image',
-                'image_sound' => 'Image and Sound',
+                'type' => [
+                    'label' => 'Type',
+                    'options' => [
+                        'image' => 'Image',
+                        'sound' => 'Sound',
+                        'image_sound' => 'Image and Sound',
+                    ]
+                ],
+                'status' => [
+                    'label' => 'Status',
+                    'options' => [
+                        'start' => 'Start',
+                        'pause' => 'Pause',
+                        'stop' => 'Stop',
+                        'test' => 'Test',
+                    ],
+                ],
                 'sessions_count' => 'Number of Sessions',
                 'created_at' => 'Created on',
-                'action' => 'View Experiment',
             ],
             'tabs' => [
                 'all' => 'All Experiments',
                 'sound' => 'Sound',
                 'image' => 'Image',
                 'image_sound' => 'Image and Sound',
-            ],
-            'actions' => [
-                'clearFilter' => 'Clear Filter',
-            ],
+            ]
         ],
         'my_experiment' => [
             'navigation_label' => 'My Experiments',
@@ -590,53 +409,10 @@ return [
                             'none' => 'None',
                         ]
                     ],
+                    'sessions_count' => 'Number of Participants',
                     'howitworks' => 'Available on "How it Works?"',
                     'created_at' => 'Creation Date',
                 ]
-            ],
-            'actions' => [
-                'create' => 'Create an Experiment',
-                'contact' => 'Contact the main experimenter',
-                'results' => 'View Results',
-                'details' => 'Details',
-                'statistics' => 'Statistics',
-                'edit' => 'Edit',
-                'delete' => 'Delete',
-                'more_actions' => 'Actions',
-                'session' => 'Session',
-                'session_link' => 'Experiment link',
-                'exports' => 'Save the Experiment',
-                'manage_experiment' => [
-                    'label' => 'Session',
-                    'success' => 'Session successfully updated'
-                ],
-                'status' => [
-                    'start' => 'Start',
-                    'pause' => 'Pause',
-                    'stop' => 'Stop',
-                    'test' => 'Test',
-                    'start_desc' => 'Activates the session and generates a unique link if one does not already exist. The session becomes accessible to participants.',
-                    'pause_desc' => 'Temporarily suspends the session. The link remains active, but participants cannot continue the session until it is resumed.',
-                    'stop_desc' => 'Ends the session and deactivates the link. To reactivate the session, you must restart it, which generates a new link.',
-                    'test_desc' => 'Activates the session in test mode. The session is accessible to participants, but no results are saved.',
-                ],
-                'export' => [
-                    'label' => 'Export',
-                    'json' => 'Export to JSON',
-                    'xml' => 'Export to XML',
-                    'desc' => 'Select the format in which you want to export the experiment data.',
-                    'media_info' => 'Including media will add all associated media files to the export.',
-                    'include_media' => 'Include media',
-                    'success' => 'Export completed successfully',
-                ],
-                'delete' => [
-                    'heading' => 'Definitive deletion',
-                    'desc_issues_delete' => 'This experiment cannot be discontinued because it is shared or has pending requests.',
-                    'confirm_delete' => 'To delete this experiment, please enter the code below.',
-                    'code_confirm' => 'Confirmation code',
-                    'code' => 'Code',
-                    'code_fail' => 'Confirmation code is incorrect',
-                ],
             ],
             'notifications' => [
                 'created' => 'Experiment successfully created',
@@ -666,6 +442,7 @@ return [
                         'pending' => 'Pending',
                         'approved' => 'Approved',
                         'rejected' => 'Rejected',
+                        'revoked' => 'Revoked',
                     ]
                 ],
                 'response_message' => [
@@ -682,7 +459,7 @@ return [
                     'label' => 'Access request issued by',
                 ],
                 'duplicate' => [
-                    'copy' => 'Copy',
+                    'copy' => '(Copy)',
                     'success' => 'Experiment duplicated successfully',
                     'error' => 'An error occurred while duplicating the experiment',
                 ],
@@ -700,10 +477,12 @@ return [
                 'columns' => [
                     'experiment' => 'Experiment',
                     'user' => 'Requester',
-                    'type' => 'Type',
-                    'type_options' => [
-                        'access' => 'Experiment Access',
-                        'results' => 'Results Access',
+                    'type' => [
+                        'label' => 'Access type',
+                        'options' => [
+                            'results' => 'Results only',
+                            'access' => 'Full collaboration',
+                        ]
                     ],
                     'status' => 'Status',
                     'created_at' => 'Request Date',
@@ -728,6 +507,91 @@ return [
                 'pending' => 'Pending Requests',
                 'approved' => 'Approved Requests',
                 'revoked' => 'Rejected/Revoked Requests',
+            ],
+        ],
+        'borrowed_experiment' => [
+            'label' => 'Borrowed Experiments',
+            'plural' => 'Borrowed Experiments',
+            'navigation_label' => 'Borrowed Experiments',
+            'table' => [
+                'columns' => [
+                    'experiment' => 'Experiment',
+                    'created_by' => 'Creator',
+                    'type_experiments' => [
+                        'label' => 'Experiment Type',
+                        'options' => [
+                            'image' => 'Image',
+                            'sound' => 'Sound',
+                            'image_sound' => 'Image and Sound',
+                        ]
+                    ],
+                    'status' => [
+                        'label' => 'Status',
+                        'options' => [
+                            'start' => 'Started',
+                            'pause' => 'Paused',
+                            'stop' => 'Stopped',
+                            'test' => 'Testing',
+                        ]
+                    ],
+                    'type_access' => [
+                        'label' => 'Access Type',
+                        'results' => 'Results Only',
+                        'access' => 'Full Collaboration'
+                    ],
+                    'sessions_count' => 'Number of Participants',
+                    'access_granted_at' => 'Access Granted At',
+                ],
+                'actions' => [
+                    'sessions' => 'Manage Sessions',
+                    'view' => 'View Details',
+                    'statistics' => 'Statistics',
+                    'results' => 'Results',
+                ],
+                'message' => [
+                    'banned' => 'Your account is banned.',
+                    'banned_secondary' => 'The main experimenter on your account is banned.',
+                    'no_access' => 'You do not have access to this experiment.',
+                    'no_access_section' => 'You do not have access to this section.',
+                ]
+            ],
+            'tabs' => [
+                'all' => 'All Experiments',
+                'results' => 'Results Only',
+                'access' => 'Full Collaboration',
+            ],
+            'notifications' => [
+                'no_completed_sessions' => 'No completed sessions to export',
+                'no_selection_completed' => 'No completed sessions selected'
+            ],
+        ],
+        'secondary_user' => [
+            'title' => 'Experiments Assigned to :username',
+            'table' => [
+                'column' => [
+                    'name' => 'Experiment Name',
+                    'type' => [
+                        'label' => 'Type',
+                        'options' => [
+                            'image' => 'Image',
+                            'sound' => 'Sound',
+                            'image_sound' => 'Image and Sound',
+                        ]
+                    ],
+                    'status' => [
+                        'label' => 'Status',
+                        'options' => [
+                            'start' => 'Started',
+                            'pause' => 'Paused',
+                            'stop' => 'Stopped',
+                            'test' => 'Testing',
+                            'none' => 'None',
+                        ]
+                    ],
+                    'created_at' => 'Creation Date',
+                    'can_configure' => 'Configuration',
+                    'can_pass' => 'Sessions',
+                ]
             ],
         ],
         'users' => [

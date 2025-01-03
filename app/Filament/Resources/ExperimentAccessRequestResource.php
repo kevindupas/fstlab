@@ -4,15 +4,12 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ExperimentAccessRequestResource\Pages;
 use App\Models\ExperimentAccessRequest;
-use Filament\Resources\Components\Tab;
 use App\Models\User;
 use App\Notifications\AccessRevokedNotification;
 use Filament\Forms;
 use Filament\Forms\Components\Placeholder;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Illuminate\Support\Str;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -137,9 +134,19 @@ class ExperimentAccessRequestResource extends Resource
                 TextColumn::make('user.name')
                     ->label(__('filament.resources.experiment-access-request.table.columns.user'))
                     ->searchable(),
-                TextColumn::make('type')
-                    ->label(__('filament.resources.experiment-access-request.table.columns.type'))
-                    ->formatStateUsing(fn(string $state): string => __("filament.resources.experiment-access-request.table.columns.type_options.$state")),
+                Tables\Columns\TextColumn::make('type')
+                    ->label(__('filament.resources.experiment-access-request.table.columns.type.label'))
+                    ->badge()
+                    ->colors([
+                        'info' => 'access',
+                        'warning' => 'results'
+                    ])
+                    ->formatStateUsing(fn($state): string => $state ? match ($state) {
+                        'results' => __('filament.resources.experiment-access-request.table.columns.type.options.results'),
+                        'access' => __('filament.resources.experiment-access-request.table.columns.type.options.access'),
+                        default => $state
+                    } : ''),
+
                 TextColumn::make('status')
                     ->label(__('filament.resources.experiment-access-request.table.columns.status'))
                     ->badge()

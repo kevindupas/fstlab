@@ -93,26 +93,26 @@ class ExperimentSessionResource extends Resource
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('experimentLink.user.name')
-                    ->label('Expérimentateur')
+                    ->label(__('pages.experiments_sessions.columns.experimenter'))
                     ->description(function ($record) {
                         if (!$record->experimentLink) {
                             return '';
                         }
 
                         if ($record->experimentLink->user_id === Auth::id()) {
-                            return '(Moi)';
+                            return __('pages.experiments_sessions.columns.experimenter_types.me');
                         }
 
                         if ($record->experimentLink->is_creator) {
-                            return '(Créateur)';
+                            return __('pages.experiments_sessions.columns.experimenter_types.creator');
                         }
 
                         if ($record->experimentLink->is_secondary) {
-                            return '(Compte secondaire)';
+                            return __('pages.experiments_sessions.columns.experimenter_types.secondary');
                         }
 
-                        return '(Collaborateur)';
-                    })
+                        return __('pages.experiments_sessions.columns.experimenter_types.collaborator');
+                    }),
             ])
             ->actions([
                 Action::make('export')

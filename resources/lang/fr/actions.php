@@ -3,6 +3,53 @@
 declare(strict_types=1);
 
 return [
+    'manage' => 'Gérer les sessions',
+    'results' => 'Voir les résultats',
+    'statistics' => 'Voir les statistiques',
+    'details_experiment' => 'Détails de l\'expérimentation',
+    'edit_experiment' => 'Editer l\'expérimentation',
+    'delete_experiment' => 'Supprimer l\'expérimentation',
+    'save_experiment' => 'Sauvegarder l\'expérimentation',
+    'contact_creator' => 'Contacter le créateur',
+    'create_experiment' => 'Créer une expérimentation',
+    'contact_principal' => 'Contacter l\'expérimentateur principal',
+    'show_experiment' => 'Voir l\'expérimentation',
+    'clearFilter' => 'Effacer le filtre',
+    'manage_session' => [
+        'label' => 'Session',
+        'information' => 'Gestion de la session',
+        'session_link' => 'Lien de l\'expérience',
+        'no_session' => 'Aucune session active',
+        'options' => [
+            'start' => 'Démarrer',
+            'pause' => 'Pause',
+            'stop' => 'Arrêter',
+            'test' => 'Test',
+        ],
+        'start_desc' => 'Active la session et génère un lien unique s\'il n\'en existe pas. La session devient accessible aux participants.',
+        'pause_desc' => 'Suspend temporairement la session. Le lien reste actif, mais les participants ne peuvent pas continuer la session jusqu\'à sa reprise.',
+        'stop_desc' => 'Termine la session et désactive le lien. Pour réactiver la session, vous devez la redémarrer, ce qui génère un nouveau lien.',
+        'test_desc' => 'Active la session en mode test. La session est accessible aux participants, mais aucun résultat n\'est sauvegardé.',
+        'success' => 'Session mise à jour avec succès'
+    ],
+    'export_experiment' => [
+        'label' => 'Exporter l\'expérimentation',
+        'json' => 'Exporter en JSON',
+        'xml' => 'Exporter en XML',
+        'desc' => 'Sélectionnez le format dans lequel vous souhaitez exporter les données de l\'expérience.',
+        'media_export_info' => 'L\'exportation des médias ajoutera tous les fichiers médias associés à l\'exportation.',
+        'media_info' => 'L\'inclusion des médias ajoutera tous les fichiers médias associés à l\'export.',
+        'include_media' => 'Inclure les médias',
+        'success' => 'Export réalisé avec succès'
+    ],
+    'delete' => [
+        'heading' => 'Suppresion définitivement',
+        'desc_issues_delete' => 'Cette expérimentation ne peut pas être supprimée car elle est partagée ou a des demandes en attente.',
+        'confirm_delete' => 'Pour supprimer cette expérimentation, veuillez saisir le code ci-dessous.',
+        'code_confirm' => 'Code de confirmation',
+        'code' => 'Code',
+        'code_fail' => 'Le code de confirmation est incorrect',
+    ],
     'accept'          => 'Accepter',
     'action'          => 'Action',
     'actions'         => 'Actions',

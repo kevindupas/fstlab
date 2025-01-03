@@ -55,6 +55,37 @@
         }
       }
   },
+  "experiment": {
+  "list": {
+    "loading": "Loading...",
+    "title": "Experimentation List",
+    "message": "Discover all the experiments available on our platform",
+    "placeholder": "Search for an experiment...",
+    "result": "Result",
+    "find": "found",
+    "by": "By",
+    "completed_session": "completed sessions",
+    "more_info": "Learn more",
+    "no_result": "No experiments match your search"
+  },
+  "detail": {
+    "no_experiment": "Experiment not found",
+    "return_to_list": "Back to the list",
+    "by": "By",
+    "completed_session": "completed sessions",
+    "description": "Description",
+    "isNotAuthenticated": "You must be logged in to request access to this experiment.",
+    "login": "Log in",
+    "call_to_result_access": "Request access to results",
+    "call_to_experiment_access": "Request access to the experiment",
+    "cancel": "Cancel",
+    "submit": "Submit request",
+    "message": "Message",
+    "placeholderResult": "Explain why you want access to the results...",
+    "placeholderExperiment": "Explain why you want access to this experiment...",
+    "requirement": "The message must contain at least 10 characters"
+  }
+},
   "thankYou" : {
     "title" : "Merci pour votre participation",
     "message" : "Votre session a bien été enregistrée. Merci pour votre participation !",

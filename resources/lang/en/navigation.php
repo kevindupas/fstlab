@@ -13,6 +13,7 @@ return [
     "pending_users" => "Registration requests",
     "rejected_user" => "Rejected users",
     'approved_user' => "Approved users",
+    'approved_user_secondary' => "Secondary users",
     'group' => [
         "users" => "Users",
         "experiments" => "Experiments",

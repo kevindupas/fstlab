@@ -6,7 +6,6 @@ use App\Filament\Pages\Experiments\Details\ExperimentDetails;
 use App\Filament\Resources\UserResource;
 use App\Models\Experiment;
 use App\Models\User;
-use App\Notifications\SupervisorMessage;
 use App\Notifications\UserMessage;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\MarkdownEditor;
@@ -55,7 +54,7 @@ class ContactUser extends Page
         return $form
             ->schema([
                 Select::make('user_id')
-                    ->label(__('filament.pages.user_contact.form.user'))
+                    ->label(__('pages.user_contact.form.user'))
                     ->options(function () use ($user) {
                         if ($user->hasRole('supervisor')) {
                             return User::role('principal_experimenter')
@@ -78,7 +77,7 @@ class ContactUser extends Page
                     ->default(fn() => $this->user?->id),
 
                 Select::make('experiment_id')
-                    ->label(__('filament.pages.user_contact.form.experiment'))
+                    ->label(__('pages.user_contact.form.experiment'))
                     ->options(function ($get) use ($user) {
                         $userId = $get('user_id') ?? $this->user?->id;
                         if (!$userId) return [];
@@ -97,8 +96,8 @@ class ContactUser extends Page
                     ->disabled(fn() => $this->experiment !== null),
 
                 MarkdownEditor::make('message')
-                    ->label(__('filament.pages.user_contact.form.message.label'))
-                    ->placeholder(__('filament.pages.user_contact.form.message.placeholder'))
+                    ->label(__('pages.user_contact.form.message.label'))
+                    ->placeholder(__('pages.user_contact.form.message.placeholder'))
                     ->required()
                     ->columnSpanFull()
                     ->toolbarButtons([
@@ -121,9 +120,9 @@ class ContactUser extends Page
         $userId = $data['user_id'] ?? $this->user?->id;
         if (!$userId) {
             Notification::make()
-                ->title('Erreur')
+                ->title(__('pages.user_contact.form.error'))
                 ->danger()
-                ->body('Utilisateur non spécifié')
+                ->body(__('pages.user_contact.form.no_user'))
                 ->send();
             return;
         }
@@ -140,7 +139,7 @@ class ContactUser extends Page
         ));
 
         Notification::make()
-            ->title(__('filament.pages.admin_contact.form.success'))
+            ->title(__('pages.admin_contact.form.success'))
             ->success()
             ->send();
 
@@ -162,11 +161,11 @@ class ContactUser extends Page
 
     public static function getNavigationLabel(): string
     {
-        return __('filament.pages.user_contact.title');
+        return __('pages.user_contact.title');
     }
 
     public function getTitle(): string | Htmlable
     {
-        return new HtmlString(__('filament.pages.user_contact.title'));
+        return new HtmlString(__('pages.user_contact.title'));
     }
 }

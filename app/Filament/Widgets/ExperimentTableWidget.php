@@ -3,7 +3,6 @@
 namespace App\Filament\Widgets;
 
 use App\Filament\Pages\Experiments\Details\ExperimentDetails;
-use App\Filament\Pages\Experiments\Sessions\ExperimentSessions;
 use App\Filament\Pages\Experiments\Statistics\ExperimentStatistics;
 use App\Models\Experiment;
 use App\Models\ExperimentLink;
@@ -15,10 +14,10 @@ use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Filament\Forms;
 use Filament\Forms\Components\Placeholder;
 use Filament\Notifications\Notification;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
@@ -81,26 +80,19 @@ class ExperimentTableWidget extends BaseWidget
             ->defaultPaginationPageOption(5)
             ->defaultSort('created_at', 'desc')
             ->columns([
-                // Colonne du créateur uniquement visible pour les supervisors
-                // Tables\Columns\TextColumn::make('creator.name')
-                //     ->label(__('filament.widgets.experiment_table.column.creator'))
-                //     ->searchable()
-                //     ->sortable()
-                //     ->visible(fn() => $user->hasRole('supervisor')),
-
                 Tables\Columns\TextColumn::make('name')
-                    ->label(__('filament.widgets.experiment_table.column.name'))
+                    ->label(__('widgets.experiment_table.column.name'))
                     ->searchable()
                     ->words(3)
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('type')
-                    ->label(__('filament.widgets.experiment_table.column.type.label'))
+                    ->label(__('widgets.experiment_table.column.type.label'))
                     ->badge()
                     ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'sound' => __('filament.widgets.experiment_table.column.type.options.sound'),
-                        'image' => __('filament.widgets.experiment_table.column.type.options.image'),
-                        'image_sound' => __('filament.widgets.experiment_table.column.type.options.image_sound'),
+                        'sound' => __('widgets.experiment_table.column.type.options.sound'),
+                        'image' => __('widgets.experiment_table.column.type.options.image'),
+                        'image_sound' => __('widgets.experiment_table.column.type.options.image_sound'),
                         default => $state
                     })
                     ->color(fn(string $state): string => match ($state) {
@@ -110,7 +102,7 @@ class ExperimentTableWidget extends BaseWidget
                     }),
 
                 Tables\Columns\TextColumn::make('status')
-                    ->label(__('filament.widgets.experiment_table.column.status'))
+                    ->label(__('widgets.experiment_table.column.status.label'))
                     ->badge()
                     ->state(function ($record) {
                         $experimentLink = \App\Models\ExperimentLink::where('experiment_id', $record->id)
@@ -119,10 +111,10 @@ class ExperimentTableWidget extends BaseWidget
                         return $experimentLink ? $experimentLink->status : 'stop';
                     })
                     ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'start' => __('filament.widgets.experiment_table.column.start'),
-                        'pause' => __('filament.widgets.experiment_table.column.pause'),
-                        'stop' => __('filament.widgets.experiment_table.column.stop'),
-                        'test' => __('filament.widgets.experiment_table.column.test'),
+                        'start' => __('widgets.experiment_table.column.status.options.start'),
+                        'pause' => __('widgets.experiment_table.column.status.options.pause'),
+                        'stop' => __('widgets.experiment_table.column.status.options.stop'),
+                        'test' => __('widgets.experiment_table.column.status.options.test'),
                         default => $state
                     })
                     ->color(fn(string $state): string => match ($state) {
@@ -135,11 +127,11 @@ class ExperimentTableWidget extends BaseWidget
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('sessions_count')
-                    ->label(__('filament.widgets.experiment_table.column.sessions_count'))
+                    ->label(__('widgets.experiment_table.column.sessions_count'))
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('filament.widgets.experiment_table.column.created_at'))
+                    ->label(__('widgets.experiment_table.column.created_at'))
                     ->date()
                     ->sortable(),
             ])
@@ -147,13 +139,13 @@ class ExperimentTableWidget extends BaseWidget
                 Tables\Actions\ActionGroup::make([
                     // Action pour lancer une session
                     Tables\Actions\Action::make('manageExperiment')
-                        ->label(__('filament.resources.my_experiment.actions.session'))
+                        ->label(__('actions.manage_session.label'))
                         ->color('success')
                         ->icon('heroicon-o-play')
                         ->modalWidth('xl')
                         ->form([
                             Forms\Components\TextInput::make('link')
-                                ->label(__('filament.resources.my_experiment.actions.session_link'))
+                                ->label(__('actions.manage_session.session_link'))
                                 ->disabled(true)
                                 ->visible(fn($get) => $get('experimentStatus') !== 'stop')
                                 ->reactive()
@@ -164,15 +156,15 @@ class ExperimentTableWidget extends BaseWidget
 
                                     return $experimentLink && $experimentLink->link
                                         ? url("/experiment/{$experimentLink->link}")
-                                        : 'No active session';
+                                        : __('actions.manage_session.no_session');
                                 }),
 
                             Forms\Components\ToggleButtons::make('experimentStatus')
                                 ->options([
-                                    'start' => __('filament.resources.my_experiment.actions.status.start'),
-                                    'pause' => __('filament.resources.my_experiment.actions.status.pause'),
-                                    'stop' => __('filament.resources.my_experiment.actions.status.stop'),
-                                    'test' => __('filament.resources.my_experiment.actions.status.test'),
+                                    'start' => __('actions.manage_session.options.start'),
+                                    'pause' => __('actions.manage_session.options.pause'),
+                                    'stop' => __('actions.manage_session.options.stop'),
+                                    'test' => __('actions.manage_session.options.test'),
                                 ])
                                 ->colors([
                                     'start' => 'success',
@@ -233,7 +225,7 @@ class ExperimentTableWidget extends BaseWidget
                                     if ($experimentLink->link) {
                                         $set('link', url("/experiment/{$experimentLink->link}"));
                                     } else {
-                                        $set('link', 'No active session');
+                                        $set('link', __('actions.manage_session.no_session'));
                                     }
 
                                     // Gestion du howitwork_page
@@ -242,30 +234,30 @@ class ExperimentTableWidget extends BaseWidget
                                         $record->save();
                                     }
                                 }),
-                            Placeholder::make('Informations')
+                            Placeholder::make(__('actions.manage_session.information'))
                                 ->content(new HtmlString(
                                     '<div>' . Blade::render('<x-heroicon-o-play class="inline-block w-5 h-5 mr-2 text-green-500" />') .
-                                        ' <strong>' . __('filament.resources.my_experiment.actions.status.start') . ':</strong> ' .
-                                        __('filament.resources.my_experiment.actions.status.start_desc') . '</div><br>' .
+                                        ' <strong>' . __('actions.manage_session.options.start') . ':</strong> ' .
+                                        __('actions.manage_session.start_desc') . '</div><br>' .
 
                                         '<div>' . Blade::render('<x-heroicon-o-pause class="inline-block w-5 h-5 mr-2 text-yellow-500" />') .
-                                        ' <strong>' . __('filament.resources.my_experiment.actions.status.pause') . ':</strong> ' .
-                                        __('filament.resources.my_experiment.actions.status.pause_desc') . '</div><br>' .
+                                        ' <strong>' . __('actions.manage_session.options.pause') . ':</strong> ' .
+                                        __('actions.manage_session.pause_desc') . '</div><br>' .
 
                                         '<div>' . Blade::render('<x-heroicon-o-stop class="inline-block w-5 h-5 mr-2 text-red-500" />') .
-                                        ' <strong>' . __('filament.resources.my_experiment.actions.status.stop') . ':</strong> ' .
-                                        __('filament.resources.my_experiment.actions.status.stop_desc') . '</div><br>' .
+                                        ' <strong>' . __('actions.manage_session.options.stop') . ':</strong> ' .
+                                        __('actions.manage_session.stop_desc') . '</div><br>' .
 
                                         '<div>' . Blade::render('<x-heroicon-o-beaker class="inline-block w-5 h-5 mr-2 text-blue-500" />') .
-                                        ' <strong>' . __('filament.resources.my_experiment.actions.status.test') . ':</strong> ' .
-                                        __('filament.resources.my_experiment.actions.status.test_desc') . '</div>'
+                                        ' <strong>' . __('actions.manage_session.options.test') . ':</strong> ' .
+                                        __('actions.manage_session.test_desc') . '</div>'
 
                                 ))
                                 ->columnSpan('full'),
                         ])
                         ->action(function ($data, $record) {
                             Notification::make()
-                                ->title(__('filament.resources.my_experiment.notifications.session_updated'))
+                                ->title(__('actions.manage_session.success'))
                                 ->success()
                                 ->send();
                         }),
@@ -274,7 +266,7 @@ class ExperimentTableWidget extends BaseWidget
 
                     // Action pour contacter le créateur
                     Tables\Actions\Action::make('contact_creator')
-                        ->label(__('filament.widgets.experiment_table.actions.contact_creator'))
+                        ->label(__('actions.contact_creator'))
                         ->icon('heroicon-o-envelope')
                         ->url(
                             fn(Experiment $record): string =>
@@ -283,13 +275,13 @@ class ExperimentTableWidget extends BaseWidget
                         ->visible(fn() => $user->hasRole('secondary_experimenter')),
 
                     Tables\Actions\Action::make('details')
-                        ->label(__('filament.widgets.experiment_table.actions.details'))
+                        ->label(__('actions.details_experiment'))
                         ->icon('heroicon-o-document-text')
                         ->url(fn(Experiment $record): string =>
                         ExperimentDetails::getUrl(['record' => $record])),
 
                     Tables\Actions\Action::make('results')
-                        ->label(__('filament.widgets.experiment_table.actions.results'))
+                        ->label(__('actions.results'))
                         ->icon('heroicon-o-eye')
                         ->color('info')
                         ->url(
@@ -298,7 +290,7 @@ class ExperimentTableWidget extends BaseWidget
                         ),
 
                     Tables\Actions\Action::make('statistics')
-                        ->label(__('filament.widgets.experiment_table.actions.statistics'))
+                        ->label(__('actions.statistics'))
                         ->icon('heroicon-o-chart-pie')
                         ->color('success')
                         ->url(
@@ -307,7 +299,7 @@ class ExperimentTableWidget extends BaseWidget
                         ),
                     // Action pour modifier (si droits)
                     Tables\Actions\Action::make('edit')
-                        ->label(__('filament.widgets.experiment_table.actions.edit'))
+                        ->label(__('actions.edit_experiment'))
                         ->icon('heroicon-o-pencil')
                         ->color('warning')
                         ->url(
@@ -326,6 +318,7 @@ class ExperimentTableWidget extends BaseWidget
                 ])
                     ->icon('heroicon-m-ellipsis-vertical')
                     ->color('gray')
+                    ->dropdownWidth(MaxWidth::ExtraSmall)
                     ->button()
                     ->label('Actions')
             ]);
@@ -337,9 +330,9 @@ class ExperimentTableWidget extends BaseWidget
         $user = Auth::user();
 
         return match (true) {
-            $user->hasRole('supervisor') || $user->hasRole('principal_experimenter') => __('filament.widgets.experiment_table.title'),
-            $user->hasRole('secondary_experimenter') => __('filament.widgets.experiment_table.title_secondary_experimenter'),
-            default => __('filament.widgets.experiment_table.title_default')
+            $user->hasRole('supervisor') || $user->hasRole('principal_experimenter') => __('widgets.experiment_table.title'),
+            $user->hasRole('secondary_experimenter') => __('widgets.experiment_table.title_secondary_experimenter'),
+            default => __('widgets.experiment_table.title_default')
         };
     }
 

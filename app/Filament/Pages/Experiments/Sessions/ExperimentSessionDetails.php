@@ -214,17 +214,20 @@ class ExperimentSessionDetails extends Page
     {
         $actions = [];
 
-        $actions[] = Action::make('search')
+        $actions[] = Action::make(__('pages.experiments_sessions_details.actions.search'))->color('success')->icon('heroicon-o-magnifying-glass')
             ->form([
                 TextInput::make('searchTerm')
-                    ->label('Rechercher dans la session')
-                    ->placeholder('Ex: jaune, rouge, etc.')
+                    ->label(__('pages.experiments_sessions_details.search.modal.search_label'))
+                    ->placeholder(__('pages.experiments_sessions_details.search.modal.search_placeholder'))
                     ->default($this->searchTerm)
             ])
+            ->modalCancelActionLabel(__('pages.experiments_sessions_details.actions.cancel'))
+            ->modalSubmitActionLabel(__('pages.experiments_sessions_details.actions.submit'))
+            ->modalWidth('md')
+            ->modalHeading(__('pages.experiments_sessions_details.search.modal.title'))
             ->action(function (array $data): void {
                 $this->searchTerm = $data['searchTerm'];
             });
-
 
         if ($this->isCreator) {
             $actions[] = Action::make('addNote')

@@ -21,12 +21,17 @@ class ListExperimentSessions extends ListRecords
         $search = request()->query('search');
         $experiment = Experiment::find($experimentId);
 
-        $hasCollaboratorAccess = $experiment->accessRequests()
-            ->where('user_id', Auth::id())
-            ->where('type', 'access')
-            ->where('status', 'approved')
-            ->exists();
+        // Par défaut, on met à false
+        $hasCollaboratorAccess = false;
 
+        // On vérifie l'accès collaborateur uniquement si l'expérience existe
+        if ($experiment) {
+            $hasCollaboratorAccess = $experiment->accessRequests()
+                ->where('user_id', Auth::id())
+                ->where('type', 'access')
+                ->where('status', 'approved')
+                ->exists();
+        }
 
         return parent::table($table)
             ->modifyQueryUsing(function (Builder $query) use ($experimentId, $tab, $experiment, $search, $hasCollaboratorAccess) {
@@ -40,37 +45,38 @@ class ListExperimentSessions extends ListRecords
                         });
                     }
 
-                    switch ($tab) {
-                        case 'creator':
-                            $query->whereHas('experimentLink', function ($q) use ($experiment) {
-                                $q->where('is_creator', true)
-                                    ->orWhere('is_secondary', true);
-                            });
-                            break;
-                        case 'mine':
-                            // Si l'utilisateur n'a pas l'accès collaborateur, 
-                            // retourner une requête vide
-                            if (!$hasCollaboratorAccess) {
-                                $query->where('id', 0); // Retourne une collection vide
-                            } else {
-                                $query->whereHas('experimentLink', function ($q) {
-                                    $q->where('user_id', Auth::id());
+                    // On vérifie que l'expérience existe avant d'utiliser ses propriétés
+                    if ($experiment) {
+                        switch ($tab) {
+                            case 'creator':
+                                $query->whereHas('experimentLink', function ($q) use ($experiment) {
+                                    $q->where('is_creator', true)
+                                        ->orWhere('is_secondary', true);
                                 });
-                            }
-                            break;
-                        case 'collaborators':
-                            $query->whereHas('experimentLink', function ($q) use ($experiment) {
-                                $q->whereHas('user', function ($userQ) use ($experiment) {
-                                    $userQ->where(function ($sq) use ($experiment) {
-                                        $sq->where('id', '!=', $experiment->created_by)
-                                            ->where(function ($innerQ) use ($experiment) {
-                                                $innerQ->where('created_by', '!=', $experiment->created_by)
-                                                    ->orWhereNull('created_by');
-                                            });
+                                break;
+                            case 'mine':
+                                if (!$hasCollaboratorAccess) {
+                                    $query->where('id', 0);
+                                } else {
+                                    $query->whereHas('experimentLink', function ($q) {
+                                        $q->where('user_id', Auth::id());
                                     });
-                                })->where('user_id', '!=', Auth::id());
-                            });
-                            break;
+                                }
+                                break;
+                            case 'collaborators':
+                                $query->whereHas('experimentLink', function ($q) use ($experiment) {
+                                    $q->whereHas('user', function ($userQ) use ($experiment) {
+                                        $userQ->where(function ($sq) use ($experiment) {
+                                            $sq->where('id', '!=', $experiment->created_by)
+                                                ->where(function ($innerQ) use ($experiment) {
+                                                    $innerQ->where('created_by', '!=', $experiment->created_by)
+                                                        ->orWhereNull('created_by');
+                                                });
+                                        });
+                                    })->where('user_id', '!=', Auth::id());
+                                });
+                                break;
+                        }
                     }
                 }
 

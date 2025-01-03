@@ -24,11 +24,11 @@ class ContactAdmin extends Page
 
     public static function getNavigationLabel(): string
     {
-        return __('filament.pages.admin_contact.title');
+        return __('pages.admin_contact.title');
     }
     public function getTitle(): string | Htmlable
     {
-        return new HtmlString(__('filament.pages.admin_contact.title'));
+        return new HtmlString(__('pages.admin_contact.title'));
     }
     public static function shouldRegisterNavigation(): bool
     {
@@ -49,19 +49,19 @@ class ContactAdmin extends Page
         return $form
             ->schema([
                 Select::make('subject')
-                    ->label(__('filament.pages.admin_contact.form.subject'))
+                    ->label(__('pages.admin_contact.form.subject'))
                     ->options([
-                        'unban' => __('filament.pages.admin_contact.form.options.unban'),
-                        'principal_banned' => __('filament.pages.admin_contact.form.options.principal_banned'),
-                        'question' => __('filament.pages.admin_contact.form.options.question'),
-                        'other' => __('filament.pages.admin_contact.form.options.other'),
+                        'unban' => __('pages.admin_contact.form.options.unban'),
+                        'principal_banned' => __('pages.admin_contact.form.options.principal_banned'),
+                        'question' => __('pages.admin_contact.form.options.question'),
+                        'other' => __('pages.admin_contact.form.options.other'),
                     ])
                     ->native(false)
                     ->required(),
 
                 MarkdownEditor::make('message')
-                    ->label(__('filament.pages.admin_contact.form.message.label'))
-                    ->placeholder(__('filament.pages.admin_contact.form.message.placeholder'))
+                    ->label(__('pages.admin_contact.form.message.label'))
+                    ->placeholder(__('pages.admin_contact.form.message.placeholder'))
                     ->required()
                     ->toolbarButtons([
                         'bold',
@@ -90,7 +90,7 @@ class ContactAdmin extends Page
         }
 
         Notification::make()
-            ->title(__('filament.pages.admin_contact.form.success'))
+            ->title(__('pages.admin_contact.form.success'))
             ->success()
             ->send();
 

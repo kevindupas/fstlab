@@ -9,7 +9,6 @@ use App\Traits\HasExperimentAccess;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class DashboardStatsWidget extends BaseWidget
 {
@@ -59,8 +58,10 @@ class DashboardStatsWidget extends BaseWidget
 
             // Nombre d'utilisateurs bannis
             $bannedUsersCount = User::where('status', 'banned')
-                ->whereHas('roles', fn($q) =>
-                $q->whereIn('name', ['principal_experimenter', 'secondary_experimenter'])
+                ->whereHas(
+                    'roles',
+                    fn($q) =>
+                    $q->whereIn('name', ['principal_experimenter', 'secondary_experimenter'])
                 )
                 ->count();
 
@@ -71,38 +72,38 @@ class DashboardStatsWidget extends BaseWidget
             })->count();
 
             $stats = [
-                Stat::make(__('filament.widgets.dashboard_table.experiments.supervisor.name'), $experimentsCount)
-                    ->description(__('filament.widgets.dashboard_table.experiments.supervisor.description'))
+                Stat::make(__('widgets.dashboard_table.experiments.supervisor.name'), $experimentsCount)
+                    ->description(__('widgets.dashboard_table.experiments.supervisor.description'))
                     ->color('success')
                     ->icon('heroicon-o-beaker'),
 
-                Stat::make(__('filament.widgets.dashboard_table.sessions.supervisor.name'), $sessionsCount)
-                    ->description(__('filament.widgets.dashboard_table.sessions.supervisor.description'))
+                Stat::make(__('widgets.dashboard_table.sessions.supervisor.name'), $sessionsCount)
+                    ->description(__('widgets.dashboard_table.sessions.supervisor.description'))
                     ->color('info')
                     ->icon('heroicon-o-users'),
 
-                Stat::make(__('filament.widgets.dashboard_table.users.supervisor.name'), $usersCount)
-                    ->description(__('filament.widgets.dashboard_table.users.supervisor.description'))
+                Stat::make(__('widgets.dashboard_table.users.supervisor.name'), $usersCount)
+                    ->description(__('widgets.dashboard_table.users.supervisor.description'))
                     ->color('warning')
                     ->icon('heroicon-o-user-group'),
 
-                Stat::make(__('filament.widgets.dashboard_table.completions.supervisor.name'), number_format($completionRate, 1) . '%')
-                    ->description(__('filament.widgets.dashboard_table.completions.supervisor.description'))
+                Stat::make(__('widgets.dashboard_table.completions.supervisor.name'), number_format($completionRate, 1) . '%')
+                    ->description(__('widgets.dashboard_table.completions.supervisor.description'))
                     ->color('success')
                     ->icon('heroicon-o-check-circle'),
 
-                Stat::make(__('filament.widgets.dashboard_table.sessions_test.supervisor.name'), $testSessionsCount)
-                    ->description(__('filament.widgets.dashboard_table.sessions_test.supervisor.description'))
+                Stat::make(__('widgets.dashboard_table.sessions_test.supervisor.name'), $testSessionsCount)
+                    ->description(__('widgets.dashboard_table.sessions_test.supervisor.description'))
                     ->color('info')
                     ->icon('heroicon-o-beaker'),
 
-                Stat::make(__('filament.widgets.dashboard_table.registrations.supervisor.name'), $pendingRegistrationsCount)
-                    ->description(__('filament.widgets.dashboard_table.registrations.supervisor.description'))
+                Stat::make(__('widgets.dashboard_table.registrations.supervisor.name'), $pendingRegistrationsCount)
+                    ->description(__('widgets.dashboard_table.registrations.supervisor.description'))
                     ->color('warning')
                     ->icon('heroicon-o-user-plus'),
 
-                Stat::make(__('filament.widgets.dashboard_table.banned.supervisor.name'), $bannedUsersCount)
-                    ->description(__('filament.widgets.dashboard_table.banned.supervisor.description'))
+                Stat::make(__('widgets.dashboard_table.banned.supervisor.name'), $bannedUsersCount)
+                    ->description(__('widgets.dashboard_table.banned.supervisor.description'))
                     ->color('danger')
                     ->icon('heroicon-o-user-minus'),
             ];
@@ -135,23 +136,23 @@ class DashboardStatsWidget extends BaseWidget
                 ->count() / max($sessionsCount, 1) * 100;
 
             $stats = [
-                Stat::make(__('filament.widgets.dashboard_table.experiments.principal.name'), $experimentsCount)
-                    ->description(__('filament.widgets.dashboard_table.experiments.principal.description'))
+                Stat::make(__('widgets.dashboard_table.experiments.principal.name'), $experimentsCount)
+                    ->description(__('widgets.dashboard_table.experiments.principal.description'))
                     ->color('success')
                     ->icon('heroicon-o-beaker'),
 
-                Stat::make(__('filament.widgets.dashboard_table.sessions.principal.name'), $sessionsCount)
-                    ->description(__('filament.widgets.dashboard_table.sessions.principal.description'))
+                Stat::make(__('widgets.dashboard_table.sessions.principal.name'), $sessionsCount)
+                    ->description(__('widgets.dashboard_table.sessions.principal.description'))
                     ->color('info')
                     ->icon('heroicon-o-users'),
 
-                Stat::make(__('filament.widgets.dashboard_table.users.principal.name'), $secondaryCount)
-                    ->description(__('filament.widgets.dashboard_table.users.principal.description'))
+                Stat::make(__('widgets.dashboard_table.users.principal.name'), $secondaryCount)
+                    ->description(__('widgets.dashboard_table.users.principal.description'))
                     ->color('warning')
                     ->icon('heroicon-o-user-group'),
 
-                Stat::make(__('filament.widgets.dashboard_table.completions.principal.name'), number_format($completionRate, 1) . '%')
-                    ->description(__('filament.widgets.dashboard_table.completions.principal.description'))
+                Stat::make(__('widgets.dashboard_table.completions.principal.name'), number_format($completionRate, 1) . '%')
+                    ->description(__('widgets.dashboard_table.completions.principal.description'))
                     ->color('success')
                     ->icon('heroicon-o-check-circle'),
             ];

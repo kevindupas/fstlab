@@ -108,12 +108,12 @@ class ExperimentListResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('type')
-                    ->label(__('filament.resources.experiment_list.column.type'))
+                    ->label(__('filament.resources.experiment_list.column.type.label'))
                     ->badge()
                     ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'sound' => __('filament.resources.experiment_list.column.sound'),
-                        'image' => __('filament.resources.experiment_list.column.image'),
-                        'image_sound' => __('filament.resources.experiment_list.column.image_sound'),
+                        'sound' => __('filament.resources.experiment_list.column.type.options.sound'),
+                        'image' => __('filament.resources.experiment_list.column.type.options.image'),
+                        'image_sound' => __('filament.resources.experiment_list.column.type.options.image_sound'),
                         default => $state
                     })
                     ->color(fn(string $state): string => match ($state) {
@@ -122,7 +122,7 @@ class ExperimentListResource extends Resource
                         'image_sound' => 'warning',
                     }),
                 Tables\Columns\TextColumn::make('status')
-                    ->label(__('filament.resources.experiment_list.column.status'))
+                    ->label(__('filament.resources.experiment_list.column.status.label'))
                     ->badge()
                     ->getStateUsing(function ($record) {
                         $experimentLink = $record->links()
@@ -131,11 +131,11 @@ class ExperimentListResource extends Resource
                         return $experimentLink ? $experimentLink->status : 'stop';
                     })
                     ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'start' => __('filament.resources.experiment_list.column.start'),
-                        'pause' => __('filament.resources.experiment_list.column.pause'),
-                        'stop' => __('filament.resources.experiment_list.column.stop'),
-                        'test' => __('filament.resources.experiment_list.column.test'),
-                        default => __('filament.resources.experiment_list.column.none'),
+                        'start' => __('filament.resources.experiment_list.column.status.options.start'),
+                        'pause' => __('filament.resources.experiment_list.column.status.options.pause'),
+                        'stop' => __('filament.resources.experiment_list.column.status.options.stop'),
+                        'test' => __('filament.resources.experiment_list.column.status.options.test'),
+                        default => __('filament.resources.experiment_list.column.status.options.stop'),
                     })
                     ->colors([
                         'success' => 'start',
@@ -165,7 +165,7 @@ class ExperimentListResource extends Resource
             ])
             ->actions([
                 Tables\Actions\Action::make('view')
-                    ->label(__('filament.resources.experiment_list.column.action'))
+                    ->label(__('actions.show_experiment'))
                     ->icon('heroicon-o-eye')
                     ->url(fn(Experiment $record): string =>
                     ExperimentDetails::getUrl(['record' => $record]))

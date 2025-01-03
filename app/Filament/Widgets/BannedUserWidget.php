@@ -14,8 +14,6 @@ class BannedUserWidget extends Widget
         /** @var \App\Models\User */
         $user = Auth::user();
 
-        // Afficher ce widget uniquement si l'utilisateur est banni
-        // ou si c'est un secondary_experimenter dont le principal est banni
         if ($user->status === 'banned') {
             return true;
         }

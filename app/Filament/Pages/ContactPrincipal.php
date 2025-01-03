@@ -22,7 +22,7 @@ class ContactPrincipal extends Page
 
     protected static bool $shouldRegisterNavigation = true;
     protected static ?string $slug = 'contact-principal';
-    protected static string $view = 'filament.pages.contact-user';
+    protected static string $view = 'filament.pages.contact-principal';
     protected static ?string $navigationIcon = 'heroicon-o-envelope';
 
     public ?array $data = [];
@@ -53,21 +53,21 @@ class ContactPrincipal extends Page
         return $form
             ->schema([
                 Select::make('experiment_id')
-                    ->label(__('filament.pages.user_contact.form.experiment'))
+                    ->label(__('pages.principal_contact.form.experiment'))
                     ->options(
-                        // Récupérer uniquement les expériences attribuées au compte secondaire
                         Experiment::whereHas('users', function ($query) use ($user) {
                             $query->where('users.id', $user->id);
                         })->pluck('name', 'id')
                     )
+                    ->getOptionLabelUsing(fn($value): ?string => Experiment::find($value)?->name)
                     ->searchable()
                     ->native(false)
                     ->reactive()
                     ->disabled(fn() => $this->experiment !== null),
 
                 MarkdownEditor::make('message')
-                    ->label(__('filament.pages.user_contact.form.message.label'))
-                    ->placeholder(__('filament.pages.user_contact.form.message.placeholder'))
+                    ->label(__('pages.principal_contact.form.message.label'))
+                    ->placeholder(__('pages.principal_contact.form.message.placeholder'))
                     ->required()
                     ->columnSpanFull()
                     ->toolbarButtons([
@@ -89,7 +89,21 @@ class ContactPrincipal extends Page
 
         /** @var \App\Models\User */
         $sender = Auth::user();
-        $principal = User::find($sender->created_by);
+
+        // On récupère l'expérience
+        $experiment = isset($data['experiment_id']) ? Experiment::find($data['experiment_id']) : $this->experiment;
+
+        if (!$experiment) {
+            Notification::make()
+                ->title('Erreur')
+                ->danger()
+                ->body('Expérience non trouvée')
+                ->send();
+            return;
+        }
+
+        // On récupère l'expérimentateur principal via le created_by de l'expérience
+        $principal = User::find($experiment->created_by);
 
         if (!$principal) {
             Notification::make()
@@ -100,8 +114,6 @@ class ContactPrincipal extends Page
             return;
         }
 
-        $experiment = isset($data['experiment_id']) ? Experiment::find($data['experiment_id']) : null;
-
         // Envoyer la notification au principal
         $principal->notify(new UserMessage(
             message: $data['message'],
@@ -110,7 +122,7 @@ class ContactPrincipal extends Page
         ));
 
         Notification::make()
-            ->title(__('filament.pages.admin_contact.form.success'))
+            ->title(__('pages.admin_contact.form.success'))
             ->success()
             ->send();
 
@@ -123,11 +135,22 @@ class ContactPrincipal extends Page
 
     public static function getNavigationLabel(): string
     {
-        return __('filament.pages.user_contact.title_secondary_experimenter');
+        return __('pages.principal_contact.title_secondary_experimenter');
     }
 
     public function getTitle(): string | Htmlable
     {
-        return new HtmlString(__('filament.pages.user_contact.title_secondary_experimenter'));
+        $baseTitle = __('pages.principal_contact.title_secondary_experimenter');
+
+        if ($this->experiment) {
+            return new HtmlString($baseTitle . ' - ' . $this->experiment->name);
+        }
+
+        return new HtmlString($baseTitle);
+    }
+
+    public function getHeading(): string | Htmlable
+    {
+        return $this->getTitle();
     }
 }

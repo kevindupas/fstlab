@@ -14,24 +14,23 @@
                         </div>
                         <div class="text-sm text-gray-500 dark:text-gray-400">
                             @if ($searchResults['count'] > 0)
-                                Occurrence{{ $searchResults['count'] > 1 ? 's' : '' }} de "{{ $searchTerm }}"
-                                trouvée{{ $searchResults['count'] > 1 ? 's' : '' }}
+                                {{ trans_choice('pages.experiments_sessions_details.search_results.occurrences_found', $searchResults['count'], ['term' => $searchTerm]) }}
                                 <span class="text-xs">
                                     @if (isset($searchResults['locations']['comments']))
                                         <span
                                             class="inline-flex items-center px-2 py-1 mr-1 rounded-full text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                            {{ $searchResults['locations']['comments'] }} commentaire(s)
+                                            {{ trans_choice('pages.experiments_sessions_details.search_results.locations.comments', $searchResults['locations']['comments'], ['count' => $searchResults['locations']['comments']]) }}
                                         </span>
                                     @endif
                                     @if (isset($searchResults['locations']['feedback']))
                                         <span
                                             class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                                            {{ $searchResults['locations']['feedback'] }} dans le feedback
+                                            {{ __('pages.experiments_sessions_details.search_results.locations.feedback') }}
                                         </span>
                                     @endif
                                 </span>
                             @else
-                                Aucune occurrence de "{{ $searchTerm }}" trouvée
+                                {{ __('pages.experiments_sessions_details.search_results.no_occurrences', ['term' => $searchTerm]) }}
                             @endif
                         </div>
                     </div>
@@ -46,9 +45,7 @@
     {{ $this->sessionInfolist }}
 
     @php
-        // Helper function pour extraire le nom du fichier
         $getFileName = function ($path) {
-            // Enlève le chemin du dossier
             return basename($path);
         };
 
@@ -65,7 +62,8 @@
     @if ($session->notes)
         <div class="-mt-2">
             <div class="bg-white rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 p-6">
-                <h2 class="text-lg font-medium mb-4">Notes de l'examinateur</h2>
+                <h2 class="text-lg font-medium mb-4">{{ __('pages.experiments_sessions_details.examiner_notes.title') }}
+                </h2>
                 <div class="prose dark:prose-invert max-w-none">
                     {{ $session->notes }}
                 </div>
@@ -79,7 +77,7 @@
             <div x-data="{ expanded: true }"
                 class="bg-white rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800">
                 <button @click="expanded = !expanded" class="w-full p-6 flex justify-between items-center">
-                    <h2 class="text-lg font-medium">Groupes d'éléments</h2>
+                    <h2 class="text-lg font-medium">{{ __('pages.experiments_sessions_details.groups.title') }}</h2>
                     <svg x-bind:class="expanded ? 'rotate-180' : ''" class="w-5 h-5 transform transition-transform"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -98,12 +96,13 @@
                                 </div>
                             </div>
 
-                            <!-- Commentaire du groupe s'il existe -->
+                            <!-- Commentaire du groupe -->
                             @if ($group->comment)
                                 <div
                                     class="bg-blue-50 dark:bg-blue-900/30 p-4 border-b border-gray-200 dark:border-gray-600">
                                     <p class="text-sm text-blue-600 dark:text-blue-300">
-                                        <span class="font-medium">Commentaire :</span>
+                                        <span
+                                            class="font-medium">{{ __('pages.experiments_sessions_details.groups.comment_label') }}</span>
                                         @if (!empty($searchTerm))
                                             {!! preg_replace(
                                                 '/(' . preg_quote($searchTerm, '/') . ')/i',
@@ -122,31 +121,29 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     @foreach ($group->elements as $element)
                                         <div class="flex flex-col space-y-3">
-                                            <!-- Contenu du média -->
                                             <div
                                                 class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 border border-gray-200 dark:border-gray-700">
                                                 @if ($isAudioFile($element->url))
                                                     <audio controls class="w-full">
                                                         <source src="{{ $element->url }}">
-                                                        Votre navigateur ne supporte pas l'élément audio.
+                                                        {{ __('pages.experiments_sessions_details.groups.media.audio_unsupported') }}
                                                     </audio>
                                                 @else
                                                     <img src="{{ $element->url }}" alt="Media {{ $element->id }}"
                                                         class="w-full h-auto rounded-lg" />
                                                 @endif
-                                                <!-- Informations du média -->
                                                 <div class="space-y-1 mt-5">
                                                     <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                                        Nom : {{ $getFileName($element->url) }}
+                                                        {{ __('pages.experiments_sessions_details.groups.media.name') }}
+                                                        {{ $getFileName($element->url) }}
                                                     </div>
                                                     <div class="text-sm text-gray-500 dark:text-gray-400">
-                                                        Position : X={{ number_format($element->x, 2) }},
-                                                        Y={{ number_format($element->y, 2) }}
+                                                        {{ __('pages.experiments_sessions_details.groups.media.position', ['x' => number_format($element->x, 2), 'y' => number_format($element->y, 2)]) }}
                                                     </div>
                                                     @if (isset($element->interactions) && $element->interactions > 0)
                                                         <div
                                                             class="text-sm font-medium text-blue-600 dark:text-blue-400">
-                                                            {{ $element->interactions }} interactions
+                                                            {{ trans_choice('pages.experiments_sessions_details.groups.media.interactions', $element->interactions, ['count' => $element->interactions]) }}
                                                         </div>
                                                     @endif
                                                 </div>
@@ -161,13 +158,15 @@
             </div>
         </div>
     @endif
-    <!-- Log des actions -->
+
+    <!-- Journal des actions -->
     @if ($actionsLog->isNotEmpty())
         <div class="-mt-2">
             <div x-data="{ expanded: false }"
                 class="bg-white rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800">
                 <button @click="expanded = !expanded" class="w-full p-6 flex justify-between items-center">
-                    <h2 class="text-lg font-medium">Journal des actions</h2>
+                    <h2 class="text-lg font-medium">{{ __('pages.experiments_sessions_details.actions_log.title') }}
+                    </h2>
                     <svg x-bind:class="expanded ? 'rotate-180' : ''" class="w-5 h-5 transform transition-transform"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -181,13 +180,16 @@
                                 <tr class="bg-gray-50 dark:bg-gray-700">
                                     <th
                                         class="px-4 py-2 text-start text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        Temps</th>
+                                        {{ __('pages.experiments_sessions_details.actions_log.headers.time') }}
+                                    </th>
                                     <th
                                         class="px-4 py-2 text-start text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        Action</th>
+                                        {{ __('pages.experiments_sessions_details.actions_log.headers.action') }}
+                                    </th>
                                     <th
                                         class="px-4 py-2 text-start text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        Détails</th>
+                                        {{ __('pages.experiments_sessions_details.actions_log.headers.details') }}
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -200,25 +202,26 @@
                                         <td class="px-4 py-2 whitespace-nowrap text-sm">
                                             <span
                                                 class="px-2 py-1 rounded-full text-xs
-                @if ($action['type'] === 'move') bg-blue-100 text-blue-800
-                @elseif($action['type'] === 'sound') bg-green-100 text-green-800
-                @else bg-purple-100 text-purple-800 @endif">
+                                                @if ($action['type'] === 'move') bg-blue-100 text-blue-800
+                                                @elseif($action['type'] === 'sound') bg-green-100 text-green-800
+                                                @else bg-purple-100 text-purple-800 @endif">
                                                 @if ($action['type'] === 'move')
-                                                    Déplacement
+                                                    {{ __('pages.experiments_sessions_details.actions_log.actions.move') }}
                                                 @elseif($action['type'] === 'sound')
-                                                    Lecture son
+                                                    {{ __('pages.experiments_sessions_details.actions_log.actions.sound') }}
                                                 @else
-                                                    Vue image
+                                                    {{ __('pages.experiments_sessions_details.actions_log.actions.image') }}
                                                 @endif
                                             </span>
                                         </td>
                                         <td class="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
                                             @if ($action['type'] === 'move')
-                                                Nom : {{ $getFileName($action['id']) }}<br>
-                                                Position : X={{ number_format($action['x'], 2) }},
-                                                Y={{ number_format($action['y'], 2) }}
+                                                {{ __('pages.experiments_sessions_details.actions_log.details.name') }}
+                                                {{ $getFileName($action['id']) }}<br>
+                                                {{ __('pages.experiments_sessions_details.actions_log.details.position', ['x' => number_format($action['x'], 2), 'y' => number_format($action['y'], 2)]) }}
                                             @else
-                                                Nom : {{ $getFileName($action['id']) }}
+                                                {{ __('pages.experiments_sessions_details.actions_log.details.name') }}
+                                                {{ $getFileName($action['id']) }}
                                             @endif
                                         </td>
                                     </tr>
