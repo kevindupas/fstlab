@@ -20,12 +20,12 @@ const FloatingLanguageButton = () => {
             label: "EN",
             flag: GB,
         },
-        {
-            code: "es",
-            name: "Español",
-            label: "ES",
-            flag: ES,
-        },
+        // {
+        //     code: "es",
+        //     name: "Español",
+        //     label: "ES",
+        //     flag: ES,
+        // },
     ];
 
     const handleLanguageSelect = (code) => {

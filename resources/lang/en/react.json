@@ -93,6 +93,33 @@
       "requirement": "Message must contain at least 10 characters"
     }
   },
+  "howItWork": {
+    "loading": {
+      "error": "An error occurred while loading the experiments"
+    },
+    "header": {
+      "title": "Demo Experiments",
+      "description": "Discover how our platform works through these interactive demo experiments."
+    },
+    "types": {
+      "sound": {
+        "title": "Sound Experiments",
+        "description": "Explore our audio-based experiments. Classify and organize different sounds according to your criteria."
+      },
+      "image": {
+        "title": "Visual Experiments",
+        "description": "Discover our image-based experiments. Categorize and analyze various visual content."
+      },
+      "image_sound": {
+        "title": "Multimedia Experiments",
+        "description": "Combine sounds and images in these complex interactive experiments."
+      }
+    },
+    "actions": {
+      "tryExperiment": "Try the experiment",
+      "noDemo": "No demo available"
+    }
+  },
   "login": {
     "title": "Register for the experiment",
     "label": "Identification number",
@@ -368,5 +395,18 @@
     "send_success": "Request sent successfully",
     "send_error": "An error occurred while sending the request",
     "send_description": "You will receive a response by email"
+  },
+  "changelog": {
+    "title": "Changelog",
+    "subtitle": "Discover the latest updates and improvements made to the platform",
+    "version": "Version",
+    "upcoming_features": "What's new",
+    "version_one": {
+      "date": "December 14, 2024",
+      "description": "First stable version of the experimentation platform"
+    },
+    "version_two": {
+      "date": "January 4, 2025"
+    }
   }
 }

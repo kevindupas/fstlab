@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Beaker, Play, Music, Image, Film } from "lucide-react";
 import axios from "axios";
 import { useTranslation } from "../Contexts/LanguageContext";
+import FloatingLanguageButton from "../Components/FloatingLanguageButton";
 
 function HowItWork() {
     const { t } = useTranslation();
@@ -143,6 +144,7 @@ function HowItWork() {
                     </div>
                 )}
             </div>
+            <FloatingLanguageButton />
         </div>
     );
 }

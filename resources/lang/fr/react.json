@@ -93,6 +93,33 @@
         "requirement" : "Le message doit contenir au moins 10 caractères"
       }
     },
+    "howItWork": {
+      "loading": {
+        "error": "Une erreur est survenue lors du chargement des expériences"
+      },
+      "header": {
+        "title": "Expériences de démonstration",
+        "description": "Découvrez le fonctionnement de notre plateforme à travers ces expériences de démonstration interactives."
+      },
+      "types": {
+        "sound": {
+          "title": "Expériences Sonores",
+          "description": "Explorez nos expériences basées sur l'audio. Classez et organisez différents sons selon vos critères."
+        },
+        "image": {
+          "title": "Expériences Visuelles",
+          "description": "Découvrez nos expériences basées sur les images. Catégorisez et analysez différents contenus visuels."
+        },
+        "image_sound": {
+          "title": "Expériences Multimédia",
+          "description": "Combinez sons et images dans ces expériences interactives complexes."
+        }
+      },
+      "actions": {
+        "tryExperiment": "Essayer l'expérience",
+        "noDemo": "Aucune démo disponible"
+      }
+    },
     "login": {
       "title" : "S'inscrire pour l'expérience",
       "label" : "Numéro d'identification",
@@ -369,5 +396,92 @@
       "send_success" : "Demande envoyée avec succès",
       "send_error" : "Une erreur s'est produite lors de l'envoi de la demande",
       "send_description" : "Vous recevrez une réponse par email"
+    },
+    "changelog": {
+    "title": "Journal des Modifications",
+    "subtitle": "Suivez l'évolution de notre plateforme d'expérimentation",
+    "version": "Version",
+    "upcoming_features": "Nouveautés",
+    "version_one": {
+      "date": "14 Décembre 2024",
+      "description": "Première version stable de la plateforme d'expérimentation",
+      "categories": {
+        "auth_users": {
+          "title": "Système d'Authentification et Gestion des Utilisateurs",
+          "features": [
+            "Inscription avec vérification ORCID et affiliation universitaire",
+            "Système d'approbation des nouveaux comptes par le superviseur",
+            "Notifications par email pour les étapes d'inscription et d'approbation",
+            "Gestion des rôles : Superviseur, Expérimentateur Principal, Expérimentateur Secondaire",
+            "Système de bannissement avec justification et notifications",
+            "Page de contact administrateur pour les demandes spéciales"
+          ]
+        },
+        "experiments": {
+          "title": "Gestion des Expériences",
+          "features": [
+            "Création d'expériences avec support multimédia (images et sons)",
+            "Personnalisation des paramètres d'interaction",
+            "Système de DOI unique pour chaque expérience",
+            "Mode test avec visualisation dans How It Works",
+            "Gestion des documents complémentaires",
+            "Interface de contrôle des sessions"
+          ]
+        },
+        "monitoring": {
+          "title": "Suivi et Analyse",
+          "features": [
+            "Tableau de bord détaillé des sessions",
+            "Suivi des interactions participants",
+            "Export des données au format CSV",
+            "Visualisation des groupes et interactions",
+            "Logs d'activité détaillés",
+            "Statistiques d'utilisation"
+          ]
+        },
+        "participant": {
+          "title": "Interface Participant",
+          "features": [
+            "Interface intuitive de classement",
+            "Gestion optimisée des sons et images",
+            "Système de groupes (C1, C2, etc.)",
+            "Affichage des consignes",
+            "Retour visuel des interactions",
+            "Compatibilité multi-appareils"
+          ]
+        },
+        "notifications": {
+          "title": "Notifications et Communications",
+          "features": [
+            "Système de notifications par email",
+            "Communication superviseur-utilisateurs",
+            "Alertes de bannissement",
+            "Notifications de changements de statut",
+            "Système de demandes d'accès"
+          ]
+        }
+      }
+    },
+    "version_two": {
+      "date": "4 Janvier 2025",
+      "fixes": [
+        "Correction des bugs d'affichage pour les expérimentateurs secondaires",
+        "Correction du bug de duplication des expériences",
+        "Résolution des problèmes d'export de données",
+        "Correction des permissions d'accès",
+        "Correction du bug d'affichage des widgets",
+        "Amélioration de la gestion des contacts entre utilisateurs"
+      ],
+      "features": [
+        "Support multilingue (Français, Anglais, Espagnol)",
+        "Amélioration de la structure des expérimentations",
+        "Nouvelle gestion des demandes d'accès",
+        "Ajout des confettis pour les sessions terminées",
+        "Amélioration des widgets partagés",
+        "Intégration des CGU à l'inscription",
+        "Révision de la structure de partage des expérimentations",
+        "Amélioration de l'interface utilisateur"
+      ]
+    }
   }
 } 
