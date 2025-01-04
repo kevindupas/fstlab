@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "../Contexts/LanguageContext";
 
 function Result() {
+    const { t } = useTranslation();
     const location = useLocation();
     const navigate = useNavigate();
     const { groups, elapsedTime, actionsLog } = location.state || {};
@@ -16,10 +18,14 @@ function Result() {
         const minutes = Math.floor(timeInSeconds / 60);
         const seconds = timeInSeconds % 60;
         return minutes > 0
-            ? `${minutes} minute${
-                  minutes > 1 ? "s" : ""
-              } et ${seconds} seconde${seconds > 1 ? "s" : ""}`
-            : `${seconds} seconde${seconds > 1 ? "s" : ""}`;
+            ? `${minutes} ${t(
+                  minutes > 1 ? "result.time.minutes" : "result.time.minute"
+              )} ${t("result.time.and")} ${seconds} ${t(
+                  seconds > 1 ? "result.time.seconds" : "result.time.second"
+              )}`
+            : `${seconds} ${t(
+                  seconds > 1 ? "result.time.seconds" : "result.time.second"
+              )}`;
     };
 
     const handleGroupChange = (index, key, value) => {
@@ -87,14 +93,15 @@ function Result() {
     };
 
     if (!groups || !elapsedTime || !actionsLog) {
-        return <p className="text-center text-red-500">Error: Missing data</p>;
+        return <p className="text-center text-red-500">{t("result.error")}</p>;
     }
 
     return (
         <div className="p-8 max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold mb-8">Experiment Summary</h2>
+            <h2 className="text-3xl font-bold mb-8">{t("result.title")}</h2>
             <p className="text-lg mb-6">
-                Total Time: {formatTime(Math.floor(elapsedTime / 1000))}
+                {t("result.totalTime")}:{" "}
+                {formatTime(Math.floor(elapsedTime / 1000))}
             </p>
 
             {updatedGroups.map((group, index) => (
@@ -103,7 +110,7 @@ function Result() {
                     className="mb-8 border p-4 rounded-lg shadow-md"
                 >
                     <label className="block text-lg font-semibold mb-2">
-                        Group Name:
+                        {t("result.groupName")}:
                         <input
                             type="text"
                             value={group.name}
@@ -115,7 +122,7 @@ function Result() {
                     </label>
 
                     <label className="block text-lg font-semibold mb-4">
-                        Group Color:
+                        {t("result.groupColor")}:
                         <input
                             type="color"
                             value={group.color}
@@ -132,7 +139,7 @@ function Result() {
 
                     <div>
                         <h4 className="text-lg font-semibold mb-4">
-                            Media in this group:
+                            {t("result.mediaInGroup")}:
                         </h4>
                         <div className="flex space-x-4">
                             {group.elements.map((item) => (
@@ -150,7 +157,7 @@ function Result() {
                                                 }
                                                 className="text-white font-bold"
                                             >
-                                                Play Sound
+                                                {t("result.playSound")}
                                             </button>
                                         </div>
                                     ) : (
@@ -166,25 +173,29 @@ function Result() {
             ))}
 
             <div className="mt-8 border p-4 rounded-lg shadow-md">
-                <h3 className="text-2xl font-bold mb-4">Your Feedback</h3>
+                <h3 className="text-2xl font-bold mb-4">
+                    {t("result.feedbackSection.title")}
+                </h3>
                 <div className="mb-4">
                     <label className="block text-lg font-semibold mb-2">
-                        Please share your experience with this experiment:
+                        {t("result.feedbackSection.label")}:
                     </label>
                     <textarea
                         value={feedback}
                         onChange={(e) => setFeedback(e.target.value)}
                         className="w-full p-2 border rounded-md h-32"
-                        placeholder="Share your thoughts, difficulties, or suggestions..."
+                        placeholder={t("result.feedbackSection.placeholder")}
                     />
                 </div>
             </div>
 
             <div className="mt-8 border p-4 rounded-lg shadow-md">
-                <h3 className="text-2xl font-bold mb-4">Technical Issues</h3>
+                <h3 className="text-2xl font-bold mb-4">
+                    {t("result.technicalIssues.title")}
+                </h3>
                 <div className="mb-4">
                     <label className="block text-lg font-semibold mb-2">
-                        Did you encounter any technical issues?
+                        {t("result.technicalIssues.label")}
                     </label>
                     <div className="flex gap-2 mb-2">
                         <button
@@ -196,7 +207,7 @@ function Result() {
                             }
                             className="bg-red-500 text-white px-4 py-2 rounded-md"
                         >
-                            Report Audio Issue
+                            {t("result.technicalIssues.reportAudio")}
                         </button>
                         <button
                             onClick={() =>
@@ -207,16 +218,19 @@ function Result() {
                             }
                             className="bg-red-500 text-white px-4 py-2 rounded-md"
                         >
-                            Report Visual Issue
+                            {t("result.technicalIssues.reportVisual")}
                         </button>
                     </div>
                     {errors.length > 0 && (
                         <div className="mt-2">
-                            <h4 className="font-semibold">Reported Issues:</h4>
+                            <h4 className="font-semibold">
+                                {t("result.technicalIssues.reportedIssues")}:
+                            </h4>
                             <ul className="list-disc list-inside">
                                 {errors.map((error, index) => (
                                     <li key={index}>
-                                        {error.type} issue at{" "}
+                                        {error.type}{" "}
+                                        {t("result.technicalIssues.issueAt")}{" "}
                                         {new Date(
                                             error.time
                                         ).toLocaleTimeString()}
@@ -233,7 +247,7 @@ function Result() {
                     onClick={handleSendData}
                     className="bg-green-500 text-white font-bold py-2 px-4 rounded-md hover:bg-green-600 transition duration-200"
                 >
-                    Envoyer
+                    {t("result.submit")}
                 </button>
             </div>
         </div>

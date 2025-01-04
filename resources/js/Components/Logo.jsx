@@ -1,9 +1,9 @@
-export function Logo(props) {
+export function Logo({ desc, className }) {
     return (
         <img
             src="../logo/logo.jpeg"
-            alt="Logo TCL-Labx Web"
-            className="w-48 h-auto"
+            alt={desc}
+            className={className || "w-48 h-auto"}
         />
     );
 }

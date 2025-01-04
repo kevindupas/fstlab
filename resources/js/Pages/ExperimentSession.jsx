@@ -6,8 +6,8 @@ import SidePanelResults from "../Components/SidePanelResults";
 import Toolbar from "../Components/Toolbar";
 import DeviceOrientationCheck from "../Utils/DeviceOrientationCheck";
 import { useTranslation } from "../Contexts/LanguageContext";
-import {useExperimentStatus} from "../Contexts/ExperimentStatusContext.jsx";
-import {TestModeModal} from "../Components/TestModeModal.jsx";
+import { useExperimentStatus } from "../Contexts/ExperimentStatusContext.jsx";
+import { TestModeModal } from "../Components/TestModeModal.jsx";
 
 function ExperimentSession() {
     const { t } = useTranslation();
@@ -47,7 +47,6 @@ function ExperimentSession() {
         setMediaInteractions(interactions);
     };
 
-
     // Vérification initiale et chargement
     useEffect(() => {
         const checkSession = async () => {
@@ -60,7 +59,8 @@ function ExperimentSession() {
             }
             // Vérifie d'abord que l'utilisateur est connecté
             const existingSession = localStorage.getItem("session");
-            const isRegistered = localStorage.getItem("isRegistered") === "true";
+            const isRegistered =
+                localStorage.getItem("isRegistered") === "true";
 
             if (!existingSession || !isRegistered) {
                 navigate(`/login/${sessionId}`);
@@ -69,7 +69,9 @@ function ExperimentSession() {
 
             try {
                 // Vérifie le statut de l'expérience
-                const isExperimentAvailable = await checkExperimentStatus(sessionId);
+                const isExperimentAvailable = await checkExperimentStatus(
+                    sessionId
+                );
 
                 if (!isExperimentAvailable) {
                     // Si l'expérience n'est pas disponible, le modal sera géré par le contexte
@@ -78,7 +80,9 @@ function ExperimentSession() {
                 }
 
                 // Si l'expérience est disponible, charge les données
-                const response = await fetch(`/api/experiment/session/${sessionId}`);
+                const response = await fetch(
+                    `/api/experiment/session/${sessionId}`
+                );
                 const data = await response.json();
 
                 if (!data.experiment) {
@@ -111,7 +115,6 @@ function ExperimentSession() {
                     const storedSession = JSON.parse(
                         localStorage.getItem("session")
                     );
-                    console.log("Début du nettoyage");
 
                     if (storedSession?.id) {
                         await fetch(
@@ -128,10 +131,6 @@ function ExperimentSession() {
                     }
 
                     localStorage.clear();
-                    console.log(
-                        "Après nettoyage, contenu localStorage:",
-                        localStorage
-                    );
 
                     navigate("/");
                 } catch (error) {
@@ -201,17 +200,19 @@ function ExperimentSession() {
                 if (cluster.some((g) => getDistance(g, item) < threshold)) {
                     cluster.push({
                         ...item,
-                        interactions: mediaInteractions[item.url] || 0
+                        interactions: mediaInteractions[item.url] || 0,
                     });
                     foundCluster = true;
                     break;
                 }
             }
             if (!foundCluster) {
-                clustersMap.push([{
-                    ...item,
-                    interactions: mediaInteractions[item.url] || 0
-                }]);
+                clustersMap.push([
+                    {
+                        ...item,
+                        interactions: mediaInteractions[item.url] || 0,
+                    },
+                ]);
             }
         });
 
@@ -369,8 +370,13 @@ function ExperimentSession() {
                         <div className="flex-1 xl:flex">
                             <KonvaComponent
                                 media={media}
-                                buttonColor={experiment?.experiment?.button_color || "#3B82F6"}
-                                size={experiment?.experiment?.button_size || 100}
+                                buttonColor={
+                                    experiment?.experiment?.button_color ||
+                                    "#3B82F6"
+                                }
+                                size={
+                                    experiment?.experiment?.button_size || 100
+                                }
                                 onAction={updateActionsLog}
                                 onMediaItemsChange={updateMediaItems}
                                 onInteractionsUpdate={handleInteractionsUpdate}
@@ -389,7 +395,9 @@ function ExperimentSession() {
                                 onEditModeChange={handleEditModeChange}
                                 onSubmit={handleSubmitResults}
                                 elapsedTime={elapsedTime}
-                                instruction={ experiment?.experiment?.instruction}
+                                instruction={
+                                    experiment?.experiment?.instruction
+                                }
                                 actionsLog={actionsLog}
                                 sessionId={sessionId}
                             />
@@ -414,14 +422,15 @@ function ExperimentSession() {
                                 </h2>
                                 {isTestMode ? (
                                     <p className="text-gray-600 mb-6">
-                                        Vous êtes actuellement en mode test. Aucune donnée ne sera sauvegardée, et cette
-                                        session est utilisée uniquement à des fins de démonstration.
+                                        {t(
+                                            "experimentSession.session.quit_session_message_test"
+                                        )}
                                     </p>
                                 ) : (
                                     <p className="text-gray-600 mb-6">
-                                        Vous pouvez soit sauvegarder votre session
-                                        pour continuer plus tard, soit la supprimer
-                                        définitivement.
+                                        {t(
+                                            "experimentSession.session.quit_session_message"
+                                        )}
                                     </p>
                                 )}
                                 <div className="flex flex-col gap-3">
@@ -441,13 +450,13 @@ function ExperimentSession() {
                                         >
                                             <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z" />
                                         </svg>
-                                        Abandonner
+                                        {t("experimentSession.session.give_up")}
                                     </button>
                                     <button
                                         onClick={() => setShowLeaveModal(false)}
                                         className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors"
                                     >
-                                        Annuler
+                                        {t("experimentSession.session.cancel")}
                                     </button>
                                 </div>
                             </div>

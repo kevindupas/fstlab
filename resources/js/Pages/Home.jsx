@@ -79,7 +79,7 @@ export default function Home() {
 
     return (
         <>
-            <div className="-mt-28 relative container mx-auto h-screen flex flex-col justify-center items-center space-y-6 md:space-y-16">
+            <div className="-mt-20 relative container mx-auto h-screen flex flex-col justify-center items-center space-y-6 md:space-y-16">
                 <Container className="pb-16 text-center">
                     <h1 className="mx-auto max-w-5xl font-display text-5xl font-medium tracking-tight text-slate-900 sm:text-7xl">
                         {t("home.title")}{" "}

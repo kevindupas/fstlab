@@ -7,88 +7,366 @@
     "logout": "Logout",
     "login": "Login",
     "register": "Register",
-    "admin_panel": "Admin Panel"
+    "admin_panel": "Admin Panel",
+    "logo": {
+      "logo_alt": "TCL-LabX Web Platform Logo"
+    }
+  },
+  "footer": {
+    "copyright": "Copyright © University Toulouse 2 Jean Jaurès",
+    "privacy_policy": "Privacy Policy",
+    "legal_notices": "Legal Notices"
   },
   "home": {
-      "title": "Experimental Platform for",
-      "titleHighlight": "Auditory Research",
-      "description": "TCL-LabX is a tool dedicated to the study of auditory perception, specially designed for cochlear implant research. It analyzes how people with cochlear implants categorize and perceive different natural sounds in their environment.",
-      "objectives": {
-        "title": "What is the aim of the study?",
-        "description1": "TCL-LabX is a tool dedicated to the study of auditory perception, specially designed for cochlear implant research. It analyzes how people with cochlear implants categorize and perceive different natural sounds in their environment.",
-        "description2": "This study aims to better understand sound categorization strategies by implanted patients, thus contributing to the improvement of auditory rehabilitation techniques."
+    "title": "Auditory and Visual",
+    "titleHighlight": "Categorization Platform",
+    "description": "TCL-LabX is a tool dedicated to studying auditory perception, specially designed for research on cochlear implants. It allows analysis of how people with cochlear implants categorize and perceive various natural sounds in their environment.",
+    "objectives": {
+      "title": "What is the study's objective?",
+      "description1": "TCL-LabX is a tool dedicated to studying auditory perception, specially designed for research on cochlear implants. It allows analysis of how people with cochlear implants categorize and perceive various natural sounds in their environment.",
+      "description2": "This study aims to better understand sound categorization strategies by implanted patients, thus contributing to the improvement of auditory rehabilitation techniques."
+    },
+    "participation": {
+      "title": "How to participate?",
+      "intro": "Your participation is entirely voluntary and anonymous. The experiment takes place in several steps:",
+      "steps": {
+        "step1": "Listening to different natural sounds",
+        "step2": "Free categorization according to your own criteria",
+        "step3": "Brief questionnaire about your experience"
       },
-      "participation": {
-        "title": "How to participate?",
-        "intro": "Your participation is entirely voluntary and anonymous. The experiment takes place in several stages:",
-        "steps": {
-          "step1": "Listening to different natural sounds",
-          "step2": "Free categorization according to your own criteria",
-          "step3": "Brief questionnaire about your experience"
-        },
-        "note": "You can stop the experiment at any time. Your data will remain strictly confidential and will be used only for research purposes."
-      },
-      "privacy": {
-        "title": "Your rights to privacy and confidentiality",
-        "voluntary": "Your participation in this research is voluntary. You are free to refuse to participate without having to justify yourself. If you participate, you can decide to stop your participation at any time without having to justify yourself and without incurring any liability or prejudice.",
-        "dataRetention": "Your data will be kept for 10 years after the publication of research results. Beyond this period, they will be deleted.",
-        "dataAccess": "Only the scientific supervisor and researchers associated with this project will have access to your data. The collected data will be processed in accordance with the General Data Protection Regulation (GDPR).",
-        "rights": "If you believe, after contacting us, that your data rights are not being respected, you can file a complaint with the CNIL: https://www.cnil.fr/fr/webform/adresser-une-plainte.",
-        "contact": {
-          "intro": "For more information, please don't hesitate to contact us:",
-          "researcher": "Pascal GAILLARD (MCF, CLLE Laboratory, University of Toulouse 2 Jean Jaurès - pascal.gaillard@univ-tlse2.fr), Scientific Project Manager"
-        }
-      },
-      "consent": {
-        "text": "By clicking here, you indicate that you have read and understood the information provided and consent to participate in this research",
-        "button": "Start the experiment"
-      },
-      "modal": {
-        "title": "Experiment Access Code",
-        "placeholder": "Enter the experiment code",
-        "submit": "Submit",
-        "cancel": "Cancel",
-        "loading": "Verifying...",
-        "error": {
-          "invalid": "Invalid experiment code",
-          "generic": "An error occurred"
-        }
+      "note": "You can stop the experiment at any time. Your data will remain strictly confidential and will be used only for research purposes."
+    },
+    "privacy": {
+      "title": "Your rights to privacy and confidentiality",
+      "voluntary": "Your participation in this research is voluntary. You are free to refuse to participate without having to justify yourself. If you participate, you can decide to stop your participation at any time without having to justify yourself and without incurring any liability or prejudice.",
+      "dataRetention": "Your data will be retained for 10 years after the publication of research results. Beyond this period, they will be deleted.",
+      "dataAccess": "Only the scientific supervisor and researchers associated with this project will have access to your data. The collected data will be processed in accordance with the General Data Protection Regulation (GDPR).",
+      "rights": "If you believe, after contacting us, that your data rights are not being respected, you can file a complaint with the CNIL: https://www.cnil.fr/fr/webform/adresser-une-plainte.",
+      "contact": {
+        "intro": "For more information, don't hesitate to contact us:",
+        "researcher": "Pascal GAILLARD (MCF, CLLE Laboratory, University Toulouse 2 Jean Jaurès - pascal.gaillard@univ-tlse2.fr), Scientific Project Manager"
       }
+    },
+    "consent": {
+      "text": "By clicking here, you indicate that you have read and understood the information provided and consent to participate in this research",
+      "button": "Start the experiment"
+    },
+    "modal": {
+      "title": "Experiment Access Code",
+      "placeholder": "Enter experiment code",
+      "submit": "Validate",
+      "cancel": "Cancel",
+      "loading": "Verifying...",
+      "error": {
+        "invalid": "Invalid experiment code",
+        "generic": "An error occurred"
+      }
+    }
   },
   "experiment": {
-  "list": {
-    "loading": "Loading...",
-    "title": "Experimentation List",
-    "message": "Discover all the experiments available on our platform",
-    "placeholder": "Search for an experiment...",
-    "result": "Result",
-    "find": "found",
-    "by": "By",
-    "completed_session": "completed sessions",
-    "more_info": "Learn more",
-    "no_result": "No experiments match your search"
+    "list": {
+      "loading": "Loading...",
+      "title": "List of Experiments",
+      "message": "Discover all experiments available on our platform",
+      "placeholder": "Search for an experiment...",
+      "result": "Result",
+      "find": "found",
+      "by": "By",
+      "completed_session": "completed sessions",
+      "more_info": "Learn more",
+      "no_result": "No experiments match your search"
+    },
+    "detail": {
+      "no_experiment": "Experiment not found",
+      "return_to_list": "Return to list",
+      "by": "By",
+      "completed_session": "completed sessions",
+      "description": "Description",
+      "login": "Login",
+      "call_to_result_access": "Request access to results",
+      "call_to_experiment_access": "Request access to experiment",
+      "cancel": "Cancel",
+      "submit": "Send request",
+      "message": "Message",
+      "placeholderResult": "Explain why you want access to the results...",
+      "placeholderExperiment": "Explain why you want access to this experiment...",
+      "requirement": "Message must contain at least 10 characters"
+    }
   },
-  "detail": {
+  "login": {
+    "title": "Register for the experiment",
+    "label": "Identification number",
+    "placeholder": "Enter your identification number",
+    "submit": "Start experiment",
+    "loading": "Registration in progress...",
+    "error": "This number has already been used for this experiment.",
+    "generic": "An error occurred during registration. Please try again."
+  },
+  "experimentError": {
+    "status": {
+      "pause": {
+        "title": "Experiment Paused",
+        "message": "This experiment is currently paused. Please try again later."
+      },
+      "stop": {
+        "title": "Experiment Ended",
+        "message": "This experiment has ended. Thank you for your interest."
+      },
+      "not_found": {
+        "title": "Experiment Not Found",
+        "message": "This experiment doesn't exist or has ended."
+      },
+      "default": {
+        "title": "Error",
+        "message": "An error occurred while accessing the experiment. Please contact the administrator."
+      }
+    },
+    "actions": {
+      "returnHome": "Return to home"
+    }
+  },
+  "experimentSession": {
+    "toolbar": {
+      "reload": "Restart",
+      "quit": "Quit",
+      "terminate": "Finish",
+      "testMode": "Test Mode - No data will be saved"
+    },
+    "session": {
+      "error": {
+        "notFound": "Experiment not found",
+        "generic": "An error occurred while loading the experiment. Please try again.",
+        "reload": "An error occurred while reloading the experiment. Please try again."
+      },
+      "loading": "Loading experiment...",
+      "return_to_home": "Return to home",
+      "quit_session": "How would you like to quit?",
+      "quit_session_message": "Warning: if you quit this session, you won't be able to resume it. Are you sure you want to quit?",
+      "quit_session_message_test": "You are currently in test mode. No data will be saved, and this session is used for demonstration purposes only.",
+      "give_up": "Give up",
+      "cancel": "Cancel",
+      "image_preview": "Image preview",
+      "alt_image_preview": "Experiment image preview"
+    },
+    "result": {
+      "title": "Experiment Summary",
+      "totalTime": "Total time",
+      "groupName": "Group name",
+      "groupColor": "Group color",
+      "mediaInGroup": "Media in this group",
+      "playSound": "Play sound",
+      "feedbackSection": {
+        "title": "Your feedback",
+        "label": "Please share your experience regarding this experiment",
+        "placeholder": "Share your thoughts, difficulties, or suggestions..."
+      },
+      "time": {
+        "minute": "minute",
+        "minutes": "minutes",
+        "second": "second",
+        "seconds": "seconds",
+        "and": "and"
+      },
+      "technicalIssues": {
+        "title": "Technical issues",
+        "label": "Did you encounter any technical issues?",
+        "reportAudio": "Report audio issue",
+        "reportVisual": "Report visual issue",
+        "reportedIssues": "Reported issues",
+        "issueAt": "issue at"
+      },
+      "submit": "Submit",
+      "error": "Error: Missing data"
+    },
+    "modal": {
+      "title": "Session End Confirmation",
+      "message": "Are you sure you want to end this session? You won't be able to resume it.",
+      "cancel": "Cancel",
+      "terminate": "End"
+    },
+    "thankYou": {
+      "title": "Thank you for your participation!",
+      "titleTest": "Test completed",
+      "message": "Your results have been successfully recorded. You can now close this window.",
+      "messageTest": "Thank you for testing the experiment. No data was recorded as you were in test mode.",
+      "returnHome": "Return to home"
+    }
+  },
+  "unfinishedModal": {
+    "title": "Unfinished Session Detected",
+    "message": "A session is already in progress. Would you like to continue it or start a new one? Starting a new session will delete the current session.",
+    "ContinueThisSession": "Continue current session",
+    "startNewSession": "Start new session"
+  },
+  "testModeModal": {
+    "title": "Test Mode Activated",
+    "description": "You are currently in test mode. This means:",
+    "features": {
+      "noData": "No data will be saved",
+      "noSession": "No session will be created",
+      "noResults": "Results will not be saved",
+      "testOnly": "This mode is only for testing the interface and functionality"
+    },
+    "actions": {
+      "understand": "I understand"
+    }
+  },
+  "speechToText": {
+    "errors": {
+      "browserNotSupported": "Your browser does not support the Speech Recognition API. Try Chrome or Edge.",
+      "initError": "Error initializing speech recognition",
+      "microphoneAccess": "Microphone access error. Please check permissions.",
+      "microphoneDenied": "Microphone access denied. Please allow access in your browser settings.",
+      "noSpeech": "No speech detected. Try speaking louder.",
+      "notInitialized": "Speech recognition is not initialized",
+      "generic": "Error: {{error}}"
+    },
+    "time": {
+      "seconds": "s"
+    }
+  },
+  "sidePanelResults": {
+    "header": {
+      "title": {
+        "inProgress": "Session in progress",
+        "completed": "Session results"
+      },
+      "duration": "Total duration",
+      "addGroup": "Add group"
+    },
+    "groups": {
+      "input": {
+        "name": "Group name",
+        "comment": "Comment on this group..."
+      },
+      "buttons": {
+        "edit": "Edit",
+        "finish": "Finish"
+      },
+      "elements": {
+        "count": {
+          "singular": "element",
+          "plural": "elements"
+        },
+        "prefix": {
+          "sound": "s",
+          "image": "p"
+        },
+        "unknownType": {
+          "title": "Unknown type"
+        }
+      }
+    },
+    "feedback": {
+      "title": "Overall feedback",
+      "placeholder": "Describe your experience, observations, or any other relevant remarks..."
+    },
+    "technicalIssues": {
+      "title": "Technical issues",
+      "buttons": {
+        "audio": "Audio Issue",
+        "visual": "Visual Issue"
+      },
+      "reportedIssues": {
+        "title": "Reported issues",
+        "prefix": "Issue",
+        "timePrefix": "at"
+      }
+    },
+    "time": {
+      "hour": "hour",
+      "hours": "hours",
+      "minute": "minute",
+      "minutes": "minutes",
+      "second": "second",
+      "seconds": "seconds",
+      "separator": ", "
+    },
+    "actions": {
+      "finish": "Finish experiment"
+    }
+  },
+  "experimentList": {
+    "title": "List of Experiments",
+    "message": "Discover all experiments available on our platform",
+    "placeholder": "Search for an experiment...",
+    "filters": "Filter by",
+    "type_filter": "Experiment type",
+    "sessions_filter": "Number of sessions",
+    "min": "Minimum",
+    "max": "Maximum",
+    "results": {
+      "singular": "result found",
+      "plural": "results found"
+    },
+    "sessions": {
+      "singular": "completed session",
+      "plural": "completed sessions"
+    },
+    "types": {
+      "image": {
+        "label": "Image",
+        "color": "blue-500"
+      },
+      "sound": {
+        "label": "Sound",
+        "color": "green-500"
+      },
+      "image_sound": {
+        "label": "Image and Sound",
+        "color": "purple-500"
+      }
+    },
+    "loading": "Loading...",
+    "no_result": "No experiments match your search",
+    "more_info": "Learn more",
+    "by": "By",
+    "your_creation": "Your creation",
+    "duplicated_from": "Duplicated from",
+    "full_access": "Full access",
+    "results_access": "Results access"
+  },
+  "experimentDetail": {
     "no_experiment": "Experiment not found",
-    "return_to_list": "Back to the list",
+    "return_to_list": "Return to list",
+    "call_to_result_access": "Request access to results",
+    "call_to_experiment_access": "Request access to experiment",
+    "call_to_duplicate": "Request experiment duplication",
+    "type": "Experiment type",
     "by": "By",
     "completed_session": "completed sessions",
-    "description": "Description",
+    "types": {
+      "image": {
+        "label": "Image"
+      },
+      "sound": {
+        "label": "Sound"
+      },
+      "image_sound": {
+        "label": "Image and Sound"
+      }
+    },
+    "images": "Images",
+    "sounds": "Sounds",
+    "documents": "Documents",
+    "description": "Experiment description",
+    "instructions": "Experiment instructions",
     "isNotAuthenticated": "You must be logged in to request access to this experiment.",
-    "login": "Log in",
-    "call_to_result_access": "Request access to results",
-    "call_to_experiment_access": "Request access to the experiment",
-    "cancel": "Cancel",
-    "submit": "Submit request",
+    "isSecondaryUser": "Secondary accounts cannot make access requests",
+    "login": "Login",
+    "your_creation": "Your creation",
     "message": "Message",
+    "cancel": "Cancel",
+    "submit": "Send request",
+    "you_have_access_results": "You already have access to results",
+    "you_have_access_experiment": "You already have full access",
     "placeholderResult": "Explain why you want access to the results...",
-    "placeholderExperiment": "Explain why you want access to this experiment...",
-    "requirement": "The message must contain at least 10 characters"
-  }
-},
-  "thankYou" : {
-    "title" : "Merci pour votre participation",
-    "message" : "Votre session a bien été enregistrée. Merci pour votre participation !",
-    "returnHome" : "Retour à l'accueil"
+    "placeholderExperiment": "Explain why you want to collaborate on this experiment...",
+    "placeholderDuplicate": "Explain why you want to duplicate this experiment...",
+    "requirement": "Message must contain at least 10 characters",
+    "send_in_progress": "Sending...",
+    "send_success": "Request sent successfully",
+    "send_error": "An error occurred while sending the request",
+    "send_description": "You will receive a response by email"
   }
 }

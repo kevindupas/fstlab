@@ -1,9 +1,17 @@
-import {AlertCircle, CirclePlus, Clock, Image as ImageIcon, Music} from "lucide-react";
+import {
+    AlertCircle,
+    CirclePlus,
+    Clock,
+    Image as ImageIcon,
+    Music,
+} from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "../Contexts/LanguageContext";
 import SpeechToText from "./SpeechToText";
 import clsx from "clsx";
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown from "react-markdown";
 import isLightColor from "../Utils/isLightColor.jsx";
+import rehypeRaw from "rehype-raw";
 
 function SidePanelResults({
     isOpen,
@@ -16,6 +24,7 @@ function SidePanelResults({
     actionsLog = [],
     sessionId,
 }) {
+    const { t } = useTranslation();
     const [localGroups, setLocalGroups] = useState(groups);
     const [feedback, setFeedback] = useState("");
     const [errors, setErrors] = useState([]);
@@ -31,17 +40,41 @@ function SidePanelResults({
         let timeString = "";
 
         if (hours > 0) {
-            timeString = `${hours} heure${hours > 1 ? "s" : ""}`;
+            timeString = `${hours} ${t(
+                `sidePanelResults.time.${hours > 1 ? "hours" : "hour"}`
+            )}`;
             if (minutes > 0)
-                timeString += `, ${minutes} minute${minutes > 1 ? "s" : ""}`;
+                timeString += `${t(
+                    "sidePanelResults.time.separator"
+                )}${minutes} ${t(
+                    `sidePanelResults.time.${
+                        minutes > 1 ? "minutes" : "minute"
+                    }`
+                )}`;
             if (seconds > 0)
-                timeString += `, ${seconds} seconde${seconds > 1 ? "s" : ""}`;
+                timeString += `${t(
+                    "sidePanelResults.time.separator"
+                )}${seconds} ${t(
+                    `sidePanelResults.time.${
+                        seconds > 1 ? "seconds" : "second"
+                    }`
+                )}`;
         } else if (minutes > 0) {
-            timeString = `${minutes} minute${minutes > 1 ? "s" : ""}`;
+            timeString = `${minutes} ${t(
+                `sidePanelResults.time.${minutes > 1 ? "minutes" : "minute"}`
+            )}`;
             if (seconds > 0)
-                timeString += `, ${seconds} seconde${seconds > 1 ? "s" : ""}`;
+                timeString += `${t(
+                    "sidePanelResults.time.separator"
+                )}${seconds} ${t(
+                    `sidePanelResults.time.${
+                        seconds > 1 ? "seconds" : "second"
+                    }`
+                )}`;
         } else {
-            timeString = `${seconds} seconde${seconds > 1 ? "s" : ""}`;
+            timeString = `${seconds} ${t(
+                `sidePanelResults.time.${seconds > 1 ? "seconds" : "second"}`
+            )}`;
         }
 
         return timeString;
@@ -71,7 +104,6 @@ function SidePanelResults({
     ];
 
     useEffect(() => {
-        // Ne filtre plus les groupes vides si on vient d'en ajouter un
         const filteredGroups = showEmptyGroups
             ? groups
             : groups.filter((group) => group.elements.length > 0);
@@ -92,7 +124,6 @@ function SidePanelResults({
         });
         setLocalGroups(updatedGroups);
 
-        // Reconstruit l'array complet des groupes en préservant les groupes vides
         const allGroups = groups.map((originalGroup) => {
             const updatedGroup = updatedGroups.find(
                 (g) => g.elements[0]?.id === originalGroup.elements[0]?.id
@@ -109,7 +140,6 @@ function SidePanelResults({
             defaultColors.find((color) => !usedColors.has(color)) ||
             "#" + Math.floor(Math.random() * 16777215).toString(16);
 
-        // Trouver le prochain numéro de groupe disponible
         const existingNumbers = groups
             .map((g) => parseInt(g.name.match(/\d+/)?.[0] || "0"))
             .sort((a, b) => a - b);
@@ -151,7 +181,6 @@ function SidePanelResults({
             setEditingGroupIndex(null);
             onEditModeChange(null);
             setShowEmptyGroups(false);
-            // Nettoyer les groupes vides après l'édition
             onGroupsChange(groups.filter((g) => g.elements.length > 0));
         } else {
             setEditingGroupIndex(index);
@@ -176,20 +205,23 @@ function SidePanelResults({
         <div className="border-l border-gray-500 bg-slate-50 flex-shrink-0 flex flex-col h-screen">
             <div className="p-6 border-b border-gray-200 bg-white">
                 <h2 className="text-xl font-bold">
-                    {!isOpen ? "Session en cours" : "Résultats de la session"}
+                    {!isOpen
+                        ? t("sidePanelResults.header.title.inProgress")
+                        : t("sidePanelResults.header.title.completed")}
                 </h2>
                 {isOpen && (
                     <div className="flex flex-col items-center justify-between gap-4 text-gray-600 mt-2">
                         <div className="flex items-center gap-2">
                             <Clock size={16} />
-                            Durée totale: {formatTime(elapsedTime)}
+                            {t("sidePanelResults.header.duration")}:{" "}
+                            {formatTime(elapsedTime)}
                         </div>
                         <button
                             onClick={handleAddGroup}
                             className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors flex items-center gap-2"
                         >
                             <CirclePlus />
-                            Ajouter un groupe
+                            {t("sidePanelResults.header.addGroup")}
                         </button>
                     </div>
                 )}
@@ -198,9 +230,12 @@ function SidePanelResults({
             <div className="flex-1 overflow-y-auto">
                 <div className="p-4">
                     {!isOpen ? (
-                        <div className="flex flex-col text-justify p-6">
-                            <ReactMarkdown>{instruction}</ReactMarkdown>
-                        </div>
+                        <ReactMarkdown
+                            rehypePlugins={[rehypeRaw]}
+                            className="mt-4 text-black prose"
+                        >
+                            {instruction}
+                        </ReactMarkdown>
                     ) : (
                         <div className="space-y-4">
                             {localGroups.map((group, index) => (
@@ -221,7 +256,9 @@ function SidePanelResults({
                                                     )
                                                 }
                                                 className="flex-1 border rounded-lg px-3 py-2 text-lg font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                                placeholder="Nom du groupe"
+                                                placeholder={t(
+                                                    "sidePanelResults.groups.input.name"
+                                                )}
                                             />
                                             <input
                                                 type="color"
@@ -245,7 +282,9 @@ function SidePanelResults({
                                                     value
                                                 )
                                             }
-                                            placeholder="Commentaire sur ce groupe..."
+                                            placeholder={t(
+                                                "sidePanelResults.groups.input.comment"
+                                            )}
                                             className="border rounded-lg h-20 text-sm w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         />
                                     </div>
@@ -275,73 +314,109 @@ function SidePanelResults({
                                                 )}
                                             </svg>
                                             {editingGroupIndex === index
-                                                ? "Terminer"
-                                                : "Modifier"}
+                                                ? t(
+                                                      "sidePanelResults.groups.buttons.finish"
+                                                  )
+                                                : t(
+                                                      "sidePanelResults.groups.buttons.edit"
+                                                  )}
                                         </button>
                                         <span className="text-sm text-gray-500">
-                                            {group.elements.length} élément
-                                            {group.elements.length > 1
-                                                ? "s"
-                                                : ""}
+                                            {group.elements.length}{" "}
+                                            {t(
+                                                `sidePanelResults.groups.elements.count.${
+                                                    group.elements.length > 1
+                                                        ? "plural"
+                                                        : "singular"
+                                                }`
+                                            )}
                                         </span>
                                     </div>
 
                                     <div className="p-4 bg-slate-300">
                                         <div className="grid grid-cols-3 gap-3">
                                             {group.elements.map((item) => {
-                                                    const isImage = isImageUrl(item.url);
-                                                    const isSound = isSoundUrl(item.url);
+                                                const isImage = isImageUrl(
+                                                    item.url
+                                                );
+                                                const isSound = isSoundUrl(
+                                                    item.url
+                                                );
 
-                                                    return (
-                                                        <div
-                                                            key={item.id}
-                                                            className="aspect-square rounded-lg overflow-hidden border flex items-center justify-center relative group"
-                                                            style={{
-                                                                backgroundColor: isSound ? group.color : "transparent",
-                                                            }}
-                                                        >
-                                                            {isSound && (
-                                                                <div className="absolute top-2 right-2">
-                                                                    <Music className={clsx("w-4 h-4", isLightColor(group.color) ? 'text-black' : 'text-white')} />
-                                                                </div>
-                                                            )}
+                                                return (
+                                                    <div
+                                                        key={item.id}
+                                                        className="aspect-square rounded-lg overflow-hidden border flex items-center justify-center relative group"
+                                                        style={{
+                                                            backgroundColor:
+                                                                isSound
+                                                                    ? group.color
+                                                                    : "transparent",
+                                                        }}
+                                                    >
+                                                        {isSound && (
+                                                            <div className="absolute top-2 right-2">
+                                                                <Music
+                                                                    className={clsx(
+                                                                        "w-4 h-4",
+                                                                        isLightColor(
+                                                                            group.color
+                                                                        )
+                                                                            ? "text-black"
+                                                                            : "text-white"
+                                                                    )}
+                                                                />
+                                                            </div>
+                                                        )}
 
-                                                            {isImage ? (
-                                                                <div className="relative w-full h-full">
-                                                                    <img
-                                                                        src={item.url}
-                                                                        alt=""
-                                                                        className="w-full h-full object-cover"
-                                                                    />
-                                                                    <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 px-2 py-1 rounded text-white text-xs">
-                                                                        p{item.originalIndex + 1}
-                                                                    </div>
+                                                        {isImage ? (
+                                                            <div className="relative w-full h-full">
+                                                                <img
+                                                                    src={
+                                                                        item.url
+                                                                    }
+                                                                    alt=""
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                                <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 px-2 py-1 rounded text-white text-xs">
+                                                                    {t(
+                                                                        "sidePanelResults.groups.elements.prefix.image"
+                                                                    )}
+                                                                    {item.originalIndex +
+                                                                        1}
                                                                 </div>
-                                                            ) : isSound ? (
-                                                                <div
-                                                                    className="flex flex-col items-center justify-center">
-                                                                        <span
-                                                                            className={`text-sm font-medium ${
-                                                                                isLightColor(group.color) ? 'text-black' : 'text-white'
-                                                                            }`}
-                                                                        >
-                                                                            s{item.originalIndex + 1}
-                                                                        </span>
-                                                                </div>
-                                                            ) : (
-                                                                <div
-                                                                    className="flex flex-col items-center justify-center text-gray-400 gap-2">
-                                                                    <AlertCircle className="w-6 h-6"/>
-                                                                    <span className="text-xs">
-                                                                        Type non
-                                                                        reconnu
-                                                                    </span>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    );
-                                                }
-                                            )}
+                                                            </div>
+                                                        ) : isSound ? (
+                                                            <div className="flex flex-col items-center justify-center">
+                                                                <span
+                                                                    className={`text-sm font-medium ${
+                                                                        isLightColor(
+                                                                            group.color
+                                                                        )
+                                                                            ? "text-black"
+                                                                            : "text-white"
+                                                                    }`}
+                                                                >
+                                                                    {t(
+                                                                        "sidePanelResults.groups.elements.prefix.sound"
+                                                                    )}
+                                                                    {item.originalIndex +
+                                                                        1}
+                                                                </span>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex flex-col items-center justify-center text-gray-400 gap-2">
+                                                                <AlertCircle className="w-6 h-6" />
+                                                                <span className="text-xs">
+                                                                    {t(
+                                                                        "sidePanelResults.groups.elements.unknownType.title"
+                                                                    )}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 </div>
@@ -362,7 +437,7 @@ function SidePanelResults({
                                         />
                                     </svg>
                                     <h3 className="text-lg font-semibold">
-                                        Commentaire global
+                                        {t("sidePanelResults.feedback.title")}
                                     </h3>
                                 </div>
                                 <div className="p-4">
@@ -370,15 +445,20 @@ function SidePanelResults({
                                         <SpeechToText
                                             value={feedback}
                                             onChange={setFeedback}
-                                            placeholder="Décrivez votre expérience, vos observations ou toute autre remarque pertinente..."
+                                            placeholder={t(
+                                                "sidePanelResults.feedback.placeholder"
+                                            )}
                                             className="min-h-[8rem] w-full rounded-lg border border-gray-200 p-3 pr-12 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                         />
                                     </div>
                                 </div>
                             </div>
+
                             <div className="bg-slate-300 rounded-lg shadow-md border p-4">
                                 <h3 className="text-lg font-semibold mb-3">
-                                    Problèmes techniques
+                                    {t(
+                                        "sidePanelResults.technicalIssues.title"
+                                    )}
                                 </h3>
                                 <div className="flex gap-3 mb-4">
                                     <button
@@ -394,7 +474,9 @@ function SidePanelResults({
                                         className="flex items-center justify-center gap-2 flex-1 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-colors"
                                     >
                                         <Music className="w-4 h-4" />
-                                        Problème Audio
+                                        {t(
+                                            "sidePanelResults.technicalIssues.buttons.audio"
+                                        )}
                                     </button>
                                     <button
                                         onClick={() =>
@@ -409,14 +491,19 @@ function SidePanelResults({
                                         className="flex items-center justify-center gap-2 flex-1 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-colors"
                                     >
                                         <ImageIcon className="w-4 h-4" />
-                                        Problème Visuel
+                                        {t(
+                                            "sidePanelResults.technicalIssues.buttons.visual"
+                                        )}
                                     </button>
                                 </div>
 
                                 {errors.length > 0 && (
                                     <div className="bg-gray-50 rounded-lg p-4">
                                         <h4 className="font-medium mb-2">
-                                            Problèmes signalés :
+                                            {t(
+                                                "sidePanelResults.technicalIssues.reportedIssues.title"
+                                            )}
+                                            :
                                         </h4>
                                         <ul className="space-y-1 text-sm text-gray-600">
                                             {errors.map((error, index) => (
@@ -426,10 +513,15 @@ function SidePanelResults({
                                                 >
                                                     <span className="w-2 h-2 rounded-full bg-red-500" />
                                                     <span>
-                                                        Problème {error.type}
+                                                        {t(
+                                                            "sidePanelResults.technicalIssues.reportedIssues.prefix"
+                                                        )}{" "}
+                                                        {error.type}
                                                     </span>
                                                     <span className="text-gray-400">
-                                                        à{" "}
+                                                        {t(
+                                                            "sidePanelResults.technicalIssues.reportedIssues.timePrefix"
+                                                        )}{" "}
                                                         {new Date(
                                                             error.time
                                                         ).toLocaleTimeString()}
@@ -451,7 +543,7 @@ function SidePanelResults({
                         onClick={handleSubmit}
                         className="w-full bg-green-500 text-white font-semibold py-3 px-4 rounded-lg hover:bg-green-600 transition-colors"
                     >
-                        Terminer l'expérience
+                        {t("sidePanelResults.actions.finish")}
                     </button>
                 </div>
             )}

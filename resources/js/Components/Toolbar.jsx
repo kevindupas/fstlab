@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "../Contexts/LanguageContext";
-import {Check, RefreshCw} from "lucide-react";
+import { Check, RefreshCw } from "lucide-react";
 
 function Toolbar({ onRestart, onLeave, onTerminate, isFinished, isTestMode }) {
     const { t } = useTranslation();
@@ -25,14 +25,11 @@ function Toolbar({ onRestart, onLeave, onTerminate, isFinished, isTestMode }) {
                 </button>
             </div>
 
-            {
-                isTestMode && (
-                    <div
-                        className="px-4 bg-yellow-400 text-black py-2 text-center font-medium z-20">
-                        Mode Test - Aucune donnée ne sera enregistrée
-                    </div>
-                )
-            }
+            {isTestMode && (
+                <div className="px-4 bg-yellow-400 text-black py-2 text-center font-medium z-20">
+                    {t("experimentSession.toolbar.testMode")}
+                </div>
+            )}
 
             {!isFinished && (
                 <button

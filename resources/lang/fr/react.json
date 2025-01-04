@@ -7,11 +7,19 @@
       "logout": "Déconnexion",
       "login": "Connexion",
       "register": "Inscription",
-      "admin_panel": "Panneau d'administration"
+      "admin_panel": "Panneau d'administration",
+      "logo": {
+        "logo_alt": "Logo de la plateforme TCL-LabX Web"
+      }
+    },
+    "footer" : {
+      "copyright": "Copyright © Université Toulouse 2 Jean Jaurès",
+      "privacy_policy": "Politique de confidentialité",
+      "legal_notices": "Mentions Légales"
     },
     "home": {
       "title": "Plateforme de catégorisation",
-      "titleHighlight": "Auditive et Visuel",
+      "titleHighlight": "Auditive et Visuelle",
       "description": "TCL-LabX est un outil dédié à l'étude de la perception auditive, spécialement conçu pour la recherche sur les implants cochléaires. Il permet d'analyser comment les personnes portant des implants cochléaires catégorisent et perçoivent les différents sons naturels de leur environnement.",
       "objectives": {
         "title": "Quel est l'objectif de l'étude ?",
@@ -74,7 +82,6 @@
         "by" : "Par",
         "completed_session" : "sessions complétées",
         "description" : "Description",
-        "isNotAuthenticated" : "Vous devez être connecté pour demander l'accès à cette expérimentation.",
         "login" : "Se connecter",
         "call_to_result_access" : "Demander l'accès aux résultats",
         "call_to_experiment_access" : "Demander l'accès à l'expérimentation",
@@ -95,17 +102,35 @@
       "error" : "Ce numéro a déjà été utilisé pour cette expérience.",
       "generic" : "Une erreur s'est produite lors de l'enregistrement. Veuillez réessayer."
     },
-    "unfinishedModal" : {
-      "title" : "Session non terminée détectée",
-      "message" : "Une session est déjà en cours. Voulez-vous la continuer ou en démarrer une nouvelle ? Le démarrage d'une nouvelle session supprimera la session en cours.",
-      "ContinueThisSession" : "Continuer la session en cours",
-      "startNewSession" : "Démarrer une nouvelle session"
+    "experimentError": {
+      "status": {
+        "pause": {
+          "title": "Expérience en Pause",
+          "message": "Cette expérience est actuellement en pause. Veuillez réessayer ultérieurement."
+        },
+        "stop": {
+          "title": "Expérience Terminée",
+          "message": "Cette expérience est terminée. Merci de votre intérêt."
+        },
+        "not_found": {
+          "title": "Expérience Introuvable",
+          "message": "Cette expérience n'existe pas ou est terminée."
+        },
+        "default": {
+          "title": "Erreur",
+          "message": "Une erreur est survenue lors de l'accès à l'expérience. Veuillez contacter l'administrateur."
+        }
+      },
+      "actions": {
+        "returnHome": "Retourner à l'accueil"
+      }
     },
     "experimentSession" : {
       "toolbar" : {
         "reload" : "Recommencer",
         "quit" : "Quitter",
-        "terminate" : "Terminer"
+        "terminate" : "Terminer",
+        "testMode" : "Mode Test - Aucune donnée ne sera enregistrée"
       },
       "session" : {
         "error" : {
@@ -116,12 +141,43 @@
         },
         "loading" : "Chargement de l'expérience...",
         "return_to_home" : "Retour à l'accueil",
-        "quit_session" : "Comment souhaitez-vous quitter ?"
-
-          
+        "quit_session" : "Comment souhaitez-vous quitter ?",
+        "quit_session_message" : "Attention,  si vous quittez cette session, vous ne pourrez pas la reprendre. Voulez-vous vraiment quitter ?",
+        "quit_session_message_test" : "Vous êtes actuellement en mode test. Aucune donnée ne sera sauvegardée, et cette session est utilisée uniquement à des fins de démonstration.",
+        "give_up" : "Abandonner",
+        "cancel" : "Annuler",
+        "image_preview" : "Aperçu de l'image",
+        "alt_image_preview" : "Aperçu de l'image de l'expérience"
       },
-      "result" : {
-
+      "result": {
+        "title": "Résumé de l'expérience",
+        "totalTime": "Temps total",
+        "groupName": "Nom du groupe",
+        "groupColor": "Couleur du groupe",
+        "mediaInGroup": "Médias dans ce groupe",
+        "playSound": "Jouer le son",
+        "feedbackSection": {
+          "title": "Vos commentaires",
+          "label": "Veuillez partager votre expérience concernant cette expérience",
+          "placeholder": "Partagez vos réflexions, difficultés ou suggestions..."
+        },
+        "time": {
+          "minute": "minute",
+          "minutes": "minutes",
+          "second": "seconde",
+          "seconds": "secondes",
+          "and": "et"
+        },
+        "technicalIssues": {
+          "title": "Problèmes techniques",
+          "label": "Avez-vous rencontré des problèmes techniques ?",
+          "reportAudio": "Signaler un problème audio",
+          "reportVisual": "Signaler un problème visuel",
+          "reportedIssues": "Problèmes signalés",
+          "issueAt": "problème à"
+        },
+        "submit": "Envoyer",
+        "error": "Erreur : Données manquantes"
       },
       "modal" : {
         "title" : "Confirmation de fin de session",
@@ -131,9 +187,187 @@
       },
       "thankYou": {
         "title": "Merci de votre participation !",
+        "titleTest" : "Test terminé",
         "message": "Vos résultats ont été enregistrés avec succès. Vous pouvez maintenant fermer cette fenêtre.",
+        "messageTest": "Merci d'avoir testé l'expérience. Aucune donnée n'a été enregistrée puisque vous étiez en mode test.",
         "returnHome": "Retourner à l'accueil"
       }
-    }
+    },
+    "unfinishedModal" : {
+      "title" : "Session non terminée détectée",
+      "message" : "Une session est déjà en cours. Voulez-vous la continuer ou en démarrer une nouvelle ? Le démarrage d'une nouvelle session supprimera la session en cours.",
+      "ContinueThisSession" : "Continuer la session en cours",
+      "startNewSession" : "Démarrer une nouvelle session"
+    },
+    "testModeModal": {
+      "title": "Mode Test Activé",
+      "description": "Vous êtes actuellement en mode test. Cela signifie que :",
+      "features": {
+        "noData": "Aucune donnée ne sera enregistrée",
+        "noSession": "Aucune session ne sera créée",
+        "noResults": "Les résultats ne seront pas sauvegardés",
+        "testOnly": "Ce mode est uniquement destiné à tester l'interface et le fonctionnement"
+      },
+      "actions": {
+        "understand": "J'ai compris"
+      }
+    },
+    "speechToText": {
+      "errors": {
+        "browserNotSupported": "Votre navigateur ne supporte pas l'API de reconnaissance vocale. Essayez Chrome ou Edge.",
+        "initError": "Erreur lors de l'initialisation de la reconnaissance vocale",
+        "microphoneAccess": "Erreur d'accès au microphone. Veuillez vérifier les permissions.",
+        "microphoneDenied": "Accès au microphone refusé. Veuillez autoriser l'accès dans les paramètres de votre navigateur.",
+        "noSpeech": "Aucune parole détectée. Essayez de parler plus fort.",
+        "notInitialized": "La reconnaissance vocale n'est pas initialisée",
+        "generic": "Erreur: {{error}}"
+      },
+      "time": {
+        "seconds": "s"
+      }
+    },
+    "sidePanelResults": {
+      "header": {
+        "title": {
+          "inProgress": "Session en cours",
+          "completed": "Résultats de la session"
+        },
+        "duration": "Durée totale",
+        "addGroup": "Ajouter un groupe"
+      },
+      "groups": {
+        "input": {
+          "name": "Nom du groupe",
+          "comment": "Commentaire sur ce groupe..."
+        },
+        "buttons": {
+          "edit": "Modifier",
+          "finish": "Terminer"
+        },
+        "elements": {
+          "count": {
+            "singular": "élément",
+            "plural": "éléments"
+          },
+          "prefix": {
+            "sound": "s",
+            "image": "p"
+          },
+          "unknownType": {
+            "title": "Type non reconnu"
+          }
+        }
+      },
+      "feedback": {
+        "title": "Commentaire global",
+        "placeholder": "Décrivez votre expérience, vos observations ou toute autre remarque pertinente..."
+      },
+      "technicalIssues": {
+        "title": "Problèmes techniques",
+        "buttons": {
+          "audio": "Problème Audio",
+          "visual": "Problème Visuel"
+        },
+        "reportedIssues": {
+          "title": "Problèmes signalés",
+          "prefix": "Problème",
+          "timePrefix": "à"
+        }
+      },
+      "time": {
+        "hour": "heure",
+        "hours": "heures",
+        "minute": "minute",
+        "minutes": "minutes",
+        "second": "seconde",
+        "seconds": "secondes",
+        "separator": ", "
+      },
+      "actions": {
+        "finish": "Terminer l'expérience"
+      }
+    },
+    "experimentList": {
+        "title": "Liste des Expérimentations",
+        "message": "Découvrez toutes les expériences disponibles sur notre plateforme",
+        "placeholder": "Rechercher une expérimentation...",
+        "filters": "Filtrer par",
+        "type_filter": "Type d'expérience",
+        "sessions_filter": "Nombre de sessions",
+        "min": "Minimum",
+        "max": "Maximum",
+        "results": {
+          "singular": "résultat trouvé",
+          "plural": "résultats trouvés"
+        },
+        "sessions": {
+          "singular": "session complétée",
+          "plural": "sessions complétées"
+        },
+        "types": {
+          "image": {
+            "label": "Image",
+            "color": "blue-500"
+          },
+          "sound": {
+            "label": "Son",
+            "color": "green-500"
+          },
+          "image_sound": {
+            "label": "Image et Son",
+            "color": "purple-500"
+          }
+        },
+        "loading": "Chargement...",
+        "no_result": "Aucune expérimentation ne correspond à votre recherche",
+        "more_info": "En savoir plus",
+        "by": "Par",
+        "your_creation" : "Votre création",
+        "duplicated_from" : "Dupliquée de",
+        "full_access" : "Accès complet",
+        "results_access" : "Accès aux résultats"
+    },
+    "experimentDetail" : {
+      "no_experiment" : "Expérience non trouvée",
+      "return_to_list" : "Retour à la liste",
+      "call_to_result_access" : "Demander l'accès aux résultats",
+      "call_to_experiment_access" : "Demander l'accès à l'expérimentation",
+      "call_to_duplicate" : "Demander la duplication de l'expérimentation",
+      "type" : "Type d'expérimentation",
+      "by" : "Par",
+      "completed_session" : "sessions complétées",
+      "types": {
+        "image": {
+          "label": "Image"
+        },
+        "sound": {
+          "label": "Son"
+        },
+        "image_sound": {
+          "label": "Image et Son"
+        }
+      },
+      "images" : "Images",
+      "sounds" : "Sons",
+      "documents" : "Documents",
+      "description" : "Description de l'expérimentation",
+      "instructions" : "Instructions de l'expérimentation",
+      "isNotAuthenticated" : "Vous devez être connecté pour demander l'accès à cette expérimentation.",
+      "isSecondaryUser" : "Les comptes secondaires ne peuvent pas faire de demandes d'accès",
+      "login" : "Se connecter",
+      "your_creation" : "Votre création",
+      "message" : "Message",
+      "cancel" : "Annuler",
+      "submit" : "Envoyer la demande",
+      "you_have_access_results" : "Vous avez déjà accès aux résultats",
+      "you_have_access_experiment" : "Vous avez déjà un accès complet",
+      "placeholderResult" : "Expliquez pourquoi vous souhaitez accéder aux résultats...",
+      "placeholderExperiment" : "Expliquez pourquoi vous souhaitez collaborer à cette expérimentation...",
+      "placeholderDuplicate" : "Expliquez pourquoi vous souhaitez dupliquer cette expérimentation...",
+      "requirement" : "Le message doit contenir au moins 10 caractères",
+      "send_in_progress" : "Envoi en cours...",
+      "send_success" : "Demande envoyée avec succès",
+      "send_error" : "Une erreur s'est produite lors de l'envoi de la demande",
+      "send_description" : "Vous recevrez une réponse par email"
   }
-  
+} 

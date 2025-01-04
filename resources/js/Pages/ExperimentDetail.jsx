@@ -3,16 +3,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../Contexts/AuthContext";
 import { useExperiments } from "../Contexts/ExperimentsContext";
 import Modal from "../Components/Modal";
-import {
-    ArrowLeft,
-    Lock,
-    Copy,
-    ChartBarIcon,
-    CheckCircleIcon,
-} from "lucide-react";
+import { ArrowLeft, ChartBarIcon, CheckCircleIcon } from "lucide-react";
 import clsx from "clsx";
 import { useTranslation } from "../Contexts/LanguageContext";
 import Notification from "../Components/Notification";
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
+import FloatingLanguageButton from "../Components/FloatingLanguageButton";
 
 function ExperimentDetail() {
     const { id } = useParams();
@@ -73,14 +70,14 @@ function ExperimentDetail() {
                 <div className="max-w-3xl mx-auto">
                     <div className="text-center">
                         <p className="text-lg font-semibold text-red-600">
-                            {t("experiment.detail.no_experiment")}
+                            {t("experimentDetail.no_experiment")}
                         </p>
                         <button
                             onClick={() => navigate("/experiments")}
                             className="mt-4 inline-flex items-center text-indigo-600 hover:text-indigo-500"
                         >
                             <ArrowLeft className="h-5 w-5 mr-2" />
-                            {t("experiment.detail.return_to_list")}
+                            {t("experimentDetail.return_to_list")}
                         </button>
                     </div>
                 </div>
@@ -142,22 +139,22 @@ function ExperimentDetail() {
     const getRequestModalTitle = () => {
         switch (requestType) {
             case "results":
-                return t("experiment.detail.call_to_result_access");
+                return t("experimentDetail.call_to_result_access");
             case "duplicate":
-                return t("experiment.detail.call_to_duplicate");
+                return t("experimentDetail.call_to_duplicate");
             default:
-                return t("experiment.detail.call_to_experiment_access");
+                return t("experimentDetail.call_to_experiment_access");
         }
     };
 
     const getRequestPlaceholder = () => {
         switch (requestType) {
             case "results":
-                return t("experiment.detail.placeholderResult");
+                return t("experimentDetail.placeholderResult");
             case "duplicate":
-                return t("experiment.detail.placeholderDuplicate");
+                return t("experimentDetail.placeholderDuplicate");
             default:
-                return t("experiment.detail.placeholderExperiment");
+                return t("experimentDetail.placeholderExperiment");
         }
     };
 
@@ -169,7 +166,7 @@ function ExperimentDetail() {
                     className="mb-6 inline-flex items-center text-indigo-600 hover:text-indigo-500"
                 >
                     <ArrowLeft className="h-5 w-5 mr-2" />
-                    {t("experiment.detail.return_to_list")}
+                    {t("experimentDetail.return_to_list")}
                 </button>
 
                 <div className="border-b border-gray-200 pb-10">
@@ -179,13 +176,13 @@ function ExperimentDetail() {
                     <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
                         <div className="flex items-center gap-2">
                             <span className="text-sm text-gray-500">
-                                {t("experiment.detail.by")}
+                                {t("experimentDetail.by")}
                             </span>
                             <span className="text-sm font-medium text-gray-900">
                                 {experiment.creator_name}
                                 {isCreator && (
                                     <span className="ml-2 inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
-                                        {t("experiment.detail.you")}
+                                        {t("experimentDetail.your_creation")}
                                     </span>
                                 )}
                             </span>
@@ -193,7 +190,7 @@ function ExperimentDetail() {
                         {experiment.original_creator_name && (
                             <div className="flex items-center gap-2">
                                 <span className="text-sm text-gray-500">
-                                    {t("experiment.detail.original_creator")}
+                                    {t("experimentDetail.original_creator")}
                                 </span>
                                 <span className="text-sm font-medium text-indigo-600">
                                     {experiment.original_creator_name}
@@ -203,7 +200,13 @@ function ExperimentDetail() {
                         <div className="flex items-center gap-2">
                             <span className="text-sm text-gray-500">
                                 {experiment.completed_sessions_count}{" "}
-                                {t("experiment.detail.completed_session")}
+                                {t(
+                                    `experimentList.sessions.${
+                                        experiment.completed_sessions_count > 1
+                                            ? "plural"
+                                            : "singular"
+                                    }`
+                                )}
                             </span>
                         </div>
                         {isAuthenticated &&
@@ -211,7 +214,7 @@ function ExperimentDetail() {
                             !user?.isSecondary && (
                                 <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700">
                                     <CheckCircleIcon className="h-3 w-3 mr-1" />
-                                    Accès complet
+                                    {t("experimentDetail.full_access")}
                                 </span>
                             )}
                         {isAuthenticated &&
@@ -220,61 +223,64 @@ function ExperimentDetail() {
                             !user?.isSecondary && (
                                 <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
                                     <ChartBarIcon className="h-3 w-3 mr-1" />
-                                    Accès aux résultats
+                                    {t("experimentDetail.results_access")}
                                 </span>
                             )}
                     </div>
                 </div>
 
+                <section className="mt-4">
+                    <h2 className="text-2xl font-bold text-gray-900">
+                        {t("experimentDetail.type")}
+                    </h2>
+                    <div>
+                        <span
+                            className={clsx(
+                                "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium",
+                                {
+                                    "bg-blue-100 text-blue-700":
+                                        experiment.type === "image",
+                                    "bg-green-100 text-green-700":
+                                        experiment.type === "sound",
+                                    "bg-purple-100 text-purple-700":
+                                        experiment.type === "image_sound",
+                                }
+                            )}
+                        >
+                            {experiment.type === "image" &&
+                                t("experimentDetail.types.image.label")}
+                            {experiment.type === "sound" &&
+                                t("experimentDetail.types.sound.label")}
+                            {experiment.type === "image_sound" &&
+                                t("experimentDetail.types.image_sound.label")}
+                        </span>
+                    </div>
+                </section>
+
                 <div className="mt-8 space-y-8">
                     <section>
                         <h2 className="text-2xl font-bold text-gray-900">
-                            {t("experiment.detail.description")}
+                            {t("experimentDetail.description")}
                         </h2>
-                        <p className="mt-4 text-gray-600">
+                        <ReactMarkdown
+                            rehypePlugins={[rehypeRaw]}
+                            className="mt-4 text-black prose"
+                        >
                             {experiment.description}
-                        </p>
-                    </section>
-
-                    <section>
-                        <h2 className="text-2xl font-bold text-gray-900">
-                            {t("experiment.detail.type")}
-                        </h2>
-                        <div className="mt-4">
-                            <span
-                                className={clsx(
-                                    "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium",
-                                    {
-                                        "bg-blue-100 text-blue-700":
-                                            experiment.type === "image",
-                                        "bg-green-100 text-green-700":
-                                            experiment.type === "sound",
-                                        "bg-purple-100 text-purple-700":
-                                            experiment.type === "image_sound",
-                                    }
-                                )}
-                            >
-                                {experiment.type === "image" &&
-                                    t("experiment.detail.type_image")}
-                                {experiment.type === "sound" &&
-                                    t("experiment.detail.type_sound")}
-                                {experiment.type === "image_sound" &&
-                                    t("experiment.detail.type_image_sound")}
-                            </span>
-                        </div>
+                        </ReactMarkdown>
                     </section>
 
                     {experiment.instruction && (
                         <section>
                             <h2 className="text-2xl font-bold text-gray-900">
-                                {t("experiment.detail.instructions")}
+                                {t("experimentDetail.instructions")}
                             </h2>
-                            <div
-                                className="mt-4 prose prose-blue max-w-none"
-                                dangerouslySetInnerHTML={{
-                                    __html: experiment.instruction,
-                                }}
-                            />
+                            <ReactMarkdown
+                                rehypePlugins={[rehypeRaw]}
+                                className="mt-4 text-black prose"
+                            >
+                                {experiment.instruction}
+                            </ReactMarkdown>
                         </section>
                     )}
 
@@ -286,7 +292,7 @@ function ExperimentDetail() {
                             ) && (
                                 <section>
                                     <h2 className="text-2xl font-bold text-gray-900">
-                                        {t("experiment.detail.images")}
+                                        {t("experimentDetail.images")}
                                     </h2>
                                     <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
                                         {experiment.media
@@ -335,7 +341,7 @@ function ExperimentDetail() {
                             ) && (
                                 <section className="mt-8">
                                     <h2 className="text-2xl font-bold text-gray-900">
-                                        {t("experiment.detail.sounds")}
+                                        {t("experimentDetail.sounds")}
                                     </h2>
                                     <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {experiment.media
@@ -372,7 +378,7 @@ function ExperimentDetail() {
                         experiment.documents.length > 0 && (
                             <section>
                                 <h2 className="text-2xl font-bold text-gray-900">
-                                    {t("experiment.detail.documents")}
+                                    {t("experimentDetail.documents")}
                                 </h2>
                                 <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {experiment.documents.map((doc, index) => (
@@ -397,12 +403,12 @@ function ExperimentDetail() {
                         {!isAuthenticated ? (
                             <div className="rounded-md bg-red-50 p-4">
                                 <p className="text-sm text-red-700">
-                                    {t("experiment.detail.isNotAuthenticated")}
+                                    {t("experimentDetail.isNotAuthenticated")}
                                     <a
                                         href="/admin/login"
                                         className="ml-1 font-medium underline hover:text-red-600"
                                     >
-                                        {t("experiment.detail.login")}
+                                        {t("experimentDetail.login")}
                                     </a>
                                 </p>
                             </div>
@@ -417,9 +423,9 @@ function ExperimentDetail() {
                                                 href="/admin/login"
                                                 className="ml-1 font-medium underline hover:text-red-600"
                                             >
-                                                Les comptes secondaires ne
-                                                peuvent pas faire de demandes
-                                                d'accès
+                                                {t(
+                                                    "experimentDetail.isSecondary"
+                                                )}
                                             </a>
                                         </p>
                                     </div>
@@ -441,9 +447,11 @@ function ExperimentDetail() {
                                         >
                                             {existingAccess?.hasResultsAccess ||
                                             existingAccess?.hasFullAccess
-                                                ? "Vous avez déjà accès aux résultats"
+                                                ? t(
+                                                      "experimentDetail.you_have_access_results"
+                                                  )
                                                 : t(
-                                                      "experiment.detail.call_to_result_access"
+                                                      "experimentDetail.call_to_result_access"
                                                   )}
                                         </button>
 
@@ -462,9 +470,11 @@ function ExperimentDetail() {
                                             )}
                                         >
                                             {existingAccess?.hasFullAccess
-                                                ? "Vous avez déjà un accès complet"
+                                                ? t(
+                                                      "experimentDetail.you_have_access_experiment"
+                                                  )
                                                 : t(
-                                                      "experiment.detail.call_to_experiment_access"
+                                                      "experimentDetail.call_to_experiment_access"
                                                   )}
                                         </button>
 
@@ -483,7 +493,7 @@ function ExperimentDetail() {
                                             )}
                                         >
                                             {t(
-                                                "experiment.detail.call_to_duplicate"
+                                                "experimentDetail.call_to_duplicate"
                                             )}
                                         </button>
                                     </>
@@ -512,7 +522,7 @@ function ExperimentDetail() {
                             }}
                             disabled={isLoading}
                         >
-                            {t("experiment.detail.cancel")}
+                            {t("experimentDetail.cancel")}
                         </button>
                         <button
                             className={clsx(
@@ -546,10 +556,10 @@ function ExperimentDetail() {
                                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                         ></path>
                                     </svg>
-                                    Envoi en cours...
+                                    {t("experimentDetail.send_in_progress")}
                                 </>
                             ) : (
-                                t("experiment.detail.submit")
+                                t("experimentDetail.submit")
                             )}
                         </button>
                     </>
@@ -558,7 +568,7 @@ function ExperimentDetail() {
                 <div className="space-y-4">
                     <label className="block">
                         <span className="text-gray-700">
-                            {t("experiment.detail.message")}
+                            {t("experimentDetail.message")}
                         </span>
                         <textarea
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
@@ -569,7 +579,7 @@ function ExperimentDetail() {
                         />
                         {requestMessage.length < 10 && (
                             <p className="mt-1 text-sm text-red-500">
-                                {t("experiment.detail.requirement")}
+                                {t("experimentDetail.requirement")}
                             </p>
                         )}
                     </label>
@@ -579,9 +589,10 @@ function ExperimentDetail() {
             <Notification
                 show={showNotification}
                 setShow={setShowNotification}
-                message="Demande envoyée avec succès"
-                description="Vous recevrez une réponse par email"
+                message={t("experimentDetail.send_success")}
+                description={t("experimentDetail.send_description")}
             />
+            <FloatingLanguageButton />
         </div>
     );
 }

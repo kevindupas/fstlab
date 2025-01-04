@@ -1,7 +1,6 @@
 import {
     CheckCircleIcon,
     MagnifyingGlassIcon,
-    UserCircleIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
     AdjustmentsHorizontalIcon,
@@ -16,6 +15,7 @@ import { useAuth } from "../Contexts/AuthContext";
 import FloatingLanguageButton from "../Components/FloatingLanguageButton";
 import clsx from "clsx";
 import { ChartBarIcon } from "lucide-react";
+import TruncatedMarkdown from "../Components/TruncatedMarkdown";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -31,8 +31,6 @@ function ExperimentList() {
     const [sessionsRange, setSessionsRange] = useState({ min: 0, max: 0 });
     const [maxPossibleSessions, setMaxPossibleSessions] = useState(0);
 
-    console.log(experiments);
-
     useEffect(() => {
         if (experiments.length) {
             const max = Math.max(
@@ -46,18 +44,21 @@ function ExperimentList() {
     const filterTypes = [
         {
             id: "image",
-            label: t("experiment.detail.type_image"),
-            color: "blue",
+            label: t("experimentList.types.image.label"),
+            bgClass: "bg-blue-500",
+            selectedClass: "bg-blue-600",
         },
         {
             id: "sound",
-            label: t("experiment.detail.type_sound"),
-            color: "green",
+            label: t("experimentList.types.sound.label"),
+            bgClass: "bg-green-500",
+            selectedClass: "bg-green-600",
         },
         {
             id: "image_sound",
-            label: t("experiment.detail.type_image_sound"),
-            color: "purple",
+            label: t("experimentList.types.image_sound.label"),
+            bgClass: "bg-yellow-500",
+            selectedClass: "bg-yellow-600",
         },
     ];
 
@@ -146,7 +147,7 @@ function ExperimentList() {
             <div className="min-h-screen bg-white px-6 py-24 sm:py-32 lg:px-8">
                 <div className="mx-auto max-w-2xl text-center">
                     <p className="text-lg font-semibold text-blue-600">
-                        {t("experiment.list.loading")}
+                        {t("experimentList.loading")}
                     </p>
                 </div>
             </div>
@@ -172,10 +173,10 @@ function ExperimentList() {
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
                         <div className="mx-auto max-w-3xl text-center">
                             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                                {t("experiment.list.title")}
+                                {t("experimentList.title")}
                             </h2>
                             <p className="mt-2 text-lg leading-8 text-gray-600">
-                                {t("experiment.list.message")}
+                                {t("experimentList.message")}
                             </p>
                         </div>
 
@@ -190,7 +191,7 @@ function ExperimentList() {
                                         type="text"
                                         className="block w-full rounded-md border border-gray-300 bg-white py-2 pl-10 pr-3 text-sm placeholder-gray-500 focus:border-blue-500 focus:text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
                                         placeholder={t(
-                                            "experiment.list.placeholder"
+                                            "experimentList.placeholder"
                                         )}
                                         value={searchQuery}
                                         onChange={(e) =>
@@ -208,7 +209,7 @@ function ExperimentList() {
                                     )}
                                 >
                                     <AdjustmentsHorizontalIcon className="h-5 w-5 mr-2" />
-                                    {t("experiment.list.filters")}
+                                    {t("experimentList.filters")}
                                 </button>
                             </div>
 
@@ -218,7 +219,7 @@ function ExperimentList() {
                                     {/* Filtres de type */}
                                     <div className="space-y-2">
                                         <label className="block text-sm font-medium text-gray-700">
-                                            {t("experiment.list.type_filter")}
+                                            {t("experimentList.type_filter")}
                                         </label>
                                         <div className="flex flex-wrap gap-2">
                                             {filterTypes.map((type) => (
@@ -233,10 +234,10 @@ function ExperimentList() {
                                                         )
                                                     }
                                                     className={clsx(
-                                                        "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors",
+                                                        "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors text-white",
                                                         selectedType === type.id
-                                                            ? `bg-${type.color}-100 text-${type.color}-700`
-                                                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                                            ? type.selectedClass
+                                                            : type.bgClass
                                                     )}
                                                 >
                                                     {type.label}
@@ -249,13 +250,13 @@ function ExperimentList() {
                                     <div className="space-y-2">
                                         <label className="block text-sm font-medium text-gray-700">
                                             {t(
-                                                "experiment.list.sessions_filter"
+                                                "experimentList.sessions_filter"
                                             )}
                                         </label>
                                         <div className="flex gap-4 items-center">
                                             <div>
                                                 <label className="block text-xs text-gray-500 mb-1">
-                                                    Min
+                                                    {t("experimentList.min")}
                                                 </label>
                                                 <input
                                                     type="number"
@@ -273,7 +274,7 @@ function ExperimentList() {
                                             </div>
                                             <div>
                                                 <label className="block text-xs text-gray-500 mb-1">
-                                                    Max
+                                                    {t("experimentList.max")}
                                                 </label>
                                                 <input
                                                     type="number"
@@ -299,10 +300,13 @@ function ExperimentList() {
                         <div className="mx-auto mt-4 max-w-2xl">
                             <p className="text-sm text-gray-500">
                                 {filteredExperiments.length}{" "}
-                                {t("experiment.list.result")}
-                                {filteredExperiments.length > 1 ? "s" : ""}{" "}
-                                {t("experiment.list.find")}
-                                {filteredExperiments.length > 1 ? "s" : ""}
+                                {t(
+                                    `experimentList.results.${
+                                        filteredExperiments.length > 1
+                                            ? "plural"
+                                            : "singular"
+                                    }`
+                                )}
                             </p>
                         </div>
 
@@ -322,9 +326,7 @@ function ExperimentList() {
                                                 </h3>
                                                 <div className="mt-2 flex flex-wrap items-center gap-3">
                                                     <span className="text-sm font-medium text-gray-500">
-                                                        {t(
-                                                            "experiment.list.by"
-                                                        )}
+                                                        {t("experimentList.by")}
                                                         <span className="ml-1 font-semibold text-indigo-600">
                                                             {
                                                                 experiment.creator_name
@@ -338,7 +340,7 @@ function ExperimentList() {
                                                             <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
                                                                 <BeakerIcon className="h-3 w-3" />
                                                                 {t(
-                                                                    "experiment.list.your_creation"
+                                                                    "experimentList.your_creation"
                                                                 )}
                                                             </span>
                                                         )}
@@ -347,7 +349,7 @@ function ExperimentList() {
                                                         <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-medium">
                                                             <BookmarkIcon className="h-3 w-3" />
                                                             {t(
-                                                                "experiment.list.duplicated_from",
+                                                                "experimentList.duplicated_from",
                                                                 {
                                                                     name: experiment.original_creator_name,
                                                                 }
@@ -357,7 +359,7 @@ function ExperimentList() {
 
                                                     <span
                                                         className={clsx(
-                                                            "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium",
+                                                            "inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium",
                                                             {
                                                                 "bg-blue-100 text-blue-700":
                                                                     experiment.type ===
@@ -374,17 +376,17 @@ function ExperimentList() {
                                                         {experiment.type ===
                                                             "image" &&
                                                             t(
-                                                                "experiment.detail.type_image"
+                                                                "experimentList.types.image.label"
                                                             )}
                                                         {experiment.type ===
                                                             "sound" &&
                                                             t(
-                                                                "experiment.detail.type_sound"
+                                                                "experimentList.types.sound.label"
                                                             )}
                                                         {experiment.type ===
                                                             "image_sound" &&
                                                             t(
-                                                                "experiment.detail.type_image_sound"
+                                                                "experimentList.types.image_sound.label"
                                                             )}
                                                     </span>
                                                 </div>
@@ -393,15 +395,18 @@ function ExperimentList() {
                                                         {experiment.hasFullAccess && (
                                                             <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-50 text-green-700 text-xs font-medium">
                                                                 <CheckCircleIcon className="h-3 w-3" />
-                                                                Accès complet
+                                                                {t(
+                                                                    "experimentList.full_access"
+                                                                )}
                                                             </span>
                                                         )}
                                                         {experiment.hasResultsAccess &&
                                                             !experiment.hasFullAccess && (
                                                                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
                                                                     <ChartBarIcon className="h-3 w-3" />
-                                                                    Accès
-                                                                    résultats
+                                                                    {t(
+                                                                        "experimentList.results_access"
+                                                                    )}
                                                                 </span>
                                                             )}
                                                     </>
@@ -410,9 +415,11 @@ function ExperimentList() {
                                         </div>
 
                                         {/* Description */}
-                                        <div className="prose prose-sm max-w-none text-gray-600">
-                                            {experiment.description}
-                                        </div>
+                                        <TruncatedMarkdown
+                                            content={experiment.description}
+                                            maxLength={150}
+                                            className="text-gray-600"
+                                        />
 
                                         {/* Actions */}
                                         <div className="flex flex-col sm:flex-row gap-4 justify-end sm:items-center">
@@ -423,7 +430,12 @@ function ExperimentList() {
                                                         experiment.completed_sessions_count
                                                     }{" "}
                                                     {t(
-                                                        "experiment.list.completed_session"
+                                                        `experimentList.sessions.${
+                                                            experiment.completed_sessions_count >
+                                                            1
+                                                                ? "plural"
+                                                                : "singular"
+                                                        }`
                                                     )}
                                                 </span>
                                             </div>
@@ -435,7 +447,7 @@ function ExperimentList() {
                                                 }
                                                 className="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 transition-colors shadow-sm hover:shadow whitespace-nowrap"
                                             >
-                                                {t("experiment.list.more_info")}
+                                                {t("experimentList.more_info")}
                                                 <ChevronRightIcon className="ml-2 h-4 w-4" />
                                             </button>
                                         </div>
@@ -504,7 +516,7 @@ function ExperimentList() {
                         {/* Message quand aucun résultat */}
                         {filteredExperiments.length === 0 && (
                             <div className="mt-8 text-center text-gray-500">
-                                {t("experiment.list.no_result")}
+                                {t("experimentList.no_result")}
                             </div>
                         )}
                     </div>

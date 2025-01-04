@@ -7,33 +7,33 @@ function ExperimentError() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const location = useLocation();
-    const { status } = location.state || { status: 'unknown' };
+    const { status } = location.state || { status: "unknown" };
 
     const getErrorContent = () => {
         switch (status) {
-            case 'pause':
+            case "pause":
                 return {
-                    title: "Expérience en Pause",
-                    message: "Cette expérience est actuellement en pause. Veuillez réessayer ultérieurement.",
-                    icon: "⏸️"
+                    title: t("experimentError.status.pause.title"),
+                    message: t("experimentError.status.pause.message"),
+                    icon: "⏸️",
                 };
-            case 'stop':
+            case "stop":
                 return {
-                    title: "Expérience Terminée",
-                    message: "Cette expérience est terminée. Merci de votre intérêt.",
-                    icon: "🏁"
+                    title: t("experimentError.status.stop.title"),
+                    message: t("experimentError.status.stop.message"),
+                    icon: "🏁",
                 };
-            case 'not_found':
+            case "not_found":
                 return {
-                    title: "Expérience Introuvable",
-                    message: "Cette expérience n'existe pas ou est terminée.",
-                    icon: "❌"
+                    title: t("experimentError.status.not_found.title"),
+                    message: t("experimentError.status.not_found.message"),
+                    icon: "❌",
                 };
             default:
                 return {
-                    title: "Erreur",
-                    message: "Une erreur est survenue lors de l'accès à l'expérience. Veuillez contacter l'administrateur.",
-                    icon: "⚠️"
+                    title: t("experimentError.status.default.title"),
+                    message: t("experimentError.status.default.message"),
+                    icon: "⚠️",
                 };
         }
     };
@@ -48,7 +48,7 @@ function ExperimentError() {
                         {errorContent.title}
                     </h1>
                     <div className="mb-6 flex justify-center">
-                        {status === 'not_found' ? (
+                        {status === "not_found" ? (
                             <XCircle className="h-16 w-16 text-red-500" />
                         ) : (
                             <span className="text-4xl">
@@ -63,7 +63,7 @@ function ExperimentError() {
                         onClick={() => navigate("/")}
                         className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-200"
                     >
-                        Retourner à l'accueil
+                        {t("experimentError.actions.returnHome")}
                     </button>
                 </div>
             </div>

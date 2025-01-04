@@ -4,6 +4,7 @@ import MediaGroup from "./MediaGroup";
 import Modal from "./Modal";
 import { arrangeItemsInGrid } from "../Utils/layoutUtils";
 import { shuffleWithSeed } from "../Utils/randomUtils";
+import { useTranslation } from "../Contexts/LanguageContext";
 
 function KonvaComponent({
     media,
@@ -21,6 +22,7 @@ function KonvaComponent({
         width: window.innerWidth,
         height: window.innerHeight,
     });
+    const { t } = useTranslation();
     const [showImageModal, setShowImageModal] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [isTablet, setIsTablet] = useState(false);
@@ -299,11 +301,11 @@ function KonvaComponent({
             <Modal
                 isOpen={showImageModal}
                 onClose={() => setShowImageModal(false)}
-                title="Aperçu de l'image"
+                title={t("experimentSession.image_preview")}
             >
                 <img
                     src={selectedImage}
-                    alt="Aperçu"
+                    alt={t("experimentSession.alt_image_preview")}
                     className="w-full h-auto max-h-[70vh] object-contain cursor-pointer"
                     onClick={() => setShowImageModal(false)}
                 />

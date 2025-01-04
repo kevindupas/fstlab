@@ -1,7 +1,9 @@
 import { Mic, MicOff } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "../Contexts/LanguageContext";
 
 const SpeechToText = ({ value, onChange, placeholder, className }) => {
+    const { t } = useTranslation();
     const [isListening, setIsListening] = useState(false);
     const [transcript, setTranscript] = useState(value || "");
     const [recognition, setRecognition] = useState(null);
@@ -21,9 +23,7 @@ const SpeechToText = ({ value, onChange, placeholder, className }) => {
         const SpeechRecognition =
             window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecognition) {
-            setError(
-                "Votre navigateur ne supporte pas l'API de reconnaissance vocale. Essayez Chrome ou Edge."
-            );
+            setError(t("speechToText.errors.browserNotSupported"));
             return;
         }
         setIsSupported(true);
@@ -65,26 +65,24 @@ const SpeechToText = ({ value, onChange, placeholder, className }) => {
 
                 switch (event.error) {
                     case "not-allowed":
-                        setError(
-                            "Accès au microphone refusé. Veuillez autoriser l'accès dans les paramètres de votre navigateur."
-                        );
+                        setError(t("speechToText.errors.microphoneDenied"));
                         break;
                     case "no-speech":
-                        setError(
-                            "Aucune parole détectée. Essayez de parler plus fort."
-                        );
+                        setError(t("speechToText.errors.noSpeech"));
                         break;
                     default:
-                        setError(`Erreur: ${event.error}`);
+                        setError(
+                            t("speechToText.errors.generic", {
+                                error: event.error,
+                            })
+                        );
                 }
             };
 
             setRecognition(recognitionInstance);
             recognitionRef.current = recognitionInstance;
         } catch (err) {
-            setError(
-                "Erreur lors de l'initialisation de la reconnaissance vocale"
-            );
+            setError(t("speechToText.errors.initError"));
         }
 
         return () => {
@@ -93,7 +91,7 @@ const SpeechToText = ({ value, onChange, placeholder, className }) => {
             }
             clearInterval(timerRef.current);
         };
-    }, []);
+    }, [t]);
 
     useEffect(() => {
         if (timeLeft === 0 && isListening && recognitionRef.current) {
@@ -129,7 +127,7 @@ const SpeechToText = ({ value, onChange, placeholder, className }) => {
 
     const toggleListening = async () => {
         if (!recognitionRef.current) {
-            setError("La reconnaissance vocale n'est pas initialisée");
+            setError(t("speechToText.errors.notInitialized"));
             return;
         }
 
@@ -147,9 +145,7 @@ const SpeechToText = ({ value, onChange, placeholder, className }) => {
                 setError("");
             }
         } catch (err) {
-            setError(
-                "Erreur d'accès au microphone. Veuillez vérifier les permissions."
-            );
+            setError(t("speechToText.errors.microphoneAccess"));
             stopRecognition();
         }
     };
@@ -197,7 +193,8 @@ const SpeechToText = ({ value, onChange, placeholder, className }) => {
                 </button>
                 {isListening && (
                     <div className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                        {timeLeft}s
+                        {timeLeft}
+                        {t("speechToText.time.seconds")}
                     </div>
                 )}
             </div>
