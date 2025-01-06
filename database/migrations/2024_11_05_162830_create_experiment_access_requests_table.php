@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained();
             $table->foreignId('experiment_id')->constrained();
-            $table->enum('type', ['access', 'results']);
+            $table->enum('type', ['access', 'results', 'duplicate']);
             $table->enum('status', ['pending', 'approved', 'rejected', 'revoked'])->default('pending');
             $table->text('request_message')->nullable();
             $table->text('response_message')->nullable();
