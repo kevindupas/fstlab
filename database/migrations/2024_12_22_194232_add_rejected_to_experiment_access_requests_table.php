@@ -2,29 +2,32 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::table('experiment_access_requests', function (Blueprint $table) {
-            // $table->enum('status', ['pending', 'approved', 'rejected', 'revoked'])->default('pending')->change();
-            DB::statement("ALTER TYPE experiment_access_request_status ADD VALUE IF NOT EXISTS 'revoked'");
-        });
+        // Supprimer d'abord la contrainte existante
+        DB::statement("ALTER TABLE experiment_access_requests ALTER COLUMN status TYPE varchar(255)");
+
+        // Ajouter la nouvelle contrainte
+        DB::statement("ALTER TABLE experiment_access_requests ADD CONSTRAINT status_check CHECK (status IN ('pending', 'approved', 'rejected', 'revoked'))");
+
+        // Définir la valeur par défaut
+        DB::statement("ALTER TABLE experiment_access_requests ALTER COLUMN status SET DEFAULT 'pending'");
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('experiment_access_requests', function (Blueprint $table) {
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending')->change();
-        });
+        // Supprimer la nouvelle contrainte
+        DB::statement("ALTER TABLE experiment_access_requests DROP CONSTRAINT IF EXISTS status_check");
+
+        // Remettre l'ancienne contrainte
+        DB::statement("ALTER TABLE experiment_access_requests ADD CONSTRAINT status_check CHECK (status IN ('pending', 'approved', 'rejected'))");
+
+        // Remettre l'ancienne valeur par défaut
+        DB::statement("ALTER TABLE experiment_access_requests ALTER COLUMN status SET DEFAULT 'pending'");
     }
 };
