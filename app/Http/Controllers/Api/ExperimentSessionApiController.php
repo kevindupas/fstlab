@@ -7,6 +7,7 @@ use App\Models\ExperimentLink;
 use App\Models\ExperimentSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ExperimentSessionApiController extends Controller
 {
@@ -33,35 +34,89 @@ class ExperimentSessionApiController extends Controller
         return $experimentLink;
     }
 
+    protected function resolveExperimentForOtherMethods($link)
+    {
+        return ExperimentLink::with('experiment')
+            ->where('link', $link)
+            ->whereIn('status', ['start', 'pause', 'test'])
+            ->first();
+    }
+
     public function show($link)
     {
-        $experimentLink = $this->resolveExperiment($link);
-        if (!$experimentLink || !$experimentLink->experiment) {
+        try {
+            // Récupérer directement l'ExperimentLink
+            $experimentLink = ExperimentLink::with('experiment')
+                ->where('link', $link)
+                ->first();
+
+            if (!$experimentLink) {
+                return response()->json([
+                    'experiment' => [
+                        'status' => 'not_found'
+                    ]
+                ]);
+            }
+
+            // Vérifier le status et retourner la réponse appropriée
+            if ($experimentLink->status === 'pause') {
+                return response()->json([
+                    'experiment' => [
+                        'status' => 'pause'
+                    ]
+                ]);
+            }
+
+            if ($experimentLink->status === 'stop') {
+                return response()->json([
+                    'experiment' => [
+                        'status' => 'stop'
+                    ]
+                ]);
+            }
+
+            // Pour les statuts start et test
+            $experiment = $experimentLink->experiment;
+
+            if (!$experiment) {
+                return response()->json([
+                    'experiment' => [
+                        'status' => 'not_found'
+                    ]
+                ]);
+            }
+
+            $mediaArray = is_string($experiment->media) ?
+                json_decode($experiment->media, true) : ($experiment->media ?? []);
+
+            $media = collect($mediaArray)->map(function ($item) use ($experiment) {
+                return [
+                    'id' => $item,
+                    'url' => asset('storage/' . $item),
+                    'type' => $experiment->type,
+                    'button_size' => $experiment->button_size ?? '100',
+                    'button_color' => $experiment->button_color ?? '#0000FF',
+                ];
+            });
+
             return response()->json([
-                'message' => 'No experiment associated with this link.'
-            ], 404);
+                'experiment' => array_merge($experiment->toArray(), [
+                    'status' => $experimentLink->status,
+                    'link' => $experimentLink->link
+                ]),
+                'media' => $media,
+                'experiment_id' => $experiment->id,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in show method: ' . $e->getMessage());
+            Log::error($e->getTraceAsString());
+
+            return response()->json([
+                'experiment' => [
+                    'status' => 'unknown'
+                ]
+            ]);
         }
-
-        $experiment = $experimentLink->experiment;
-        $mediaArray = is_string($experiment->media) ? json_decode($experiment->media, true) : $experiment->media;
-        $media = collect($mediaArray)->map(function ($item) use ($experiment) {
-            return [
-                'id' => $item,
-                'url' => asset('storage/' . $item),
-                'type' => $experiment->type,
-                'button_size' => $experiment->button_size ?? '100',
-                'button_color' => $experiment->button_color ?? '#0000FF',
-            ];
-        });
-
-        return response()->json([
-            'experiment' => array_merge($experiment->toArray(), [
-                'status' => $experimentLink->status,
-                'link' => $experimentLink->link
-            ]),
-            'media' => $media,
-            'experiment_id' => $experiment->id,
-        ]);
     }
 
     public function registerParticipant(Request $request, $link)
