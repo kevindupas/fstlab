@@ -27,7 +27,8 @@ class ExperimentSession extends Model
         'notes',
         'feedback',
         'errors_log',
-        'is_dark'
+        'is_dark',
+        'canvas_size',
     ];
 
     protected $casts = [
@@ -36,6 +37,7 @@ class ExperimentSession extends Model
         'errors_log' => 'array',
         'started_at' => 'datetime',
         'completed_at' => 'datetime',
+        'canvas_size' => 'array',
     ];
 
     public function experiment()

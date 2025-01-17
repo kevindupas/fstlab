@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "../Contexts/LanguageContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
@@ -9,6 +9,28 @@ function ThankYou() {
     const navigate = useNavigate();
     const location = useLocation();
     const isTestMode = location.state?.isTest;
+
+    useEffect(() => {
+        const exitFullscreen = async () => {
+            try {
+                if (document.fullscreenElement) {
+                    if (document.exitFullscreen) {
+                        await document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        // Safari
+                        await document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        // IE11
+                        await document.msExitFullscreen();
+                    }
+                }
+            } catch (error) {
+                console.warn("Exit fullscreen failed:", error);
+            }
+        };
+
+        exitFullscreen();
+    }, []);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">

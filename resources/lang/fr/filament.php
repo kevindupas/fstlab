@@ -346,6 +346,8 @@ return [
                 'doi_helper' => 'Le digital object identifier (DOI) est un mécanisme d\'identification de ressources stable, unique pour votre expérimentation.',
                 'howitworks' => 'Comment ça marche',
                 'howitworks_helper' => 'Si activé, l\'expérimentation en mode "test" sera visible sur la page Comment ça marche ?. Désactivé automatiquement si le status change.',
+                'is_public' => 'Rendre publique',
+                'is_public_helper' => 'Rendre votre expérimentation publique pour qu\'elle soit visible par tous les utilisateurs.',
                 'status' => [
                     'label' => 'Démarrer l\'expérience ?',
                     'helper_text' => 'Mode "test" pour essayer sans sauvegarder de résultats. Mode "start" pour démarrer réellement l\'expérience.',

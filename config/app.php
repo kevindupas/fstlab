@@ -123,4 +123,6 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'add_media_in_api' => env('ADD_MEDIA_IN_API', false),
+
 ];

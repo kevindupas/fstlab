@@ -5,6 +5,8 @@ import Modal from "./Modal";
 import { arrangeItemsInGrid } from "../Utils/layoutUtils";
 import { shuffleWithSeed } from "../Utils/randomUtils";
 import { useTranslation } from "../Contexts/LanguageContext";
+import AudioProgressBar from "./AudioProgressBar";
+import getPhysicalScreenSize from "../Utils/getPhysicalScreenSize";
 
 function KonvaComponent({
     media,
@@ -17,10 +19,11 @@ function KonvaComponent({
     editingGroupIndex,
     onMediaGroupChange,
     onInteractionsUpdate,
+    onCanvasSizeChange,
 }) {
     const [stageSize, setStageSize] = useState({
-        width: window.innerWidth,
-        height: window.innerHeight,
+        width: window.innerWidth - 450,
+        height: window.innerHeight - 50,
     });
     const { t } = useTranslation();
     const [showImageModal, setShowImageModal] = useState(false);
@@ -31,25 +34,31 @@ function KonvaComponent({
     const currentAudioRef = useRef(null);
     const [currentSoundUrl, setCurrentSoundUrl] = useState(null);
     const [mediaInteractions, setMediaInteractions] = useState({});
+    const [audioProgress, setAudioProgress] = useState(0);
+    const [audioDuration, setAudioDuration] = useState(0);
+    const [currentSoundName, setCurrentSoundName] = useState("");
+    const audioProgressInterval = useRef(null);
 
-    const getSoundUrl = (item) => {
-        const soundExtensions = [".wav", ".mp3", ".ogg", ".m4a", ".aac"];
+    const { pixelsToCentimeters } = useMemo(() => getPhysicalScreenSize(), []);
 
-        if (item.type === "image_sound") {
-            // Si c'est une URL se terminant par une extension de son, c'est un son
-            if (
-                soundExtensions.some((ext) =>
-                    item.url.toLowerCase().endsWith(ext)
-                )
-            ) {
-                return item.url;
-            }
-        }
-        if (item.type === "sound") {
-            return item.url;
-        }
-        return null;
-    };
+    // const getSoundUrl = (item) => {
+    //     const soundExtensions = [".wav", ".mp3", ".ogg", ".m4a", ".aac"];
+
+    //     if (item.type === "image_sound") {
+    //         // Si c'est une URL se terminant par une extension de son, c'est un son
+    //         if (
+    //             soundExtensions.some((ext) =>
+    //                 item.url.toLowerCase().endsWith(ext)
+    //             )
+    //         ) {
+    //             return item.url;
+    //         }
+    //     }
+    //     if (item.type === "sound") {
+    //         return item.url;
+    //     }
+    //     return null;
+    // };
 
     useEffect(() => {
         if (!mediaArray.length) return;
@@ -77,17 +86,44 @@ function KonvaComponent({
         }
     }, [mediaItems, onMediaItemsChange]);
 
+    useEffect(() => {
+        if (onCanvasSizeChange) {
+            onCanvasSizeChange({
+                width_cm: pixelsToCentimeters(stageSize.width),
+                height_cm: pixelsToCentimeters(stageSize.height),
+                width_px: stageSize.width,
+                height_px: stageSize.height,
+                dpi: window.devicePixelRatio * 96,
+            });
+        }
+    }, []);
+
     const handleResize = useMemo(() => {
         return () => {
             const newWidth = window.innerWidth - 450;
             const newHeight = window.innerHeight - 50;
 
-            setStageSize({ width: newWidth, height: newHeight });
-            setMediaItems((prevItems) =>
-                arrangeItemsInGrid(prevItems, size, newWidth, newHeight)
-            );
+            if (
+                newWidth !== stageSize.width ||
+                newHeight !== stageSize.height
+            ) {
+                setStageSize({ width: newWidth, height: newHeight });
+                setMediaItems((prevItems) =>
+                    arrangeItemsInGrid(prevItems, size, newWidth, newHeight)
+                );
+
+                if (onCanvasSizeChange) {
+                    onCanvasSizeChange({
+                        width_cm: pixelsToCentimeters(newWidth),
+                        height_cm: pixelsToCentimeters(newHeight),
+                        width_px: newWidth,
+                        height_px: newHeight,
+                        dpi: window.devicePixelRatio * 96,
+                    });
+                }
+            }
         };
-    }, [size]);
+    }, [size, onCanvasSizeChange, pixelsToCentimeters, stageSize]);
 
     useEffect(() => {
         handleResize();
@@ -157,9 +193,12 @@ function KonvaComponent({
             setMediaInteractions(newInteractions);
             onInteractionsUpdate(newInteractions);
 
-            // Ajouter l'action au log
+            // Trouver le nom du son (s1, s2, etc.)
             const item = mediaItems.find((item) => item.url === url);
             if (item) {
+                const index = mediaItems.indexOf(item);
+                setCurrentSoundName(`s${index + 1}`);
+
                 onAction({
                     id: item.id,
                     type: "sound",
@@ -170,23 +209,41 @@ function KonvaComponent({
             }
         }
 
-        // Reste de la logique de lecture du son
+        // Arrêter l'ancien son s'il y en a un
         if (currentAudioRef.current) {
+            clearInterval(audioProgressInterval.current);
             currentAudioRef.current.pause();
             currentAudioRef.current = null;
             setCurrentSoundUrl(null);
+            setAudioProgress(0);
+            setCurrentSoundName("");
         }
 
+        // Jouer le nouveau son
         if (url && url !== currentSoundUrl) {
             const audio = new Audio(url);
+
+            audio.addEventListener("loadedmetadata", () => {
+                setAudioDuration(audio.duration);
+            });
+
+            audio.addEventListener("play", () => {
+                audioProgressInterval.current = setInterval(() => {
+                    setAudioProgress(audio.currentTime / audio.duration);
+                }, 50);
+            });
+
+            audio.addEventListener("ended", () => {
+                clearInterval(audioProgressInterval.current);
+                setCurrentSoundUrl(null);
+                setAudioProgress(0);
+                setCurrentSoundName("");
+                currentAudioRef.current = null;
+            });
+
             currentAudioRef.current = audio;
             audio.play().catch((err) => console.error("Erreur audio:", err));
             setCurrentSoundUrl(url);
-
-            audio.onended = () => {
-                setCurrentSoundUrl(null);
-                currentAudioRef.current = null;
-            };
         }
     };
 
@@ -256,6 +313,17 @@ function KonvaComponent({
         }
     };
 
+    useEffect(() => {
+        return () => {
+            if (audioProgressInterval.current) {
+                clearInterval(audioProgressInterval.current);
+            }
+            if (currentAudioRef.current) {
+                currentAudioRef.current.pause();
+            }
+        };
+    }, []);
+
     return (
         <div className="w-full h-full">
             <Stage
@@ -264,6 +332,14 @@ function KonvaComponent({
                 // style={{ backgroundColor: "#f0f0f0" }}
             >
                 <Layer>
+                    {currentSoundName && (
+                        <AudioProgressBar
+                            currentSoundName={currentSoundName}
+                            progress={audioProgress}
+                            duration={audioDuration}
+                            stageWidth={stageSize.width}
+                        />
+                    )}
                     {mediaItems.map((item, index) => (
                         <MediaGroup
                             key={index}

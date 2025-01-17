@@ -30,12 +30,32 @@ function ExperimentSession() {
     const [mediaInteractions, setMediaInteractions] = useState({});
     const [currentMediaItems, setCurrentMediaItems] = useState([]);
     const [editingGroupIndex, setEditingGroupIndex] = useState(null);
+    const [canvasSize, setCanvasSize] = useState(null);
 
     // États pour les résultats
     const [isFinished, setIsFinished] = useState(false);
     const [groups, setGroups] = useState([]);
 
     const handleGroupsChange = (updatedGroups) => {
+        // Log l'ajout ou la suppression de groupe
+        const groupDiff = updatedGroups.length - groups.length;
+
+        if (groupDiff > 0) {
+            // Un groupe a été ajouté
+            updateActionsLog({
+                type: "group_created",
+                group_name: updatedGroups[updatedGroups.length - 1].name,
+                group_color: updatedGroups[updatedGroups.length - 1].color,
+                time: Date.now(),
+            });
+        } else if (groupDiff < 0) {
+            // Un groupe a été supprimé
+            updateActionsLog({
+                type: "group_deleted",
+                time: Date.now(),
+            });
+        }
+
         setGroups(updatedGroups);
     };
 
@@ -46,6 +66,10 @@ function ExperimentSession() {
     const handleInteractionsUpdate = (interactions) => {
         setMediaInteractions(interactions);
     };
+
+    const handleCanvasSizeChange = useCallback((newSize) => {
+        setCanvasSize(newSize);
+    }, []);
 
     // Vérification initiale et chargement
     useEffect(() => {
@@ -246,10 +270,10 @@ function ExperimentSession() {
 
     const handleSubmitResults = async (data) => {
         if (isTestMode) {
-            // En mode test, on va directement à la page de remerciement sans sauvegarder
             navigate("/thank-you", { state: { isTest: true } });
             return;
         }
+
         try {
             const sessionData = JSON.parse(localStorage.getItem("session"));
             const response = await fetch(
@@ -267,6 +291,7 @@ function ExperimentSession() {
                         duration: data.elapsedTime,
                         feedback: data.feedback,
                         errors_log: data.errors || [],
+                        canvas_size: canvasSize,
                     }),
                 }
             );
@@ -283,14 +308,20 @@ function ExperimentSession() {
     };
 
     const handleMediaGroupChange = (mediaId, newGroupIndex) => {
+        let oldGroupName = null;
+        groups.forEach((group, index) => {
+            if (group.elements.some((elem) => elem.id === mediaId)) {
+                oldGroupName = group.name;
+            }
+        });
+
         setGroups((prevGroups) => {
-            // Crée une copie des groupes existants
             const newGroups = prevGroups.map((group) => ({
                 ...group,
-                elements: [...group.elements], // Copie profonde des éléments
+                elements: [...group.elements],
             }));
 
-            // Trouve le média dans son groupe actuel
+            // Trouve le média et le déplace
             let mediaToMove = null;
             let oldGroupIndex = -1;
 
@@ -304,7 +335,6 @@ function ExperimentSession() {
                 }
             });
 
-            // Si on a trouvé le média, on le déplace
             if (mediaToMove && oldGroupIndex !== -1) {
                 // Retire le média de son ancien groupe
                 newGroups[oldGroupIndex].elements = newGroups[
@@ -313,8 +343,16 @@ function ExperimentSession() {
 
                 // Ajoute le média au nouveau groupe
                 newGroups[newGroupIndex].elements.push(mediaToMove);
+
+                // Log le déplacement
+                updateActionsLog({
+                    type: "item_moved_between_groups",
+                    item_id: mediaId,
+                    from_group: oldGroupName,
+                    to_group: newGroups[newGroupIndex].name,
+                    time: Date.now(),
+                });
             } else {
-                // Si le média n'était dans aucun groupe, on le cherche dans les médias courants
                 const mediaFromCurrent = currentMediaItems.find(
                     (item) => item.id === mediaId
                 );
@@ -323,6 +361,14 @@ function ExperimentSession() {
                         id: mediaFromCurrent.id,
                         url: mediaFromCurrent.url,
                         type: mediaFromCurrent.type,
+                    });
+
+                    // Log l'ajout initial à un groupe
+                    updateActionsLog({
+                        type: "item_added_to_group",
+                        item_id: mediaId,
+                        group_name: newGroups[newGroupIndex].name,
+                        time: Date.now(),
                     });
                 }
             }
@@ -378,6 +424,7 @@ function ExperimentSession() {
                                     experiment?.experiment?.button_size || 100
                                 }
                                 onAction={updateActionsLog}
+                                onCanvasSizeChange={handleCanvasSizeChange}
                                 onMediaItemsChange={updateMediaItems}
                                 onInteractionsUpdate={handleInteractionsUpdate}
                                 isFinished={isFinished}

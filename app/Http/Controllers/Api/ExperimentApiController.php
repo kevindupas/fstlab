@@ -26,20 +26,25 @@ class ExperimentApiController extends Controller
                 $query->whereNotNull('completed_at');
             }])
             ->get()
+            ->filter(function ($experiment) {
+                // Ne retourne que les expériences publiques
+                return $experiment->is_public === true;
+            })
             ->map(function ($experiment) use ($user) {
-                // Gérer les médias
                 $media = [];
-                if ($experiment->media) {
-                    // Si c'est une string JSON, on la décode
-                    if (is_string($experiment->media)) {
-                        $mediaArray = json_decode($experiment->media, true) ?? [];
-                    } else {
-                        $mediaArray = $experiment->media;
+                // Vérifie si on doit inclure les médias
+                if (config('app.add_media_in_api', false)) {
+                    if ($experiment->media) {
+                        if (is_string($experiment->media)) {
+                            $mediaArray = json_decode($experiment->media, true) ?? [];
+                        } else {
+                            $mediaArray = $experiment->media;
+                        }
+                        // Ajouter le préfixe /storage/
+                        $media = array_map(function ($path) {
+                            return '/storage/' . $path;
+                        }, $mediaArray);
                     }
-                    // Ajouter le préfixe /storage/
-                    $media = array_map(function ($path) {
-                        return '/storage/' . $path;
-                    }, $mediaArray);
                 }
 
                 // Gérer les documents
@@ -59,10 +64,8 @@ class ExperimentApiController extends Controller
 
                 $hasFullAccess = false;
                 $hasResultsAccess = false;
-                Log::info('OK');
 
                 if ($user) {
-                    Log::info('JE SUIS ICI');
                     // Vérifier dans experiment_user
                     $experimentUser = $experiment->users()
                         ->where('user_id', $user->id)

@@ -140,12 +140,86 @@
                                                     <div class="text-sm text-gray-500 dark:text-gray-400">
                                                         {{ __('pages.experiments_sessions_details.groups.media.position', ['x' => number_format($element->x, 2), 'y' => number_format($element->y, 2)]) }}
                                                     </div>
-                                                    @if (isset($element->interactions) && $element->interactions > 0)
-                                                        <div
-                                                            class="text-sm font-medium text-blue-600 dark:text-blue-400">
-                                                            {{ trans_choice('pages.experiments_sessions_details.groups.media.interactions', $element->interactions, ['count' => $element->interactions]) }}
-                                                        </div>
-                                                    @endif
+
+                                                    <!-- Résumé détaillé des interactions -->
+                                                    <div class="mt-3 space-y-2">
+                                                        <!-- Lectures/Vues -->
+                                                        @if ($element->detailed_interactions['plays'] > 0)
+                                                            <div class="flex items-center gap-2">
+                                                                <span class="flex items-center gap-1">
+                                                                    @if ($isAudioFile($element->url))
+                                                                        <svg class="w-4 h-4 text-green-500"
+                                                                            fill="none" stroke="currentColor"
+                                                                            viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round"
+                                                                                stroke-linejoin="round" stroke-width="2"
+                                                                                d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z">
+                                                                            </path>
+                                                                        </svg>
+                                                                    @else
+                                                                        <svg class="w-4 h-4 text-blue-500"
+                                                                            fill="none" stroke="currentColor"
+                                                                            viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round"
+                                                                                stroke-linejoin="round" stroke-width="2"
+                                                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+                                                                            </path>
+                                                                            <path stroke-linecap="round"
+                                                                                stroke-linejoin="round" stroke-width="2"
+                                                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                                            </path>
+                                                                        </svg>
+                                                                    @endif
+                                                                </span>
+                                                                <span class="text-sm font-medium">
+                                                                    {{ trans_choice('pages.experiments_sessions_details.groups.media.play_count', $element->detailed_interactions['plays'], ['count' => $element->detailed_interactions['plays']]) }}
+                                                                </span>
+                                                            </div>
+                                                        @endif
+
+                                                        <!-- Déplacements -->
+                                                        @if ($element->detailed_interactions['moves'] > 0)
+                                                            <div class="flex items-center gap-2">
+                                                                <svg class="w-4 h-4 text-orange-500" fill="none"
+                                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4">
+                                                                    </path>
+                                                                </svg>
+                                                                <span class="text-sm font-medium">
+                                                                    {{ trans_choice('pages.experiments_sessions_details.groups.media.move_count', $element->detailed_interactions['moves'], ['count' => $element->detailed_interactions['moves']]) }}
+                                                                </span>
+                                                            </div>
+                                                        @endif
+
+                                                        <!-- Changements de groupe -->
+                                                        @if (!empty($element->detailed_interactions['group_changes']))
+                                                            <div class="mt-2 text-sm flex items-center">
+                                                                <div
+                                                                    class="font-medium text-purple-600 dark:text-purple-400">
+                                                                    {{ trans_choice('pages.experiments_sessions_details.groups.media.group_changes', count($element->detailed_interactions['group_changes']), ['count' => count($element->detailed_interactions['group_changes'])]) }}:
+                                                                </div>
+                                                                <div class="pl-2 space-y-1">
+                                                                    @foreach ($element->detailed_interactions['group_changes'] as $change)
+                                                                        <div
+                                                                            class="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                                                                            <span>{{ $change['from'] }}</span>
+                                                                            <svg class="w-3 h-3" fill="none"
+                                                                                stroke="currentColor"
+                                                                                viewBox="0 0 24 24">
+                                                                                <path stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    stroke-width="2" d="M9 5l7 7-7 7">
+                                                                                </path>
+                                                                            </svg>
+                                                                            <span>{{ $change['to'] }}</span>
+                                                                        </div>
+                                                                    @endforeach
+                                                                </div>
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -169,7 +243,8 @@
                     </h2>
                     <svg x-bind:class="expanded ? 'rotate-180' : ''" class="w-5 h-5 transform transition-transform"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                        </path>
                     </svg>
                 </button>
 
@@ -202,27 +277,71 @@
                                         <td class="px-4 py-2 whitespace-nowrap text-sm">
                                             <span
                                                 class="px-2 py-1 rounded-full text-xs
-                                                @if ($action['type'] === 'move') bg-blue-100 text-blue-800
-                                                @elseif($action['type'] === 'sound') bg-green-100 text-green-800
-                                                @else bg-purple-100 text-purple-800 @endif">
-                                                @if ($action['type'] === 'move')
-                                                    {{ __('pages.experiments_sessions_details.actions_log.actions.move') }}
-                                                @elseif($action['type'] === 'sound')
-                                                    {{ __('pages.experiments_sessions_details.actions_log.actions.sound') }}
-                                                @else
-                                                    {{ __('pages.experiments_sessions_details.actions_log.actions.image') }}
-                                                @endif
+            @switch($action['type'])
+                @case('move')
+                    bg-blue-100 text-blue-800
+                    @break
+                @case('sound')
+                    bg-green-100 text-green-800
+                    @break
+                @case('group_created')
+                    bg-purple-100 text-purple-800
+                    @break
+                @case('item_moved_between_groups')
+                    bg-yellow-100 text-yellow-800
+                    @break
+                @default
+                    bg-gray-100 text-gray-800
+            @endswitch
+        ">
+                                                @switch($action['type'])
+                                                    @case('move')
+                                                        {{ __('pages.experiments_sessions_details.actions_log.actions.move') }}
+                                                    @break
+
+                                                    @case('sound')
+                                                        {{ __('pages.experiments_sessions_details.actions_log.actions.sound') }}
+                                                    @break
+
+                                                    @case('group_created')
+                                                        {{ __('pages.experiments_sessions_details.actions_log.actions.simple_group_created') }}
+                                                    @break
+
+                                                    @case('item_moved_between_groups')
+                                                        {{ __('pages.experiments_sessions_details.actions_log.actions.simple_group_change') }}
+                                                    @break
+
+                                                    @default
+                                                        {{ $action['type'] }}
+                                                @endswitch
                                             </span>
                                         </td>
                                         <td class="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
-                                            @if ($action['type'] === 'move')
-                                                {{ __('pages.experiments_sessions_details.actions_log.details.name') }}
-                                                {{ $getFileName($action['id']) }}<br>
-                                                {{ __('pages.experiments_sessions_details.actions_log.details.position', ['x' => number_format($action['x'], 2), 'y' => number_format($action['y'], 2)]) }}
-                                            @else
-                                                {{ __('pages.experiments_sessions_details.actions_log.details.name') }}
-                                                {{ $getFileName($action['id']) }}
-                                            @endif
+                                            @switch($action['type'])
+                                                @case('move')
+                                                    {{ $getFileName($action['id']) }}<br>
+                                                    {{ __('pages.experiments_sessions_details.actions_log.details.position', ['x' => number_format($action['x'], 2), 'y' => number_format($action['y'], 2)]) }}
+                                                @break
+
+                                                @case('sound')
+                                                    {{ $getFileName($action['id']) }}
+                                                @break
+
+                                                @case('group_created')
+                                                    {{ __('pages.experiments_sessions_details.actions_log.details.group_created_details', [
+                                                        'name' => $action['group_name'],
+                                                        'color' => $action['group_color'],
+                                                    ]) }}
+                                                @break
+
+                                                @case('item_moved_between_groups')
+                                                    {{ __('pages.experiments_sessions_details.actions_log.details.item_moved_details', [
+                                                        'name' => $getFileName($action['item_id']),
+                                                        'from' => $action['from_group'],
+                                                        'to' => $action['to_group'],
+                                                    ]) }}
+                                                @break
+                                            @endswitch
                                         </td>
                                     </tr>
                                 @endforeach

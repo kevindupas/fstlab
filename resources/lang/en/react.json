@@ -267,7 +267,7 @@
         "comment": "Comment on this group..."
       },
       "buttons": {
-        "edit": "Edit",
+        "edit": "Add an item to the class",
         "finish": "Finish"
       },
       "elements": {

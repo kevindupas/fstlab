@@ -106,7 +106,32 @@ class ExperimentSessionDetails extends Page
                                     ->label(__('filament.pages.experiments_sessions_details.fields.screen_height')),
                             ]),
                     ]),
-
+                Section::make(__('pages.experiments_sessions_details.sections.canvas_size'))
+                    ->schema([
+                        Grid::make(3)
+                            ->schema([
+                                TextEntry::make('canvas_size')
+                                    ->label(__('pages.experiments_sessions_details.fields.canvas_dimensions'))
+                                    ->formatStateUsing(function ($state) {
+                                        if (!$state) return null;
+                                        $data = json_decode($state, true);
+                                        return sprintf(
+                                            '%s cm × %s cm (%s px × %s px)',
+                                            number_format($data['width_cm'], 2),
+                                            number_format($data['height_cm'], 2),
+                                            $data['width_px'],
+                                            $data['height_px']
+                                        );
+                                    }),
+                                TextEntry::make('canvas_size')
+                                    ->label(__('pages.experiments_sessions_details.fields.screen_dpi'))
+                                    ->formatStateUsing(function ($state) {
+                                        if (!$state) return null;
+                                        $data = json_decode($state, true);
+                                        return $data['dpi'] . ' DPI';
+                                    }),
+                            ]),
+                    ]),
                 Section::make(__('filament.pages.experiments_sessions_details.sections.feedback'))
                     ->schema([
                         TextEntry::make('feedback')
@@ -185,33 +210,89 @@ class ExperimentSessionDetails extends Page
         ];
     }
 
+    protected function getElementInteractions($element, $actionsLog)
+    {
+        $elementId = $element->id;
+        $interactions = [
+            'plays' => 0,          // Nombre de lectures/vues
+            'moves' => 0,          // Nombre de déplacements
+            'group_changes' => [],  // Historique des changements de groupe
+        ];
+
+        foreach ($actionsLog as $action) {
+            if (($action->type === 'sound' || $action->type === 'image') && $action->id === $elementId) {
+                $interactions['plays']++;
+            } elseif ($action->type === 'move' && $action->id === $elementId) {
+                $interactions['moves']++;
+            } elseif ($action->type === 'item_moved_between_groups' && $action->item_id === $elementId) {
+                $interactions['group_changes'][] = [
+                    'from' => $action->from_group,
+                    'to' => $action->to_group
+                ];
+            }
+        }
+
+        return $interactions;
+    }
+
     protected function getViewData(): array
     {
         $groups = json_decode($this->record->group_data);
         $actionsLog = collect(json_decode($this->record->actions_log));
 
         if ($this->searchTerm) {
-            // On utilise un clone des groupes pour les modifications
             $groups = collect($groups)->map(function ($group) {
                 $groupClone = clone $group;
                 if ($group->comment) {
-                    $groupClone->comment = strip_tags($group->comment); // On s'assure qu'il n'y a pas déjà de HTML
+                    $groupClone->comment = strip_tags($group->comment);
                 }
                 return $groupClone;
             });
         }
 
+        $groups = collect($groups)->map(function ($group) use ($actionsLog) {
+            $group->elements = collect($group->elements)->map(function ($element) use ($actionsLog) {
+                $element->detailed_interactions = $this->getElementInteractions($element, $actionsLog);
+                return $element;
+            });
+            return $group;
+        });
+
         return [
             'session' => $this->record,
             'groups' => $groups,
             'actionsLog' => $actionsLog->map(function ($action) {
-                return [
-                    'id' => $action->id,
+                $baseData = [
                     'type' => $action->type ?? 'move',
-                    'x' => $action->x ?? null,
-                    'y' => $action->y ?? null,
                     'time' => \Carbon\Carbon::createFromTimestampMs($action->time)->format('H:i:s.v'),
                 ];
+
+                switch ($action->type) {
+                    case 'move':
+                    case 'sound':
+                    case 'image':
+                        return array_merge($baseData, [
+                            'id' => $action->id,
+                            'x' => $action->x ?? null,
+                            'y' => $action->y ?? null,
+                        ]);
+
+                    case 'group_created':
+                        return array_merge($baseData, [
+                            'group_name' => $action->group_name,
+                            'group_color' => $action->group_color,
+                        ]);
+
+                    case 'item_moved_between_groups':
+                        return array_merge($baseData, [
+                            'item_id' => $action->item_id,
+                            'from_group' => $action->from_group,
+                            'to_group' => $action->to_group,
+                        ]);
+
+                    default:
+                        return $baseData;
+                }
             }),
             'searchTerm' => $this->searchTerm,
             'searchResults' => $this->getSearchResults(),

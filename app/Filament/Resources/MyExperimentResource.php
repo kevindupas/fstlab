@@ -143,7 +143,11 @@ class MyExperimentResource extends Resource
                         })
                         ->disabled()
                         ->columnSpan('full'),
+                    Forms\Components\Toggle::make('is_public')
+                        ->label(__('filament.resources.my_experiment.form.is_public'))
+                        ->helperText(__('filament.resources.my_experiment.form.is_public_helper'))
                 ])->collapsible(),
+
 
             Forms\Components\Section::make(__('filament.resources.my_experiment.general_section.heading'))
                 ->description(__('filament.resources.my_experiment.general_section.description'))

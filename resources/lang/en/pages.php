@@ -321,6 +321,7 @@ return [
             'participant' => 'Participant Information',
             'technical' => 'Technical Information',
             'feedback' => 'Feedback and Notes',
+            'canvas_size' => 'Canvas dimensions',
         ],
         'fields' => [
             'participant_number' => 'Name',
@@ -334,6 +335,8 @@ return [
             'feedback' => 'Participant Feedback',
             'errors' => 'Reported Errors',
             'examiner_notes' => 'Examiner Notes',
+            'canvas_dimensions' => 'Canvas dimensions',
+            'screen_dpi' => 'Screen resolution',
         ],
         'time' => [
             'seconds' => 'seconds',
@@ -380,6 +383,9 @@ return [
                 'position' => 'Position: X=:x, Y=:y',
                 'interactions' => ':count interaction|interactions',
                 'audio_unsupported' => 'Your browser does not support the audio element.',
+                'play_count' => ':count lecture|:count lectures',
+                'move_count' => ':count déplacement|:count déplacements',
+                'group_changes' => ':count changement de groupe|:count changements de groupe',
             ],
         ],
         'actions_log' => [
@@ -393,10 +399,14 @@ return [
                 'move' => 'Move',
                 'sound' => 'Play Sound',
                 'image' => 'View Image',
+                'simple_group_created' => 'Create a group',
+                'simple_group_change' => 'Change group',
             ],
             'details' => [
                 'name' => 'Name:',
                 'position' => 'Position: X=:x, Y=:y',
+                'group_created_details' => 'Create group :name with color :color',
+                'item_moved_details' => ':name moved from group :from to group :to',
             ],
         ],
     ],

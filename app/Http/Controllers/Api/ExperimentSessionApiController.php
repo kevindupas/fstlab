@@ -171,7 +171,6 @@ class ExperimentSessionApiController extends Controller
             'group_data' => 'required|array',
             'duration' => 'required|integer',
             'feedback' => 'nullable|string',
-
         ]);
 
         $session = ExperimentSession::find($sessionId);
@@ -183,6 +182,7 @@ class ExperimentSessionApiController extends Controller
         $session->update([
             'group_data' => json_encode($request->group_data),
             'actions_log' => json_encode($request->actions_log),
+            'canvas_size' => json_encode($request->canvas_size),
             'duration' => $request->duration,
             'completed_at' => now(),
             'feedback' => $request->feedback,

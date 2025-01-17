@@ -98,6 +98,22 @@ function Login() {
             }
 
             if (data.session) {
+                try {
+                    const elem = document.documentElement;
+                    if (elem.requestFullscreen) {
+                        await elem.requestFullscreen();
+                    } else if (elem.webkitRequestFullscreen) {
+                        // Safari
+                        await elem.webkitRequestFullscreen();
+                    } else if (elem.msRequestFullscreen) {
+                        // IE11
+                        await elem.msRequestFullscreen();
+                    }
+                } catch (error) {
+                    console.warn("Fullscreen request failed:", error);
+                    // On continue même si le fullscreen échoue
+                }
+
                 localStorage.setItem("participantNumber", participantNumber);
                 localStorage.setItem("isRegistered", "true");
                 localStorage.setItem(

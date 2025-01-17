@@ -7,6 +7,8 @@ use App\Filament\Pages\Experiments\Statistics\Widgets\CompletionChartWidget;
 use App\Filament\Pages\Experiments\Statistics\Widgets\DeviceTypeChartWidget;
 use App\Filament\Pages\Experiments\Statistics\Widgets\DurationChartWidget;
 use App\Filament\Pages\Experiments\Statistics\Widgets\ErrorsByTypeChartWidget;
+use App\Filament\Pages\Experiments\Statistics\Widgets\GlobalStatsWidget;
+use App\Filament\Pages\Experiments\Statistics\Widgets\MediaStatsWidget;
 use App\Filament\Pages\Experiments\Statistics\Widgets\StatsOverviewWidget;
 use App\Models\Experiment;
 use Filament\Pages\Page;
@@ -50,9 +52,12 @@ class ExperimentStatistics extends Page
     protected function getHeaderWidgets(): array
     {
         return [
-            StatsOverviewWidget::make([
+            GlobalStatsWidget::make([
                 'record' => $this->record,
             ]),
+            // MediaStatsWidget::make([
+            //     'record' => $this->record,
+            // ]),
             CompletionChartWidget::make([
                 'record' => $this->record,
             ]),
@@ -62,9 +67,7 @@ class ExperimentStatistics extends Page
             DurationChartWidget::make([
                 'record' => $this->record,
             ]),
-            ActionsTimelineChartWidget::make([
-                'record' => $this->record,
-            ]),
+            // ActionsTimelineChartWidget retiré car redondant avec les nouvelles stats
             ErrorsByTypeChartWidget::make([
                 'record' => $this->record,
             ]),

@@ -22,13 +22,15 @@ class Experiment extends Model
         'doi',
         'instruction',
         'documents',
-        'howitwork_page'
+        'howitwork_page',
+        'is_public',
     ];
 
     protected $casts = [
         'media' => 'array',
         'documents' => 'array',
         'howitwork_page' => 'boolean',
+        'is_public' => 'boolean',
     ];
 
     public function users()

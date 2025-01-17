@@ -346,6 +346,8 @@ return [
                 'doi_helper' => 'The Digital Object Identifier (DOI) is a stable, unique identification mechanism for your experiment.',
                 'howitworks' => 'How it works',
                 'howitworks_helper' => 'If enabled, the experiment in "test" mode will be visible on the How it Works? page. Automatically disabled if the status changes.',
+                'is_public' => 'Make it public',
+                'is_public_helper' => 'Make your experiment public so that it can be seen by all users',
                 'status' => [
                     'label' => 'Start the experiment?',
                     'helper_text' => 'Use "test" mode to try without saving results. Use "start" mode to officially launch the experiment.',
