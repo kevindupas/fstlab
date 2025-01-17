@@ -47,4 +47,9 @@ class ExperimentSession extends Model
     {
         return $this->belongsTo(ExperimentLink::class);
     }
+
+    public function accessRequests()
+    {
+        return $this->hasMany(ExperimentAccessRequest::class);
+    }
 }
