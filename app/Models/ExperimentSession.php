@@ -50,6 +50,6 @@ class ExperimentSession extends Model
 
     public function accessRequests()
     {
-        return $this->hasMany(ExperimentAccessRequest::class);
+        return $this->hasMany(ExperimentAccessRequest::class, 'experiment_id', 'experiment_id');
     }
 }
