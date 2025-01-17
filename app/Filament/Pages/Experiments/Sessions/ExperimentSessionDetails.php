@@ -40,22 +40,37 @@ class ExperimentSessionDetails extends Page
 
     public function mount(ExperimentSession $record = null): void
     {
+        $this->record = $record;
+        $user = Auth::user();
         // Vérifie si l'enregistrement existe
+
+
+        $isCreatorOrSecondary = $record->created_by === $user->id ||
+            $user->created_by === $record->created_by;
+
+        // Vérifier si l'utilisateur a un accès approuvé
+        $hasAccess = $record->accessRequests()
+            ->where('user_id', $user->id)
+            ->where('status', 'approved')
+            ->exists();
+
         if (!$record) {
             redirect()->route('filament.admin.resources.experiment-sessions.index')->with('error', 'Session not found');
             return;
         }
 
-        $this->record = $record;
-
-        // Vérifie si c'est le créateur ou un compte secondaire du créateur
-        $this->isCreator = $record->experiment->created_by === Auth::id() ||
-            Auth::user()->created_by === $record->experiment->created_by;
-
-        // Soit c'est le créateur/secondaire, soit il a accès via le trait
-        if (!$this->isCreator && !$this->canAccessExperiment($record->experiment)) {
-            abort(403, __('filament.pages.experiments_sessions_details.access_denied'));
+        if (!$isCreatorOrSecondary && !$hasAccess) {
+            abort(403, 'You do not have permission to access these statistics.');
         }
+
+        // // Vérifie si c'est le créateur ou un compte secondaire du créateur
+        // $this->isCreator = $record->experiment->created_by === Auth::id() ||
+        //     Auth::user()->created_by === $record->experiment->created_by;
+
+        // // Soit c'est le créateur/secondaire, soit il a accès via le trait
+        // if (!$this->isCreator && !$this->canAccessExperiment($record->experiment)) {
+        //     abort(403, __('filament.pages.experiments_sessions_details.access_denied'));
+        // }
     }
 
 
