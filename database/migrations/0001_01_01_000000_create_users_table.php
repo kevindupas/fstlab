@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('university')->nullable();
             $table->string('orcid')->nullable();
-            $table->enum('status', ['pending', 'approved', 'rejected', 'banned'])->default('pending');
+            $table->enum('status', ['unverified', 'pending', 'approved', 'rejected', 'banned'])->default('pending');
             $table->text('registration_reason')->nullable();
             $table->text('rejection_reason')->nullable();
             $table->text('banned_reason')->nullable();

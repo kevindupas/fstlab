@@ -4,14 +4,16 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
-use Kenepa\ResourceLock\Models\Concerns\HasLocks;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable, HasRoles, CanResetPassword;
 
@@ -35,6 +37,7 @@ class User extends Authenticatable
         'unbanned_reason',
         'locale',
         'terms_accepted',
+        'email_verified_at',
     ];
 
     /**
@@ -84,4 +87,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(User::class, 'created_by');
     }
+
+    // public function canAccessPanel(Panel $panel): bool
+    // {
+    //     return true;
+    // }
 }

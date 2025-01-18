@@ -54,6 +54,12 @@ class GlobalStatsWidget extends BaseWidget
         $avgPlaysPerSession = $sessions->count() > 0 ? round($totalPlays / $sessions->count(), 1) : 0;
         $avgGroupChangesPerSession = $sessions->count() > 0 ? round($totalGroupChanges / $sessions->count(), 1) : 0;
 
+        $commonBrowsers = $sessions->groupBy('browser')
+            ->map->count()
+            ->sortDesc()
+            ->take(2)
+            ->map(fn($count, $browser) => "$browser ($count)");
+
         return [
             // Taille moyenne du canvas
             Stat::make(
@@ -73,23 +79,10 @@ class GlobalStatsWidget extends BaseWidget
                 ->icon('heroicon-o-cursor-arrow-rays')
                 ->color('success'),
 
-            // Changements de groupe
-            Stat::make(
-                'Organisation des groupes',
-                sprintf('%.1f changements/session', $avgGroupChangesPerSession)
-            )
-                ->description(sprintf('Total : %d changements', $totalGroupChanges))
-                ->icon('heroicon-o-user-group')
-                ->color('warning'),
+            Stat::make('Navigateurs', $commonBrowsers->implode(', '))
+                ->description('Les plus utilisés')
+                ->color('gray'),
 
-            // Statistiques globales
-            Stat::make(
-                'Totaux globaux',
-                sprintf('%d actions', $totalMoves + $totalPlays)
-            )
-                ->description(sprintf('%d déplacements, %d lectures/vues', $totalMoves, $totalPlays))
-                ->icon('heroicon-o-chart-bar')
-                ->color('info'),
         ];
     }
 }

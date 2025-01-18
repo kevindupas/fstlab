@@ -2,12 +2,15 @@
 
 namespace App\Filament\Pages\Auth;
 
+use App\Models\User;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Auth\Register as BaseRegister;
 use Illuminate\Validation\Rules\Password;
 use Filament\Actions\Action;
+use Filament\Http\Responses\Auth\RegistrationResponse;
+use Illuminate\Database\Eloquent\Model;
 
 class Register extends BaseRegister
 {
@@ -19,15 +22,6 @@ class Register extends BaseRegister
     public $password = '';
     public $password_confirmation = '';
     public $terms_accepted = false;
-
-    protected function getFormActions(): array
-    {
-        return [
-            $this->getRegisterFormAction()
-                ->disabled(fn() => ! $this->terms_accepted)
-                ->label(__('filament-panels::pages/auth/register.form.actions.register.label')),
-        ];
-    }
 
     protected function getForms(): array
     {
@@ -61,7 +55,7 @@ class Register extends BaseRegister
                             ->label(__('pages.auth.register.registration_reason.label'))
                             ->required()
                             ->minLength(50)
-                            ->helperText(__('pages.auth.register.registration_reason.helpMessage'))
+                            ->helperText(fn($state) => strlen($state) . __('pages.auth.register.registration_reason.helpMessage'))
                             ->rules(['required', 'string', 'min:50']),
 
                         TextInput::make('orcid')
@@ -78,7 +72,14 @@ class Register extends BaseRegister
                             ->validationMessages([
                                 'attributes' => __('pages.auth.register.password.helpMessage'),
                             ])
-                            ->rules(['required', 'string', Password::defaults()]),
+                            ->rules([
+                                'required',
+                                'string',
+                                Password::min(3)
+                                    ->mixedCase()
+                                    ->numbers()
+                                    ->symbols()
+                            ]),
 
                         TextInput::make('password_confirmation')
                             ->label(__('pages.auth.register.confirm_password.label'))
@@ -102,6 +103,23 @@ class Register extends BaseRegister
                             ]),
                     ])
             ),
+        ];
+    }
+
+    protected function mutateFormDataBeforeRegister(array $data): array
+    {
+        return [
+            ...$data,
+            'status' => 'unverified',
+        ];
+    }
+    protected function getFormActions(): array
+    {
+        return [
+            $this->getRegisterFormAction()
+                ->label(__('filament-panels::pages/auth/register.form.actions.register.label'))
+                ->disabled(fn() => ! $this->terms_accepted)
+                ->action('register'),
         ];
     }
 

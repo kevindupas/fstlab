@@ -1,6 +1,7 @@
 <?php
 
 use App\Filament\Pages\ExperimentSessions;
+use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ExperimentController;
 use App\Http\Controllers\ExportSessionsController;

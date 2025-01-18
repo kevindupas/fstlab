@@ -7,71 +7,39 @@ use App\Models\User;
 use App\Notifications\NewRegistrationRequest;
 use App\Notifications\RegistrationSubmitted;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class UserObserver
 {
-    /**
-     * Handle the User "created" event.
-     */
     public function created(User $user): void
     {
-        // Si un utilisateur est connecté, c'est une création via resource
-        if (Auth::check()) {
-            if (isset($user->role)) {
-                $user->assignRole($user->role);
-            }
-            return; // On ne fait rien d'autre
-        }
-
-        // Sinon c'est une inscription normale via register
-        $principalExperimenterRole = Role::where('name', 'principal_experimenter')->first();
-        if ($principalExperimenterRole) {
-            $user->assignRole($principalExperimenterRole);
-        }
-
-        // Mettre le status en pending par défaut
-        $user->status = 'pending';
-        $user->save();
-
-        // Notifier l'utilisateur que sa demande est en cours
-        $user->notify(new RegistrationSubmitted());
-
-        // Notifier le supervisor
-        $supervisor = User::role('supervisor')->first();
-        if ($supervisor) {
-            $supervisor->notify(new NewRegistrationRequest($user));
+        if (!Auth::check()) {
+            $user->assignRole('principal_experimenter');
         }
     }
 
-    /**
-     * Handle the User "updated" event.
-     */
     public function updated(User $user): void
     {
-        //
-    }
+        if (
+            $user->wasChanged('email_verified_at') &&
+            $user->email_verified_at !== null &&
+            !$user->wasChanged('status')
+        ) {
 
-    /**
-     * Handle the User "deleted" event.
-     */
-    public function deleted(User $user): void
-    {
-        //
-    }
+            DB::table('users')
+                ->where('id', $user->id)
+                ->update(['status' => 'pending']);
 
-    /**
-     * Handle the User "restored" event.
-     */
-    public function restored(User $user): void
-    {
-        //
-    }
+            // On notifie
+            $user->notify(new RegistrationSubmitted());
+            User::role('supervisor')->first()?->notify(new NewRegistrationRequest($user));
 
-    /**
-     * Handle the User "force deleted" event.
-     */
-    public function forceDeleted(User $user): void
-    {
-        //
+            // Déconnexion avec message
+            Auth::logout();
+            session()->invalidate();
+            session()->regenerateToken();
+            session()->flash('warning', __('messages.account_pending_approval'));
+        }
     }
 }
