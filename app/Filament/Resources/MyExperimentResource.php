@@ -108,8 +108,8 @@ class MyExperimentResource extends Resource
 
                             if ($state === 'test' || $state === 'start') {
                                 $link = Str::random(6);
-                                $livewire->data['link'] = url("/experiment/{$link}");
-                                $livewire->data['temp_link'] = $link;
+                                $set('link', url("/experiment/{$link}"));
+                                $set('temp_link', $link);
                             }
 
                             if ($state !== 'test') {
