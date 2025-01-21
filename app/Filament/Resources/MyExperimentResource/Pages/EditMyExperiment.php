@@ -3,9 +3,11 @@
 namespace App\Filament\Resources\MyExperimentResource\Pages;
 
 use App\Filament\Resources\MyExperimentResource;
+use App\Models\ExperimentLink;
 use Filament\Actions;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class EditMyExperiment extends EditRecord
@@ -38,5 +40,27 @@ class EditMyExperiment extends EditRecord
                         }])
                 ]),
         ];
+    }
+
+    protected function afterSave(): void
+    {
+        // Récupérer le lien existant
+        $experimentLink = ExperimentLink::where('experiment_id', $this->record->id)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if ($experimentLink) {
+            // Mettre à jour le lien si un nouveau a été généré
+            if (isset($this->data['temp_link'])) {
+                $experimentLink->update([
+                    'link' => $this->data['temp_link'],
+                    'status' => $this->data['status']
+                ]);
+            } else {
+                $experimentLink->update([
+                    'status' => $this->data['status']
+                ]);
+            }
+        }
     }
 }
