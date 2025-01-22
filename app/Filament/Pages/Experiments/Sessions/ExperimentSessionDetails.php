@@ -240,8 +240,16 @@ class ExperimentSessionDetails extends Page
         $groups = json_decode($this->record->group_data);
         $actionsLog = collect(json_decode($this->record->actions_log));
 
+        $groups = collect($groups)->map(function ($group) {
+            // S'assurer que comment existe, même si null
+            if (!property_exists($group, 'comment')) {
+                $group->comment = null;
+            }
+            return $group;
+        });
+
         if ($this->searchTerm) {
-            $groups = collect($groups)->map(function ($group) {
+            $groups = $groups->map(function ($group) {
                 $groupClone = clone $group;
                 if ($group->comment) {
                     $groupClone->comment = strip_tags($group->comment);
@@ -250,7 +258,7 @@ class ExperimentSessionDetails extends Page
             });
         }
 
-        $groups = collect($groups)->map(function ($group) use ($actionsLog) {
+        $groups = $groups->map(function ($group) use ($actionsLog) {
             $group->elements = collect($group->elements)->map(function ($element) use ($actionsLog) {
                 $element->detailed_interactions = $this->getElementInteractions($element, $actionsLog);
                 return $element;
