@@ -27,7 +27,6 @@ class ExperimentApiController extends Controller
             }])
             ->get()
             ->filter(function ($experiment) {
-                // Ne retourne que les expériences publiques
                 return $experiment->is_public === true;
             })
             ->map(function ($experiment) use ($user) {
@@ -109,7 +108,9 @@ class ExperimentApiController extends Controller
                     'hasFullAccess' => $hasFullAccess,
                     'hasResultsAccess' => $hasResultsAccess,
                 ];
-            });
+            })
+            ->values()
+            ->all();
 
         return response()->json($experiments);
     }
