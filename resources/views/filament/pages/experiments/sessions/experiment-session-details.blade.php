@@ -133,9 +133,11 @@
                                                         class="w-full h-auto rounded-lg" />
                                                 @endif
                                                 <div class="space-y-1 mt-5">
-                                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                                    <div
+                                                        class="text-sm font-medium text-gray-900 dark:text-white break-words">
                                                         {{ __('pages.experiments_sessions_details.groups.media.name') }}
-                                                        {{ $getFileName($element->url) }}
+                                                        <span
+                                                            class="break-all">{{ $getFileName($element->url) }}</span>
                                                     </div>
                                                     <div class="text-sm text-gray-500 dark:text-gray-400">
                                                         {{ __('pages.experiments_sessions_details.groups.media.position', ['x' => number_format($element->x, 2), 'y' => number_format($element->y, 2)]) }}
