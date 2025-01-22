@@ -22,7 +22,7 @@ const ITEMS_PER_PAGE = 5;
 function ExperimentList() {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { experiments = [], isLoading, error } = useExperiments();
+    const { experiments, isLoading, error } = useExperiments();
     const { isAuthenticated, user } = useAuth();
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -64,8 +64,6 @@ function ExperimentList() {
 
     // Filtrer les expériences en fonction de la recherche et des filtres
     const filteredExperiments = useMemo(() => {
-        if (!Array.isArray(experiments)) return [];
-
         return experiments.filter((experiment) => {
             const matchesSearch =
                 experiment.name
