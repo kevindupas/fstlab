@@ -213,13 +213,13 @@ function ExperimentSession() {
 
         // Calculer le ratio entre le viewport et notre zone de travail
         const ratio = Math.min(
-            viewport.width / stageSize.width,
-            viewport.height / stageSize.height
+            viewport.width / canvasSize.width,
+            viewport.height / canvasSize.height
         );
 
         // Ajuster le threshold en fonction du ratio
         const threshold =
-            Math.min(stageSize.width, stageSize.height) * 0.1 * ratio;
+            Math.min(canvasSize.width, canvasSize.height) * 0.1 * ratio;
 
         console.log(
             "Viewport dimensions:",
@@ -229,9 +229,9 @@ function ExperimentSession() {
         );
         console.log(
             "Canvas dimensions:",
-            stageSize.width,
+            canvasSize.width,
             "x",
-            stageSize.height
+            canvasSize.height
         );
         console.log("Ratio:", ratio);
         console.log("Calculated threshold:", threshold);
@@ -284,7 +284,7 @@ function ExperimentSession() {
 
         setGroups(preparedGroups);
         setIsFinished(true);
-    }, [currentMediaItems, mediaInteractions, stageSize]);
+    }, [currentMediaItems, mediaInteractions, canvasSize]);
 
     const updateActionsLog = useCallback((newAction) => {
         setActionsLog((prevLog) => [...prevLog, newAction]);
