@@ -209,9 +209,9 @@ function ExperimentSession() {
     }, [startTime, isFinished]);
 
     const handleTerminate = useCallback(() => {
-        // On utilise directement canvasSize pour le threshold
+        // On utilise un threshold plus petit car on regarde la plus proche distance
         const threshold =
-            Math.min(canvasSize.width_px, canvasSize.height_px) * 0.15;
+            Math.min(canvasSize.width_px, canvasSize.height_px) * 0.08;
 
         console.log(
             "Canvas dimensions:",
@@ -228,27 +228,23 @@ function ExperimentSession() {
             return Math.sqrt(dx * dx + dy * dy);
         };
 
-        // Trier les éléments par coordonnées pour une meilleure cohérence
-        const sortedItems = [...currentMediaItems].sort((a, b) => {
-            if (a.y === b.y) return a.x - b.x;
-            return a.y - b.y;
-        });
-
         // Pour chaque élément
-        sortedItems.forEach((item) => {
+        currentMediaItems.forEach((item) => {
             // Chercher le cluster le plus proche
             let closestCluster = null;
             let minDistance = Infinity;
 
             for (let cluster of clustersMap) {
-                // Calculer la distance moyenne avec tous les éléments du cluster
-                const avgDistance =
-                    cluster.reduce((sum, element) => {
-                        return sum + getDistance(element, item);
-                    }, 0) / cluster.length;
+                // On cherche l'élément le plus proche dans le cluster
+                const closestInCluster = Math.min(
+                    ...cluster.map((element) => getDistance(element, item))
+                );
 
-                if (avgDistance < minDistance && avgDistance < threshold) {
-                    minDistance = avgDistance;
+                if (
+                    closestInCluster < minDistance &&
+                    closestInCluster < threshold
+                ) {
+                    minDistance = closestInCluster;
                     closestCluster = cluster;
                 }
             }
@@ -289,7 +285,6 @@ function ExperimentSession() {
         setGroups(preparedGroups);
         setIsFinished(true);
     }, [currentMediaItems, mediaInteractions, canvasSize]);
-
     const updateActionsLog = useCallback((newAction) => {
         setActionsLog((prevLog) => [...prevLog, newAction]);
     }, []);
