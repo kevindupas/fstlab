@@ -209,54 +209,60 @@ function ExperimentSession() {
     }, [startTime, isFinished]);
 
     const handleTerminate = useCallback(() => {
-        // On utilise un threshold plus petit car on regarde la plus proche distance
-        const threshold =
-            Math.min(canvasSize.width_px, canvasSize.height_px) * 0.08;
-
-        console.log(
-            "Canvas dimensions:",
-            canvasSize.width_px,
-            "x",
-            canvasSize.height_px
-        );
-        console.log("Threshold for grouping:", threshold);
-
-        const clustersMap = [];
+        // Fonction utilitaire pour calculer la distance entre deux points
         const getDistance = (pos1, pos2) => {
             const dx = pos1.x - pos2.x;
             const dy = pos1.y - pos2.y;
             return Math.sqrt(dx * dx + dy * dy);
         };
 
-        // Pour chaque élément
+        // Calcule la distance moyenne entre les éléments les plus proches
+        let totalMinDistance = 0;
+        let minDistanceCount = 0;
+
+        currentMediaItems.forEach((item1, i) => {
+            const distances = currentMediaItems
+                .slice(i + 1)
+                .map((item2) => getDistance(item1, item2))
+                .filter((d) => d > 0);
+
+            if (distances.length > 0) {
+                totalMinDistance += Math.min(...distances);
+                minDistanceCount++;
+            }
+        });
+
+        // Le threshold est basé sur la distance moyenne entre les plus proches voisins
+        const averageMinDistance = totalMinDistance / minDistanceCount;
+        const threshold = averageMinDistance * 1.5; // Facteur ajustable
+
+        console.log("Average min distance:", averageMinDistance);
+        console.log("Threshold:", threshold);
+
+        const clustersMap = [];
+
         currentMediaItems.forEach((item) => {
-            // Chercher le cluster le plus proche
-            let closestCluster = null;
-            let minDistance = Infinity;
+            let addedToCluster = false;
 
+            // Vérifie d'abord les clusters existants
             for (let cluster of clustersMap) {
-                // On cherche l'élément le plus proche dans le cluster
-                const closestInCluster = Math.min(
-                    ...cluster.map((element) => getDistance(element, item))
-                );
-
+                // Si l'item est proche d'au moins un élément du cluster
                 if (
-                    closestInCluster < minDistance &&
-                    closestInCluster < threshold
+                    cluster.some(
+                        (element) => getDistance(element, item) < threshold
+                    )
                 ) {
-                    minDistance = closestInCluster;
-                    closestCluster = cluster;
+                    cluster.push({
+                        ...item,
+                        interactions: mediaInteractions[item.url] || 0,
+                    });
+                    addedToCluster = true;
+                    break;
                 }
             }
 
-            // Si on a trouvé un cluster assez proche
-            if (closestCluster) {
-                closestCluster.push({
-                    ...item,
-                    interactions: mediaInteractions[item.url] || 0,
-                });
-            } else {
-                // Sinon créer un nouveau cluster
+            // Si l'item n'a été ajouté à aucun cluster existant
+            if (!addedToCluster) {
                 clustersMap.push([
                     {
                         ...item,
@@ -265,6 +271,31 @@ function ExperimentSession() {
                 ]);
             }
         });
+
+        // Fusion des clusters qui ont des éléments proches
+        let mergeOccurred;
+        do {
+            mergeOccurred = false;
+            for (let i = 0; i < clustersMap.length; i++) {
+                for (let j = i + 1; j < clustersMap.length; j++) {
+                    // Vérifie si deux clusters ont des éléments proches
+                    if (
+                        clustersMap[i].some((item1) =>
+                            clustersMap[j].some(
+                                (item2) => getDistance(item1, item2) < threshold
+                            )
+                        )
+                    ) {
+                        // Fusionne les clusters
+                        clustersMap[i].push(...clustersMap[j]);
+                        clustersMap.splice(j, 1);
+                        mergeOccurred = true;
+                        break;
+                    }
+                }
+                if (mergeOccurred) break;
+            }
+        } while (mergeOccurred);
 
         const clusterColors = [
             "#FF0000",
@@ -284,7 +315,8 @@ function ExperimentSession() {
 
         setGroups(preparedGroups);
         setIsFinished(true);
-    }, [currentMediaItems, mediaInteractions, canvasSize]);
+    }, [currentMediaItems, mediaInteractions]);
+
     const updateActionsLog = useCallback((newAction) => {
         setActionsLog((prevLog) => [...prevLog, newAction]);
     }, []);
