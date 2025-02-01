@@ -202,7 +202,7 @@ function SidePanelResults({
     };
 
     return (
-        <div className="border-l border-gray-500 bg-slate-50 flex-shrink-0 flex flex-col h-screen">
+        <div className="border-l border-gray-500 bg-slate-50 flex flex-col h-full w-full">
             <div className="p-6 border-b border-gray-200 bg-white">
                 <h2 className="text-xl font-bold">
                     {!isOpen
