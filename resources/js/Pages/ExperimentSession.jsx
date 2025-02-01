@@ -209,7 +209,33 @@ function ExperimentSession() {
     }, [startTime, isFinished]);
 
     const handleTerminate = useCallback(() => {
-        const threshold = 200;
+        const viewport = window.visualViewport;
+
+        // Calculer le ratio entre le viewport et notre zone de travail
+        const ratio = Math.min(
+            viewport.width / stageSize.width,
+            viewport.height / stageSize.height
+        );
+
+        // Ajuster le threshold en fonction du ratio
+        const threshold =
+            Math.min(stageSize.width, stageSize.height) * 0.1 * ratio;
+
+        console.log(
+            "Viewport dimensions:",
+            viewport.width,
+            "x",
+            viewport.height
+        );
+        console.log(
+            "Canvas dimensions:",
+            stageSize.width,
+            "x",
+            stageSize.height
+        );
+        console.log("Ratio:", ratio);
+        console.log("Calculated threshold:", threshold);
+
         const clustersMap = [];
 
         const getDistance = (pos1, pos2) => {
@@ -258,7 +284,7 @@ function ExperimentSession() {
 
         setGroups(preparedGroups);
         setIsFinished(true);
-    }, [currentMediaItems, mediaInteractions]);
+    }, [currentMediaItems, mediaInteractions, stageSize]);
 
     const updateActionsLog = useCallback((newAction) => {
         setActionsLog((prevLog) => [...prevLog, newAction]);

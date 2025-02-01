@@ -21,14 +21,16 @@ function KonvaComponent({
     onInteractionsUpdate,
     onCanvasSizeChange,
 }) {
+    const [isTablet, setIsTablet] = useState(false);
+    const sidebarWidth = isTablet ? 350 : 450;
+
     const [stageSize, setStageSize] = useState({
-        width: window.innerWidth - 450,
+        width: window.innerWidth - sidebarWidth,
         height: window.innerHeight - 50,
     });
     const { t } = useTranslation();
     const [showImageModal, setShowImageModal] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
-    const [isTablet, setIsTablet] = useState(false);
     const mediaArray = useMemo(() => Object.values(media || {}), [media]);
     const [mediaItems, setMediaItems] = useState([]);
     const currentAudioRef = useRef(null);
@@ -41,24 +43,10 @@ function KonvaComponent({
 
     const { pixelsToCentimeters } = useMemo(() => getPhysicalScreenSize(), []);
 
-    // const getSoundUrl = (item) => {
-    //     const soundExtensions = [".wav", ".mp3", ".ogg", ".m4a", ".aac"];
-
-    //     if (item.type === "image_sound") {
-    //         // Si c'est une URL se terminant par une extension de son, c'est un son
-    //         if (
-    //             soundExtensions.some((ext) =>
-    //                 item.url.toLowerCase().endsWith(ext)
-    //             )
-    //         ) {
-    //             return item.url;
-    //         }
-    //     }
-    //     if (item.type === "sound") {
-    //         return item.url;
-    //     }
-    //     return null;
-    // };
+    useEffect(() => {
+        const sessionData = JSON.parse(localStorage.getItem("session") || "{}");
+        setIsTablet(sessionData.device_type === "tablet");
+    }, []);
 
     useEffect(() => {
         if (!mediaArray.length) return;
@@ -66,7 +54,7 @@ function KonvaComponent({
         const shuffledItems = shuffleWithSeed(mediaArray, 12213).map(
             (item, originalIndex) => ({
                 ...item,
-                originalIndex, // Ajouter l'index original à chaque item
+                originalIndex,
             })
         );
 
@@ -100,7 +88,7 @@ function KonvaComponent({
 
     const handleResize = useMemo(() => {
         return () => {
-            const newWidth = window.innerWidth - 450;
+            const newWidth = window.innerWidth - sidebarWidth;
             const newHeight = window.innerHeight - 50;
 
             if (
@@ -123,7 +111,13 @@ function KonvaComponent({
                 }
             }
         };
-    }, [size, onCanvasSizeChange, pixelsToCentimeters, stageSize]);
+    }, [
+        size,
+        onCanvasSizeChange,
+        pixelsToCentimeters,
+        stageSize,
+        sidebarWidth,
+    ]);
 
     useEffect(() => {
         handleResize();
@@ -158,7 +152,7 @@ function KonvaComponent({
 
         onAction({
             id: item.id,
-            type: "move", // Ajout du type pour les déplacements
+            type: "move",
             x: newX,
             y: newY,
             time: Date.now(),
@@ -246,11 +240,6 @@ function KonvaComponent({
             setCurrentSoundUrl(url);
         }
     };
-
-    useEffect(() => {
-        const sessionData = JSON.parse(localStorage.getItem("session") || "{}");
-        setIsTablet(sessionData.device_type === "tablet");
-    }, []);
 
     const handleShowImage = (url) => {
         // Gérer le compteur d'interactions
