@@ -7,6 +7,7 @@ import { shuffleWithSeed } from "../Utils/randomUtils";
 import { useTranslation } from "../Contexts/LanguageContext";
 import AudioProgressBar from "./AudioProgressBar";
 import getPhysicalScreenSize from "../Utils/getPhysicalScreenSize";
+import { getSystemInfo } from "../Utils/getSystemInfo";
 
 function KonvaComponent({
     media,
@@ -20,9 +21,10 @@ function KonvaComponent({
     onMediaGroupChange,
     onInteractionsUpdate,
     onCanvasSizeChange,
+    checkIsTablet,
 }) {
-    const [isTablet, setIsTablet] = useState(false);
-    const sidebarWidth = isTablet ? 350 : 450;
+    const systemData = getSystemInfo();
+    const sidebarWidth = checkIsTablet ? 350 : 450;
 
     const [stageSize, setStageSize] = useState({
         width: window.innerWidth - sidebarWidth,
@@ -42,11 +44,6 @@ function KonvaComponent({
     const audioProgressInterval = useRef(null);
 
     const { pixelsToCentimeters } = useMemo(() => getPhysicalScreenSize(), []);
-
-    useEffect(() => {
-        const sessionData = JSON.parse(localStorage.getItem("session") || "{}");
-        setIsTablet(sessionData.device_type === "tablet");
-    }, []);
 
     useEffect(() => {
         if (!mediaArray.length) return;
@@ -336,7 +333,7 @@ function KonvaComponent({
                             index={index}
                             buttonColor={getItemColor(item)}
                             size={size}
-                            isTablet={isTablet}
+                            isTablet={checkIsTablet}
                             draggable={!isFinished}
                             onDragEnd={(e) =>
                                 !isFinished && handleDragEnd(e, index)

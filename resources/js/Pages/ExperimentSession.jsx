@@ -8,6 +8,8 @@ import DeviceOrientationCheck from "../Utils/DeviceOrientationCheck";
 import { useTranslation } from "../Contexts/LanguageContext";
 import { useExperimentStatus } from "../Contexts/ExperimentStatusContext.jsx";
 import { TestModeModal } from "../Components/TestModeModal.jsx";
+import { getSystemInfo } from "../Utils/getSystemInfo.js";
+import clsx from "clsx";
 
 function ExperimentSession() {
     const { t } = useTranslation();
@@ -17,6 +19,8 @@ function ExperimentSession() {
     const [showTestModeModal, setShowTestModeModal] = useState(true);
     const location = useLocation();
     const isTestMode = location.state?.isTest;
+    const [isTablet, setIsTablet] = useState(false);
+    const systemData = getSystemInfo();
 
     // États de base
     const [experiment, setExperiment] = useState(null);
@@ -35,6 +39,13 @@ function ExperimentSession() {
     // États pour les résultats
     const [isFinished, setIsFinished] = useState(false);
     const [groups, setGroups] = useState([]);
+
+    useEffect(() => {
+        if (systemData.device_type === "tablet") {
+            setIsTablet(true);
+            console.log(isTablet);
+        }
+    }, []);
 
     const handleGroupsChange = (updatedGroups) => {
         // Log l'ajout ou la suppression de groupe
@@ -480,6 +491,7 @@ function ExperimentSession() {
                                 size={
                                     experiment?.experiment?.button_size || 100
                                 }
+                                checkIsTablet={isTablet}
                                 onAction={updateActionsLog}
                                 onCanvasSizeChange={handleCanvasSizeChange}
                                 onMediaItemsChange={updateMediaItems}
@@ -491,7 +503,12 @@ function ExperimentSession() {
                             />
                         </div>
 
-                        <div className="shrink-0 border-t border-gray-200 lg:w-[450px] lg:border-l lg:border-t-0">
+                        <div
+                            className={clsx(
+                                "shrink-0 border-t border-gray-200 lg:border-l lg:border-t-0",
+                                isTablet ? "w-[350px]" : "w-[450px]"
+                            )}
+                        >
                             <SidePanelResults
                                 isOpen={isFinished}
                                 groups={groups}
@@ -511,6 +528,7 @@ function ExperimentSession() {
                     <Toolbar
                         onRestart={handleRestart}
                         isTestMode={isTestMode}
+                        checkIsTablet={isTablet}
                         onLeave={() => setShowLeaveModal(true)}
                         onTerminate={handleTerminate}
                         isFinished={isFinished}

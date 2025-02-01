@@ -2,21 +2,21 @@ import React, { useEffect, useState } from "react";
 import { Group, Image, Rect, Text } from "react-konva";
 
 function MediaGroup({
-                        item,
-                        index,
-                        buttonColor,
-                        size,
-                        onDragEnd,
-                        onDragMove,
-                        onPlaySound,
-                        onShowImage,
-                        isTablet,
-                        draggable,
-                        groups,
-                        cursor,
-                        onClick,
-                        currentSoundUrl
-                    }) {
+    item,
+    index,
+    buttonColor,
+    size,
+    onDragEnd,
+    onDragMove,
+    onPlaySound,
+    onShowImage,
+    isTablet,
+    draggable,
+    groups,
+    cursor,
+    onClick,
+    currentSoundUrl,
+}) {
     const [image, setImage] = useState(null);
     const [touchStart, setTouchStart] = useState(0);
     const DOUBLE_TAP_DELAY = 300;
@@ -76,7 +76,9 @@ function MediaGroup({
 
     const getGroupColor = () => {
         // Si l'item est dans un groupe, utiliser la couleur du groupe
-        const group = groups.find(g => g.elements.some(e => e.id === item.id));
+        const group = groups.find((g) =>
+            g.elements.some((e) => e.id === item.id)
+        );
         if (group) return group.color;
 
         // Sinon, utiliser la couleur par défaut pour les sons

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import UAParser from "ua-parser-js";
 import { UnfinishedSessionModal } from "../Components/UnfinishedSessionModal";
 import { useSession } from "../Contexts/SessionContext";
 import DeviceOrientationCheck from "../Utils/DeviceOrientationCheck";
 import { useTranslation } from "../Contexts/LanguageContext";
 import { useExperimentStatus } from "../Contexts/ExperimentStatusContext.jsx";
+import { getSystemInfo } from "../Utils/getSystemInfo.js";
 
 function Login() {
     const { t } = useTranslation();
@@ -46,20 +46,6 @@ function Login() {
 
         verifyExperimentStatus();
     }, [sessionId, checkExperimentStatus, checkExistingSession, t]);
-
-    const getSystemInfo = () => {
-        const parser = new UAParser();
-        const result = parser.getResult();
-
-        return {
-            browser: `${result.browser.name} ${result.browser.version}`,
-            device_type: result.device.type || "desktop",
-            operating_system: `${result.os.name} ${result.os.version}`,
-            screen_width: window.innerWidth,
-            screen_height: window.innerHeight,
-            is_dark: window.matchMedia("(prefers-color-scheme: dark)").matches,
-        };
-    };
 
     const handleRegistration = async (e) => {
         e.preventDefault();
