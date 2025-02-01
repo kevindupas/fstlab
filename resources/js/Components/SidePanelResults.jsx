@@ -227,7 +227,7 @@ function SidePanelResults({
                 )}
             </div>
 
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto scroll-container">
                 <div className="p-4">
                     {!isOpen ? (
                         <ReactMarkdown

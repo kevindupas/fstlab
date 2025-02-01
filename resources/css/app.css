@@ -39,3 +39,20 @@ ol {
 strong {
     @apply font-semibold text-black;
 }
+
+/* Désactive le pull-to-refresh sur toute la page */
+body {
+    overscroll-behavior-y: none;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* Permet le scroll normal dans le panneau latéral */
+.scroll-container {
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+}
