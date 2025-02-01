@@ -468,7 +468,7 @@ function ExperimentSession() {
                     </div>
                 </div>
             ) : (
-                <div className="flex h-screen flex-col">
+                <div className="flex h-screen w-screen flex-col overflow-hidden">
                     <div className="mx-auto w-full grow lg:flex">
                         <div className="flex-1 xl:flex">
                             <KonvaComponent
