@@ -4,12 +4,10 @@ namespace App\Filament\Pages\Experiments\Sessions;
 
 use App\Models\ExperimentSession;
 use App\Traits\HasExperimentAccess;
-use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\Tabs;
 use Filament\Forms\Form;
 use Filament\Pages\Page;
 use League\Csv\Writer;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use ZipArchive;
 
 class ExperimentSessionExport extends Page
 {
@@ -22,10 +20,8 @@ class ExperimentSessionExport extends Page
 
     public ExperimentSession $record;
     public ?int $experiment_id = null;
-    public ?array $data = [];
-
-    public ?array $basic_fields = [];
-    public ?array $group_fields = [];
+    public string $export_format = 'matrix';
+    public string $csv_delimiter = 'tab';
 
     public function mount(): void
     {
@@ -36,214 +32,179 @@ class ExperimentSessionExport extends Page
         }
 
         $this->experiment_id = $this->record->experiment_id;
-        $this->basic_fields = [
-            'participant_number',
-            'experimenter_info',
-            'dates',
-            'duration',
-            'system_info',
-            'feedback',
-        ];
-        $this->group_fields = [
-            'group_names',
-            'group_comments',
-            'media_info',
-        ];
-
-        $this->form->fill();
     }
 
-    public function form(Form $form): Form
+    private function getDelimiter(): string
     {
-        return $form
-            ->schema([
-                Tabs::make(__('pages.experiment_session_export.export_options.title'))
-                    ->tabs([
-                        Tabs\Tab::make(__('pages.experiment_session_export.export_options.basic'))
-                            ->schema([
-                                CheckboxList::make('basic_fields')
-                                    ->label(__('pages.experiment_session_export.labels.select_fields'))
-                                    ->options([
-                                        'participant_number' => __('pages.experiment_session_export.basic_fields.participant_number'),
-                                        'experimenter_info' => __('pages.experiment_session_export.basic_fields.experimenter_info'),
-                                        'dates' => __('pages.experiment_session_export.basic_fields.dates'),
-                                        'duration' => __('pages.experiment_session_export.basic_fields.duration'),
-                                        'system_info' => __('pages.experiment_session_export.basic_fields.system_info'),
-                                        'feedback' => __('pages.experiment_session_export.basic_fields.feedback'),
-                                    ])
-                                    ->columns(2)
-                                    ->helperText(__('pages.experiment_session_export.helper_text.basic')),
-                            ]),
-
-                        Tabs\Tab::make(__('pages.experiment_session_export.export_options.group'))
-                            ->schema([
-                                CheckboxList::make('group_fields')
-                                    ->label(__('pages.experiment_session_export.labels.select_group_data'))
-                                    ->options([
-                                        'group_names' => __('pages.experiment_session_export.group_fields.group_names'),
-                                        'group_comments' => __('pages.experiment_session_export.group_fields.group_comments'),
-                                        'media_info' => __('pages.experiment_session_export.group_fields.media_info')
-                                    ])
-                                    ->columns(2)
-                                    ->helperText(__('pages.experiment_session_export.helper_text.group')),
-                            ]),
-                    ])
-                    ->columnSpanFull(),
-            ]);
+        return match ($this->csv_delimiter) {
+            'tab' => "\t",
+            'comma' => ',',
+            'semicolon' => ';',
+        };
     }
 
-    public function export(): StreamedResponse
+    private function cleanMediaName(string $filename): string
     {
-        $sessions = collect([$this->record]);
-        $data = $this->form->getState();
+        return preg_replace('/^\d{4}-\d{2}-\d{2}-\d{6}-/', '', basename($filename));
+    }
 
-        return response()->streamDownload(function () use ($sessions, $data) {
+    public function export()
+    {
+        return match ($this->export_format) {
+            'matrix' => $this->exportMatrix(),
+            'individual' => $this->exportIndividualFiles(),
+            'both' => $this->exportBoth(),
+        };
+    }
+
+    private function exportMatrix()
+    {
+        return response()->streamDownload(function () {
             $csv = Writer::createFromString();
-            $csv->setDelimiter(',');
-            $csv->setEnclosure('"');
+            $csv->setDelimiter($this->getDelimiter());
 
-            // Construction des en-têtes en fonction des sélections
-            $headers = [__('pages.experiment_session_export.csv_headers.session_id')];
-
-            if (in_array('participant_number', $data['basic_fields'])) {
-                $headers[] = __('pages.experiment_session_export.csv_headers.participant_number');
-            }
-            if (in_array('experimenter_info', $data['basic_fields'])) {
-                $headers[] = __('pages.experiment_session_export.csv_headers.experimenter_name');
-                $headers[] = __('pages.experiment_session_export.csv_headers.experimenter_type');
-            }
-            if (in_array('dates', $data['basic_fields'])) {
-                $headers[] = __('pages.experiment_session_export.csv_headers.created_at');
-                $headers[] = __('pages.experiment_session_export.csv_headers.completed_at');
-            }
-            if (in_array('duration', $data['basic_fields'])) {
-                $headers[] = __('pages.experiment_session_export.csv_headers.duration_seconds');
-            }
-            if (in_array('system_info', $data['basic_fields'])) {
-                $headers[] = __('pages.experiment_session_export.csv_headers.browser');
-                $headers[] = __('pages.experiment_session_export.csv_headers.system');
-                $headers[] = __('pages.experiment_session_export.csv_headers.device');
-                $headers[] = __('pages.experiment_session_export.csv_headers.screen_width');
-                $headers[] = __('pages.experiment_session_export.csv_headers.screen_height');
-            }
-            if (in_array('feedback', $data['basic_fields'])) {
-                $headers[] = __('pages.experiment_session_export.csv_headers.feedback');
-            }
-
-            // En-têtes pour les groupes
-            if (!empty($data['group_fields'])) {
-                for ($i = 1; $i <= 3; $i++) {
-                    if (in_array('group_names', $data['group_fields'])) {
-                        $headers[] = __('pages.experiment_session_export.csv_headers.group_name', ['number' => $i]);
-                    }
-                    if (in_array('group_comments', $data['group_fields'])) {
-                        $headers[] = __('pages.experiment_session_export.csv_headers.group_comment', ['number' => $i]);
-                    }
-                    if (in_array('media_info', $data['group_fields'])) {
-                        for ($j = 1; $j <= 4; $j++) {
-                            $headers[] = __('pages.experiment_session_export.csv_headers.media_name', ['group' => $i, 'number' => $j]);
-                            $headers[] = __('pages.experiment_session_export.csv_headers.media_interactions', ['group' => $i, 'number' => $j]);
-                            $headers[] = __('pages.experiment_session_export.csv_headers.media_x', ['group' => $i, 'number' => $j]);
-                            $headers[] = __('pages.experiment_session_export.csv_headers.media_y', ['group' => $i, 'number' => $j]);
-                        }
-                    }
-                }
-            }
-
+            // En-têtes avec l'ID du participant
+            $headers = ['', $this->record->participant_number];
             $csv->insertOne($headers);
 
-            foreach ($sessions as $session) {
-                $row = [(int)$session->id];
+            // Mapping des médias -> groupes
+            $mediaGroups = [];
+            $allMediaNames = [];
 
-                if (in_array('participant_number', $data['basic_fields'])) {
-                    $row[] = (string)$session->participant_number;
+            $groupData = json_decode($this->record->group_data, true) ?? [];
+            foreach ($groupData as $groupIndex => $group) {
+                foreach ($group['elements'] ?? [] as $element) {
+                    $mediaName = $this->cleanMediaName($element['url']);
+                    $mediaGroups[$mediaName] = $groupIndex + 1;
+                    $allMediaNames[$mediaName] = true;
                 }
-                if (in_array('experimenter_info', $data['basic_fields'])) {
-                    $row[] = $session->experimentLink?->user?->name ?? __('pages.experiment_session_export.values.na');
-                    $row[] = __('pages.experiment_session_export.experimenter_types.' . $this->getExperimenterType($session));
-                }
-                if (in_array('dates', $data['basic_fields'])) {
-                    $row[] = $session->created_at->format('Y-m-d H:i:s');
-                    $row[] = $session->completed_at?->format('Y-m-d H:i:s') ?? __('pages.experiment_session_export.values.na');
-                }
-                if (in_array('duration', $data['basic_fields'])) {
-                    $row[] = number_format($session->duration / 1000, 3, '.', '');
-                }
-                if (in_array('system_info', $data['basic_fields'])) {
-                    $row[] = $session->browser ?? __('pages.experiment_session_export.values.na');
-                    $row[] = $session->operating_system ?? __('pages.experiment_session_export.values.na');
-                    $row[] = $session->device_type ?? __('pages.experiment_session_export.values.na');
-                    $row[] = (string)$session->screen_width;
-                    $row[] = (string)$session->screen_height;
-                }
-                if (in_array('feedback', $data['basic_fields'])) {
-                    $row[] = $this->cleanText($session->feedback);
-                }
+            }
 
-                // Données des groupes
-                if (!empty($data['group_fields'])) {
-                    $groupData = json_decode($session->group_data, true) ?? [];
-                    for ($i = 0; $i < 3; $i++) {
-                        $group = $groupData[$i] ?? null;
+            // Trie les noms des médias
+            $allMediaNames = array_keys($allMediaNames);
+            sort($allMediaNames);
 
-                        if (in_array('group_names', $data['group_fields'])) {
-                            $row[] = $group ? $this->cleanText($group['name'] ?? __('pages.experiment_session_export.values.na')) : __('pages.experiment_session_export.values.na');
-                        }
-                        if (in_array('group_comments', $data['group_fields'])) {
-                            $row[] = $group ? $this->cleanText($group['comment'] ?? __('pages.experiment_session_export.values.na')) : __('pages.experiment_session_export.values.na');
-                        }
-                        if (in_array('media_info', $data['group_fields'])) {
-                            $elements = $group ? ($group['elements'] ?? []) : [];
-                            for ($j = 0; $j < 4; $j++) {
-                                $element = $elements[$j] ?? null;
-                                if ($element) {
-                                    $row[] = basename($element['url']);
-                                    $row[] = (int)($element['interactions'] ?? 0);
-                                    $row[] = number_format($element['x'] ?? 0, 3, '.', '');
-                                    $row[] = number_format($element['y'] ?? 0, 3, '.', '');
-                                } else {
-                                    $row[] = __('pages.experiment_session_export.values.na');
-                                    $row[] = '0';
-                                    $row[] = '0.000';
-                                    $row[] = '0.000';
-                                }
-                            }
-                        }
-                    }
-                }
-
+            // Une ligne par média
+            foreach ($allMediaNames as $mediaName) {
+                $row = [$mediaName, $mediaGroups[$mediaName] ?? ''];
                 $csv->insertOne($row);
             }
 
-            echo "\xEF\xBB\xBF"; // BOM UTF-8
             echo $csv->toString();
-        }, __('pages.experiment_session_export.download_filename', ['date' => date('Y-m-d')]), [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="' . __('pages.experiment_session_export.download_filename', ['date' => date('Y-m-d')]) . '"'
-        ]);
+        }, 'matrice_' . $this->record->participant_number . '_' . date('Y-m-d') . '.csv');
     }
 
-    private function cleanText(?string $text): string
+    private function exportIndividualFiles()
     {
-        if (empty($text)) return __('pages.experiment_session_export.values.na');
-        return str_replace(["\n", "\r", ",", ";"], [" ", " ", " ", " "], $text);
+        $tempDir = storage_path('app/temp');
+        if (!file_exists($tempDir)) {
+            mkdir($tempDir, 0755, true);
+        }
+
+        $zip = new ZipArchive();
+        $zipFileName = $tempDir . '/export_' . uniqid() . '.zip';
+
+        if ($zip->open($zipFileName, ZipArchive::CREATE) !== true) {
+            throw new \RuntimeException("Could not create ZIP archive");
+        }
+
+        $participantId = $this->record->participant_number;
+        $groupData = json_decode($this->record->group_data, true) ?? [];
+
+        // Fichier principal
+        $mainContent = $this->generateParticipantContent($participantId, $groupData, false);
+        $zip->addFromString($participantId . '.csv', $mainContent);
+
+        // Fichier commentaires
+        $commentContent = $this->generateParticipantContent($participantId, $groupData, true);
+        $zip->addFromString($participantId . '-comment.csv', $commentContent);
+
+        $zip->close();
+
+        return response()->download($zipFileName, 'export_' . $this->record->participant_number . '_' . date('Y-m-d') . '.zip')
+            ->deleteFileAfterSend();
     }
 
-    private function getExperimenterType(ExperimentSession $session): string
+    private function exportBoth()
     {
-        if (!$session->experimentLink) {
-            return 'na';
+        $tempDir = storage_path('app/temp');
+        if (!file_exists($tempDir)) {
+            mkdir($tempDir, 0755, true);
         }
 
-        if ($session->experimentLink->is_creator) {
-            return 'creator';
+        $zip = new ZipArchive();
+        $zipFileName = $tempDir . '/export_' . uniqid() . '.zip';
+
+        if ($zip->open($zipFileName, ZipArchive::CREATE) !== true) {
+            throw new \RuntimeException("Could not create ZIP archive");
         }
 
-        if ($session->experimentLink->is_secondary) {
-            return 'secondary';
+        // Ajoute la matrice
+        ob_start();
+        $csv = Writer::createFromString();
+        $csv->setDelimiter($this->getDelimiter());
+
+        // En-têtes avec l'ID du participant
+        $headers = ['', $this->record->participant_number];
+        $csv->insertOne($headers);
+
+        // Mapping des médias -> groupes
+        $mediaGroups = [];
+        $allMediaNames = [];
+
+        $groupData = json_decode($this->record->group_data, true) ?? [];
+        foreach ($groupData as $groupIndex => $group) {
+            foreach ($group['elements'] ?? [] as $element) {
+                $mediaName = $this->cleanMediaName($element['url']);
+                $mediaGroups[$mediaName] = $groupIndex + 1;
+                $allMediaNames[$mediaName] = true;
+            }
         }
 
-        return 'collaborator';
+        // Trie les noms des médias
+        $allMediaNames = array_keys($allMediaNames);
+        sort($allMediaNames);
+
+        // Une ligne par média
+        foreach ($allMediaNames as $mediaName) {
+            $row = [$mediaName, $mediaGroups[$mediaName] ?? ''];
+            $csv->insertOne($row);
+        }
+
+        $matrixContent = $csv->toString();
+        ob_end_clean();
+
+        $zip->addFromString('matrice.csv', $matrixContent);
+
+        // Ajoute les fichiers individuels
+        $participantId = $this->record->participant_number;
+
+        // Fichier principal
+        $mainContent = $this->generateParticipantContent($participantId, $groupData, false);
+        $zip->addFromString($participantId . '.csv', $mainContent);
+
+        // Fichier commentaires
+        $commentContent = $this->generateParticipantContent($participantId, $groupData, true);
+        $zip->addFromString($participantId . '-comment.csv', $commentContent);
+
+        $zip->close();
+
+        return response()->download($zipFileName, 'export_complet_' . $this->record->participant_number . '_' . date('Y-m-d') . '.zip')
+            ->deleteFileAfterSend();
+    }
+
+    private function generateParticipantContent($participantId, $groupData, $withComments): string
+    {
+        $delimiter = $this->getDelimiter();
+        $content = $participantId . "\n";
+        foreach ($groupData as $group) {
+            $mediaNames = array_map(fn($e) => $this->cleanMediaName($e['url']), $group['elements'] ?? []);
+            $content .= implode($delimiter, $mediaNames) . "\n";
+            if ($withComments) {
+                $content .= ($group['comment'] ?? '') . "\n";
+            }
+        }
+        return $content;
     }
 
     public function getTitle(): string
