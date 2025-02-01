@@ -202,8 +202,8 @@ function SidePanelResults({
     };
 
     return (
-        <div className="border-l border-gray-500 bg-slate-50 flex flex-col h-full w-full">
-            <div className="p-6 border-b border-gray-200 bg-white">
+        <div className="border-l border-gray-500 bg-slate-50 flex flex-col h-screen w-full">
+            <div className="p-6 border-b border-gray-200 bg-white flex-shrink-0">
                 <h2 className="text-xl font-bold">
                     {!isOpen
                         ? t("sidePanelResults.header.title.inProgress")
@@ -538,7 +538,7 @@ function SidePanelResults({
             </div>
 
             {isOpen && (
-                <div className="p-4 border-t border-gray-500 bg-white">
+                <div className="p-4 border-t border-gray-500 bg-white flex-shrink-0">
                     <button
                         onClick={handleSubmit}
                         className="w-full bg-green-500 text-white font-semibold py-3 px-4 rounded-lg hover:bg-green-600 transition-colors"
