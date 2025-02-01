@@ -209,54 +209,58 @@ function ExperimentSession() {
     }, [startTime, isFinished]);
 
     const handleTerminate = useCallback(() => {
-        const viewport = window.visualViewport;
-
-        // Calculer le ratio entre le viewport et notre zone de travail
-        const ratio = Math.min(
-            viewport.width / canvasSize.width,
-            viewport.height / canvasSize.height
-        );
-
-        // Ajuster le threshold en fonction du ratio
+        // On utilise directement canvasSize pour le threshold
         const threshold =
-            Math.min(canvasSize.width, canvasSize.height) * 0.1 * ratio;
+            Math.min(canvasSize.width_px, canvasSize.height_px) * 0.15;
 
-        console.log(
-            "Viewport dimensions:",
-            viewport.width,
-            "x",
-            viewport.height
-        );
         console.log(
             "Canvas dimensions:",
-            canvasSize.width,
+            canvasSize.width_px,
             "x",
-            canvasSize.height
+            canvasSize.height_px
         );
-        console.log("Ratio:", ratio);
-        console.log("Calculated threshold:", threshold);
+        console.log("Threshold for grouping:", threshold);
 
         const clustersMap = [];
-
         const getDistance = (pos1, pos2) => {
             const dx = pos1.x - pos2.x;
             const dy = pos1.y - pos2.y;
             return Math.sqrt(dx * dx + dy * dy);
         };
 
-        currentMediaItems.forEach((item) => {
-            let foundCluster = false;
+        // Trier les éléments par coordonnées pour une meilleure cohérence
+        const sortedItems = [...currentMediaItems].sort((a, b) => {
+            if (a.y === b.y) return a.x - b.x;
+            return a.y - b.y;
+        });
+
+        // Pour chaque élément
+        sortedItems.forEach((item) => {
+            // Chercher le cluster le plus proche
+            let closestCluster = null;
+            let minDistance = Infinity;
+
             for (let cluster of clustersMap) {
-                if (cluster.some((g) => getDistance(g, item) < threshold)) {
-                    cluster.push({
-                        ...item,
-                        interactions: mediaInteractions[item.url] || 0,
-                    });
-                    foundCluster = true;
-                    break;
+                // Calculer la distance moyenne avec tous les éléments du cluster
+                const avgDistance =
+                    cluster.reduce((sum, element) => {
+                        return sum + getDistance(element, item);
+                    }, 0) / cluster.length;
+
+                if (avgDistance < minDistance && avgDistance < threshold) {
+                    minDistance = avgDistance;
+                    closestCluster = cluster;
                 }
             }
-            if (!foundCluster) {
+
+            // Si on a trouvé un cluster assez proche
+            if (closestCluster) {
+                closestCluster.push({
+                    ...item,
+                    interactions: mediaInteractions[item.url] || 0,
+                });
+            } else {
+                // Sinon créer un nouveau cluster
                 clustersMap.push([
                     {
                         ...item,
