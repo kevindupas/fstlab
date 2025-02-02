@@ -220,7 +220,6 @@ function ExperimentSession() {
     }, [startTime, isFinished]);
 
     const handleTerminate = useCallback(() => {
-        // Fonction utilitaire pour calculer la distance entre deux points
         const getDistance = (pos1, pos2) => {
             const dx = pos1.x - pos2.x;
             const dy = pos1.y - pos2.y;
@@ -245,7 +244,8 @@ function ExperimentSession() {
 
         // Le threshold est basé sur la distance moyenne entre les plus proches voisins
         const averageMinDistance = totalMinDistance / minDistanceCount;
-        const threshold = averageMinDistance * 1.5; // Facteur ajustable
+        // const threshold = averageMinDistance * 1.5;
+        const threshold = averageMinDistance;
 
         console.log("Average min distance:", averageMinDistance);
         console.log("Threshold:", threshold);
