@@ -24,7 +24,7 @@ function KonvaComponent({
     checkIsTablet,
 }) {
     const systemData = getSystemInfo();
-    const sidebarWidth = checkIsTablet ? 350 : 450;
+    const sidebarWidth = checkIsTablet ? 350 : 400;
 
     const [stageSize, setStageSize] = useState({
         width: window.innerWidth - sidebarWidth,

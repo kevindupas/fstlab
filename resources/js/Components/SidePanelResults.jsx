@@ -23,6 +23,7 @@ function SidePanelResults({
     onEditModeChange,
     actionsLog = [],
     sessionId,
+    isTablet,
 }) {
     const { t } = useTranslation();
     const [localGroups, setLocalGroups] = useState(groups);
@@ -228,7 +229,7 @@ function SidePanelResults({
             </div>
 
             <div className="flex-1 overflow-y-auto scroll-container">
-                <div className="p-4">
+                <div className="p-2">
                     {!isOpen ? (
                         <ReactMarkdown
                             rehypePlugins={[rehypeRaw]}
@@ -243,8 +244,8 @@ function SidePanelResults({
                                     key={index}
                                     className="bg-white rounded-lg shadow-lg border overflow-hidden"
                                 >
-                                    <div className="p-4 border-b bg-slate-300">
-                                        <div className="flex items-center gap-4 mb-4">
+                                    <div className="p-2 border-b bg-slate-300">
+                                        <div className="flex items-center gap-2 mb-4">
                                             <input
                                                 type="text"
                                                 value={group.name}
@@ -289,13 +290,13 @@ function SidePanelResults({
                                         />
                                     </div>
 
-                                    <div className="px-4 py-3 bg-slate-300 border-b flex items-center justify-between">
+                                    <div className="px-2 py-3 bg-slate-300 border-b flex items-center justify-between w-full">
                                         <button
                                             onClick={() =>
                                                 handleEditGroup(index)
                                             }
                                             className={clsx(
-                                                "px-4 py-2 rounded-lg transition-all flex items-center gap-2",
+                                                "px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-xs",
                                                 editingGroupIndex === index
                                                     ? "bg-blue-500 text-white shadow-lg transform scale-105"
                                                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -333,7 +334,7 @@ function SidePanelResults({
                                         </span>
                                     </div>
 
-                                    <div className="p-4 bg-slate-300">
+                                    <div className="p-2 bg-slate-300">
                                         <div className="grid grid-cols-3 gap-3">
                                             {group.elements.map((item) => {
                                                 const isImage = isImageUrl(
@@ -423,7 +424,7 @@ function SidePanelResults({
                             ))}
 
                             <div className="bg-slate-300 rounded-lg shadow-md border overflow-hidden">
-                                <div className="px-4 py-3 bg-slate-300 border-b flex items-center gap-3">
+                                <div className="px-2 py-3 bg-slate-300 border-b flex items-center gap-3">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         className="h-5 w-5 text-gray-600"
@@ -440,7 +441,7 @@ function SidePanelResults({
                                         {t("sidePanelResults.feedback.title")}
                                     </h3>
                                 </div>
-                                <div className="p-4">
+                                <div className="p-2">
                                     <div className="relative">
                                         <SpeechToText
                                             value={feedback}
@@ -454,7 +455,7 @@ function SidePanelResults({
                                 </div>
                             </div>
 
-                            <div className="bg-slate-300 rounded-lg shadow-md border p-4">
+                            <div className="bg-slate-300 rounded-lg shadow-md border p-2">
                                 <h3 className="text-lg font-semibold mb-3">
                                     {t(
                                         "sidePanelResults.technicalIssues.title"
@@ -538,10 +539,13 @@ function SidePanelResults({
             </div>
 
             {isOpen && (
-                <div className="p-4 border-t border-gray-500 bg-white flex-shrink-0 h-full">
+                <div className="p-2 border-t border-gray-500 bg-white flex-shrink-0">
                     <button
                         onClick={handleSubmit}
-                        className="w-full bg-green-500 text-white font-semibold py-3 px-4 rounded-lg hover:bg-green-600 transition-colors"
+                        className={clsx(
+                            "w-full bg-green-500 text-white font-semibold py-3 px-4 rounded-lg hover:bg-green-600 transition-colors",
+                            isTablet ? "text-sm" : "text-lg"
+                        )}
                     >
                         {t("sidePanelResults.actions.finish")}
                     </button>

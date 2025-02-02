@@ -508,7 +508,7 @@ function ExperimentSession() {
                                 "shrink-0 border-t border-gray-200 lg:border-l lg:border-t-0",
                                 isTablet
                                     ? "w-full lg:w-[350px]"
-                                    : "w-full lg:w-[450px]"
+                                    : "w-full lg:w-[400px]"
                             )}
                         >
                             <SidePanelResults
@@ -523,6 +523,7 @@ function ExperimentSession() {
                                 }
                                 actionsLog={actionsLog}
                                 sessionId={sessionId}
+                                isTablet={isTablet}
                             />
                         </div>
                     </div>

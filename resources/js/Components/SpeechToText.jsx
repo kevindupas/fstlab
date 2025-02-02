@@ -176,7 +176,7 @@ const SpeechToText = ({ value, onChange, placeholder, className }) => {
                 placeholder={placeholder}
             />
 
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-2 w-14">
                 <button
                     onClick={toggleListening}
                     className={`p-2 rounded-full transition-colors ${
