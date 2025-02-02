@@ -427,7 +427,7 @@ function SidePanelResults({
                                 <div className="px-2 py-3 bg-slate-300 border-b flex items-center gap-3">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
-                                        className="h-5 w-5 text-gray-600"
+                                        className="h-5 w-5 text-black"
                                         viewBox="0 0 20 20"
                                         fill="currentColor"
                                     >
@@ -437,7 +437,7 @@ function SidePanelResults({
                                             clipRule="evenodd"
                                         />
                                     </svg>
-                                    <h3 className="text-lg font-semibold">
+                                    <h3 className="text-md font-semibold">
                                         {t("sidePanelResults.feedback.title")}
                                     </h3>
                                 </div>
@@ -449,14 +449,17 @@ function SidePanelResults({
                                             placeholder={t(
                                                 "sidePanelResults.feedback.placeholder"
                                             )}
-                                            className="min-h-[8rem] w-full rounded-lg border border-gray-200 p-3 pr-12 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                            className={clsx(
+                                                "min-h-[8rem] w-full rounded-lg border border-gray-200 p-3 pr-12 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all",
+                                                isTablet ? "text-sm" : "text-md"
+                                            )}
                                         />
                                     </div>
                                 </div>
                             </div>
 
                             <div className="bg-slate-300 rounded-lg shadow-md border p-2">
-                                <h3 className="text-lg font-semibold mb-3">
+                                <h3 className="text-md font-semibold mb-3">
                                     {t(
                                         "sidePanelResults.technicalIssues.title"
                                     )}
@@ -472,7 +475,10 @@ function SidePanelResults({
                                                 },
                                             ])
                                         }
-                                        className="flex items-center justify-center gap-2 flex-1 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-colors"
+                                        className={clsx(
+                                            "flex items-center justify-center gap-2 flex-1 font-semibold bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-colors",
+                                            isTablet ? "text-sm" : "text-lg"
+                                        )}
                                     >
                                         <Music className="w-4 h-4" />
                                         {t(
@@ -489,7 +495,10 @@ function SidePanelResults({
                                                 },
                                             ])
                                         }
-                                        className="flex items-center justify-center gap-2 flex-1 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-colors"
+                                        className={clsx(
+                                            "flex items-center justify-center gap-2 flex-1 font-semibold bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-colors",
+                                            isTablet ? "text-sm" : "text-lg"
+                                        )}
                                     >
                                         <ImageIcon className="w-4 h-4" />
                                         {t(
@@ -513,13 +522,27 @@ function SidePanelResults({
                                                     className="flex items-center gap-2"
                                                 >
                                                     <span className="w-2 h-2 rounded-full bg-red-500" />
-                                                    <span>
+                                                    <span
+                                                        className={clsx(
+                                                            "text-white",
+                                                            isTablet
+                                                                ? "text-sm"
+                                                                : "text-md"
+                                                        )}
+                                                    >
                                                         {t(
                                                             "sidePanelResults.technicalIssues.reportedIssues.prefix"
                                                         )}{" "}
                                                         {error.type}
                                                     </span>
-                                                    <span className="text-gray-400">
+                                                    <span
+                                                        className={clsx(
+                                                            "text-gray-400",
+                                                            isTablet
+                                                                ? "text-sm"
+                                                                : "text-md"
+                                                        )}
+                                                    >
                                                         {t(
                                                             "sidePanelResults.technicalIssues.reportedIssues.timePrefix"
                                                         )}{" "}
