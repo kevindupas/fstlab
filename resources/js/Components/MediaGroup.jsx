@@ -18,10 +18,6 @@ function MediaGroup({
     currentSoundUrl,
 }) {
     const [image, setImage] = useState(null);
-    const [touchStartPosition, setTouchStartPosition] = useState(null);
-    const [lastTapTime, setLastTapTime] = useState(0);
-    const DOUBLE_TAP_DELAY = 300;
-    const TOUCH_MOVE_THRESHOLD = 10;
 
     const imageExtensions = [".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp"];
     const soundExtensions = [".wav", ".mp3", ".ogg", ".m4a", ".aac"];
@@ -33,11 +29,6 @@ function MediaGroup({
         item.url.toLowerCase().endsWith(ext)
     );
 
-    const getSoundUrl = () => {
-        if (isSound) return item.url;
-        return null;
-    };
-
     useEffect(() => {
         if (isImage) {
             const img = new window.Image();
@@ -46,70 +37,23 @@ function MediaGroup({
         }
     }, [item, isImage]);
 
-    const handleClick = (e) => {
-        if (!isTablet) {
-            // Gestion des clics pour desktop
-            if (e.evt.detail === 2) {
-                // Double-clic pour son/image
-                const soundUrl = getSoundUrl();
-                if (isSound) {
-                    if (currentSoundUrl === soundUrl) {
-                        onPlaySound(null);
-                    } else {
-                        onPlaySound(soundUrl);
-                    }
-                } else if (isImage) {
-                    onShowImage(item.url);
-                }
-            } else if (e.evt.detail === 1 && onClick) {
-                // Simple clic pour le groupe
-                onClick(item);
-            }
-        }
-    };
-
-    const handleTouchStart = (e) => {
-        const now = Date.now();
-        const touch = e.evt.touches[0];
-        setTouchStartPosition({ x: touch.clientX, y: touch.clientY });
-
-        const timeSinceLastTap = now - lastTapTime;
-        if (timeSinceLastTap < DOUBLE_TAP_DELAY) {
-            // Double tap pour son/image
-            const soundUrl = getSoundUrl();
+    const handleTap = (e) => {
+        // Double-tap/click pour son/image
+        if (e.evt.detail === 2) {
             if (isSound) {
-                if (currentSoundUrl === soundUrl) {
+                if (currentSoundUrl === item.url) {
                     onPlaySound(null);
                 } else {
-                    onPlaySound(soundUrl);
+                    onPlaySound(item.url);
                 }
             } else if (isImage) {
                 onShowImage(item.url);
             }
-            setLastTapTime(0);
-        } else {
-            setLastTapTime(now);
-        }
-    };
-
-    const handleTouchEnd = (e) => {
-        if (!touchStartPosition) return;
-
-        const touch = e.evt.changedTouches[0];
-        const moveX = Math.abs(touch.clientX - touchStartPosition.x);
-        const moveY = Math.abs(touch.clientY - touchStartPosition.y);
-
-        const timeSinceLastTap = Date.now() - lastTapTime;
-
-        // Si le mouvement est minimal et ce n'est pas un double tap potentiel
-        if (moveX < TOUCH_MOVE_THRESHOLD && moveY < TOUCH_MOVE_THRESHOLD) {
-            if (timeSinceLastTap >= DOUBLE_TAP_DELAY) {
-                // Simple tap pour le groupe
-                onClick && onClick(item);
-            }
+            return;
         }
 
-        setTouchStartPosition(null);
+        // Simple tap/click pour le groupe
+        onClick && onClick(item);
     };
 
     const getGroupColor = () => {
@@ -128,9 +72,7 @@ function MediaGroup({
             draggable={draggable}
             onDragEnd={onDragEnd}
             onDragMove={onDragMove}
-            onClick={!isTablet ? handleClick : undefined}
-            onTouchStart={isTablet ? handleTouchStart : undefined}
-            onTouchEnd={isTablet ? handleTouchEnd : undefined}
+            onClick={handleTap}
             cursor={cursor}
         >
             {isImage ? (
