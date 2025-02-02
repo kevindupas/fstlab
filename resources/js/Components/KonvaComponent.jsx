@@ -173,6 +173,18 @@ function KonvaComponent({
     };
 
     const handlePlaySound = (url) => {
+        // Arrêter l'ancien son d'abord et réinitialiser les états
+        if (currentAudioRef.current) {
+            clearInterval(audioProgressInterval.current);
+            currentAudioRef.current.pause();
+            currentAudioRef.current = null;
+            setCurrentSoundUrl(null);
+            setAudioProgress(0);
+            setCurrentSoundName("");
+            audioProgressInterval.current = null;
+        }
+
+        // Si on a une nouvelle URL, jouer le nouveau son
         if (url) {
             // Gérer le compteur d'interactions
             const newInteractions = {
@@ -182,7 +194,7 @@ function KonvaComponent({
             setMediaInteractions(newInteractions);
             onInteractionsUpdate(newInteractions);
 
-            // Trouver le nom du son (s1, s2, etc.)
+            // Trouver le nom du son
             const item = mediaItems.find((item) => item.url === url);
             if (item) {
                 const index = mediaItems.indexOf(item);
@@ -196,20 +208,8 @@ function KonvaComponent({
                     time: Date.now(),
                 });
             }
-        }
 
-        // Arrêter l'ancien son s'il y en a un
-        if (currentAudioRef.current) {
-            clearInterval(audioProgressInterval.current);
-            currentAudioRef.current.pause();
-            currentAudioRef.current = null;
-            setCurrentSoundUrl(null);
-            setAudioProgress(0);
-            setCurrentSoundName("");
-        }
-
-        // Jouer le nouveau son
-        if (url && url !== currentSoundUrl) {
+            // Créer et configurer le nouvel audio
             const audio = new Audio(url);
 
             audio.addEventListener("loadedmetadata", () => {
@@ -217,6 +217,11 @@ function KonvaComponent({
             });
 
             audio.addEventListener("play", () => {
+                // S'assurer que l'ancien interval est nettoyé
+                if (audioProgressInterval.current) {
+                    clearInterval(audioProgressInterval.current);
+                }
+
                 audioProgressInterval.current = setInterval(() => {
                     setAudioProgress(audio.currentTime / audio.duration);
                 }, 50);
@@ -224,15 +229,27 @@ function KonvaComponent({
 
             audio.addEventListener("ended", () => {
                 clearInterval(audioProgressInterval.current);
+                audioProgressInterval.current = null;
                 setCurrentSoundUrl(null);
                 setAudioProgress(0);
                 setCurrentSoundName("");
                 currentAudioRef.current = null;
             });
 
+            // S'assurer que tous les états sont mis à jour avant de jouer
             currentAudioRef.current = audio;
-            audio.play().catch((err) => console.error("Erreur audio:", err));
             setCurrentSoundUrl(url);
+
+            // Jouer le son
+            audio.play().catch((err) => {
+                console.error("Erreur audio:", err);
+                // Réinitialiser les états en cas d'erreur
+                clearInterval(audioProgressInterval.current);
+                setCurrentSoundUrl(null);
+                setAudioProgress(0);
+                setCurrentSoundName("");
+                currentAudioRef.current = null;
+            });
         }
     };
 
@@ -257,11 +274,15 @@ function KonvaComponent({
             });
         }
 
-        // Reste de la logique d'affichage de l'image
+        // Arrêter l'audio et nettoyer tous les états audio
         if (currentAudioRef.current) {
+            clearInterval(audioProgressInterval.current);
             currentAudioRef.current.pause();
             currentAudioRef.current = null;
             setCurrentSoundUrl(null);
+            setAudioProgress(0);
+            setCurrentSoundName("");
+            audioProgressInterval.current = null;
         }
 
         setSelectedImage(url);
