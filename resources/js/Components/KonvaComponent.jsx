@@ -7,7 +7,6 @@ import { shuffleWithSeed } from "../Utils/randomUtils";
 import { useTranslation } from "../Contexts/LanguageContext";
 import AudioProgressBar from "./AudioProgressBar";
 import getPhysicalScreenSize from "../Utils/getPhysicalScreenSize";
-import { getSystemInfo } from "../Utils/getSystemInfo";
 
 function KonvaComponent({
     media,
@@ -23,7 +22,6 @@ function KonvaComponent({
     onCanvasSizeChange,
     checkIsTablet,
 }) {
-    const systemData = getSystemInfo();
     const sidebarWidth = checkIsTablet ? 350 : 400;
 
     const [stageSize, setStageSize] = useState({

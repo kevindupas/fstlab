@@ -20,6 +20,7 @@ function MediaGroup({
     const [image, setImage] = useState(null);
     const [touchStart, setTouchStart] = useState(0);
     const DOUBLE_TAP_DELAY = 300;
+    const TOUCH_MOVE_THRESHOLD = 10;
 
     const imageExtensions = [".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp"];
     const soundExtensions = [".wav", ".mp3", ".ogg", ".m4a", ".aac"];
@@ -87,6 +88,25 @@ function MediaGroup({
         return "transparent";
     };
 
+    const handleTouchEnd = (e) => {
+        if (!touchStartPosition) return;
+
+        const touch = e.evt.changedTouches[0];
+        const moveX = Math.abs(touch.clientX - touchStartPosition.x);
+        const moveY = Math.abs(touch.clientY - touchStartPosition.y);
+
+        // Si le mouvement est minimal (pas de glissement significatif)
+        if (moveX < TOUCH_MOVE_THRESHOLD && moveY < TOUCH_MOVE_THRESHOLD) {
+            const now = Date.now();
+            // Si ce n'est pas un double tap, traiter comme un simple tap
+            if (!touchStart || now - touchStart >= DOUBLE_TAP_DELAY) {
+                onClick && onClick(item);
+            }
+        }
+
+        setTouchStartPosition(null);
+    };
+
     return (
         <Group
             x={item.x}
@@ -96,6 +116,7 @@ function MediaGroup({
             onDragMove={onDragMove}
             onClick={handleClick}
             onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
             cursor={cursor}
         >
             {isImage ? (
