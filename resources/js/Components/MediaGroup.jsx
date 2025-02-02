@@ -18,7 +18,6 @@ function MediaGroup({
     currentSoundUrl,
 }) {
     const [image, setImage] = useState(null);
-    // const [touchStart, setTouchStart] = useState(0);
     const [touchStartPosition, setTouchStartPosition] = useState(null);
     const [lastTapTime, setLastTapTime] = useState(0);
     const DOUBLE_TAP_DELAY = 300;
@@ -51,6 +50,7 @@ function MediaGroup({
         if (!isTablet) {
             // Gestion des clics pour desktop
             if (e.evt.detail === 2) {
+                // Double-clic pour son/image
                 const soundUrl = getSoundUrl();
                 if (isSound) {
                     if (currentSoundUrl === soundUrl) {
@@ -61,8 +61,9 @@ function MediaGroup({
                 } else if (isImage) {
                     onShowImage(item.url);
                 }
-            } else if (e.evt.detail === 1) {
-                onClick && onClick(item);
+            } else if (e.evt.detail === 1 && onClick) {
+                // Simple clic pour le groupe
+                onClick(item);
             }
         }
     };
@@ -74,7 +75,7 @@ function MediaGroup({
 
         const timeSinceLastTap = now - lastTapTime;
         if (timeSinceLastTap < DOUBLE_TAP_DELAY) {
-            // Double tap détecté
+            // Double tap pour son/image
             const soundUrl = getSoundUrl();
             if (isSound) {
                 if (currentSoundUrl === soundUrl) {
@@ -85,7 +86,7 @@ function MediaGroup({
             } else if (isImage) {
                 onShowImage(item.url);
             }
-            setLastTapTime(0); // Réinitialiser pour éviter les triples taps
+            setLastTapTime(0);
         } else {
             setLastTapTime(now);
         }
@@ -98,11 +99,12 @@ function MediaGroup({
         const moveX = Math.abs(touch.clientX - touchStartPosition.x);
         const moveY = Math.abs(touch.clientY - touchStartPosition.y);
 
-        // Si le mouvement est minimal (pas de glissement significatif)
+        const timeSinceLastTap = Date.now() - lastTapTime;
+
+        // Si le mouvement est minimal et ce n'est pas un double tap potentiel
         if (moveX < TOUCH_MOVE_THRESHOLD && moveY < TOUCH_MOVE_THRESHOLD) {
-            const timeSinceLastTap = Date.now() - lastTapTime;
-            // Si ce n'est pas un double tap potentiel, traiter comme un simple tap
             if (timeSinceLastTap >= DOUBLE_TAP_DELAY) {
+                // Simple tap pour le groupe
                 onClick && onClick(item);
             }
         }
