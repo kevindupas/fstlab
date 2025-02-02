@@ -18,6 +18,8 @@ function MediaGroup({
     currentSoundUrl,
 }) {
     const [image, setImage] = useState(null);
+    const [lastTap, setLastTap] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
 
     const imageExtensions = [".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp"];
     const soundExtensions = [".wav", ".mp3", ".ogg", ".m4a", ".aac"];
@@ -38,22 +40,56 @@ function MediaGroup({
     }, [item, isImage]);
 
     const handleTap = (e) => {
-        // Double-tap/click pour son/image
-        if (e.evt.detail === 2) {
-            if (isSound) {
-                if (currentSoundUrl === item.url) {
-                    onPlaySound(null);
-                } else {
-                    onPlaySound(item.url);
-                }
-            } else if (isImage) {
-                onShowImage(item.url);
-            }
-            return;
-        }
+        if (isTablet) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
 
-        // Simple tap/click pour le groupe
-        onClick && onClick(item);
+            if (!isDragging) {
+                if (tapLength < 300 && tapLength > 0) {
+                    // Double tap
+                    if (isSound) {
+                        if (currentSoundUrl === item.url) {
+                            onPlaySound(null);
+                        } else {
+                            onPlaySound(item.url);
+                        }
+                    } else if (isImage) {
+                        onShowImage(item.url);
+                    }
+                    setLastTap(0);
+                } else {
+                    // Single tap
+                    onClick && onClick(item);
+                    setLastTap(currentTime);
+                }
+            }
+        } else {
+            // Desktop behavior
+            if (e.evt.detail === 2) {
+                if (isSound) {
+                    if (currentSoundUrl === item.url) {
+                        onPlaySound(null);
+                    } else {
+                        onPlaySound(item.url);
+                    }
+                } else if (isImage) {
+                    onShowImage(item.url);
+                }
+            } else {
+                onClick && onClick(item);
+            }
+        }
+    };
+
+    const handleDragStart = () => {
+        setIsDragging(true);
+    };
+
+    const handleDragEndCustom = (e) => {
+        setIsDragging(false);
+        if (onDragEnd) {
+            onDragEnd(e);
+        }
     };
 
     const getGroupColor = () => {
@@ -70,9 +106,11 @@ function MediaGroup({
             x={item.x}
             y={item.y}
             draggable={draggable}
-            onDragEnd={onDragEnd}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEndCustom}
             onDragMove={onDragMove}
-            onClick={handleTap}
+            onTap={isTablet ? handleTap : undefined}
+            onClick={!isTablet ? handleTap : undefined}
             cursor={cursor}
         >
             {isImage ? (
