@@ -18,7 +18,9 @@ function MediaGroup({
     currentSoundUrl,
 }) {
     const [image, setImage] = useState(null);
-    const [touchStart, setTouchStart] = useState(0);
+    // const [touchStart, setTouchStart] = useState(0);
+    const [touchStartPosition, setTouchStartPosition] = useState(null);
+    const [lastTapTime, setLastTapTime] = useState(0);
     const DOUBLE_TAP_DELAY = 300;
     const TOUCH_MOVE_THRESHOLD = 10;
 
@@ -46,10 +48,34 @@ function MediaGroup({
     }, [item, isImage]);
 
     const handleClick = (e) => {
-        // Double-clic ou double-tap pour son/image
-        if ((isTablet && touchStart) || (!isTablet && e.evt.detail === 2)) {
-            const soundUrl = getSoundUrl();
+        if (!isTablet) {
+            // Gestion des clics pour desktop
+            if (e.evt.detail === 2) {
+                const soundUrl = getSoundUrl();
+                if (isSound) {
+                    if (currentSoundUrl === soundUrl) {
+                        onPlaySound(null);
+                    } else {
+                        onPlaySound(soundUrl);
+                    }
+                } else if (isImage) {
+                    onShowImage(item.url);
+                }
+            } else if (e.evt.detail === 1) {
+                onClick && onClick(item);
+            }
+        }
+    };
 
+    const handleTouchStart = (e) => {
+        const now = Date.now();
+        const touch = e.evt.touches[0];
+        setTouchStartPosition({ x: touch.clientX, y: touch.clientY });
+
+        const timeSinceLastTap = now - lastTapTime;
+        if (timeSinceLastTap < DOUBLE_TAP_DELAY) {
+            // Double tap détecté
+            const soundUrl = getSoundUrl();
             if (isSound) {
                 if (currentSoundUrl === soundUrl) {
                     onPlaySound(null);
@@ -59,33 +85,10 @@ function MediaGroup({
             } else if (isImage) {
                 onShowImage(item.url);
             }
+            setLastTapTime(0); // Réinitialiser pour éviter les triples taps
+        } else {
+            setLastTapTime(now);
         }
-
-        // Simple clic pour la sélection de groupe (si actif)
-        if (onClick && e.evt.detail === 1) {
-            onClick(item);
-        }
-    };
-
-    const handleTouchStart = () => {
-        const now = Date.now();
-        if (touchStart && now - touchStart < DOUBLE_TAP_DELAY) {
-            handleClick({ evt: { detail: 2 } });
-        }
-        setTouchStart(now);
-    };
-
-    const getGroupColor = () => {
-        // Si l'item est dans un groupe, utiliser la couleur du groupe
-        const group = groups.find((g) =>
-            g.elements.some((e) => e.id === item.id)
-        );
-        if (group) return group.color;
-
-        // Sinon, utiliser la couleur par défaut pour les sons
-        if (isSound) return buttonColor;
-
-        return "transparent";
     };
 
     const handleTouchEnd = (e) => {
@@ -97,14 +100,23 @@ function MediaGroup({
 
         // Si le mouvement est minimal (pas de glissement significatif)
         if (moveX < TOUCH_MOVE_THRESHOLD && moveY < TOUCH_MOVE_THRESHOLD) {
-            const now = Date.now();
-            // Si ce n'est pas un double tap, traiter comme un simple tap
-            if (!touchStart || now - touchStart >= DOUBLE_TAP_DELAY) {
+            const timeSinceLastTap = Date.now() - lastTapTime;
+            // Si ce n'est pas un double tap potentiel, traiter comme un simple tap
+            if (timeSinceLastTap >= DOUBLE_TAP_DELAY) {
                 onClick && onClick(item);
             }
         }
 
         setTouchStartPosition(null);
+    };
+
+    const getGroupColor = () => {
+        const group = groups.find((g) =>
+            g.elements.some((e) => e.id === item.id)
+        );
+        if (group) return group.color;
+        if (isSound) return buttonColor;
+        return "transparent";
     };
 
     return (
@@ -114,9 +126,9 @@ function MediaGroup({
             draggable={draggable}
             onDragEnd={onDragEnd}
             onDragMove={onDragMove}
-            onClick={handleClick}
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
+            onClick={!isTablet ? handleClick : undefined}
+            onTouchStart={isTablet ? handleTouchStart : undefined}
+            onTouchEnd={isTablet ? handleTouchEnd : undefined}
             cursor={cursor}
         >
             {isImage ? (

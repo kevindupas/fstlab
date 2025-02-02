@@ -377,9 +377,13 @@ function ExperimentSession() {
 
     const handleMediaGroupChange = (mediaId, newGroupIndex) => {
         let oldGroupName = null;
+        let foundInGroups = false;
+
+        // Vérifier si le média existe déjà dans un groupe
         groups.forEach((group, index) => {
             if (group.elements.some((elem) => elem.id === mediaId)) {
                 oldGroupName = group.name;
+                foundInGroups = true;
             }
         });
 
@@ -389,49 +393,62 @@ function ExperimentSession() {
                 elements: [...group.elements],
             }));
 
-            // Trouve le média et le déplace
-            let mediaToMove = null;
-            let oldGroupIndex = -1;
+            if (foundInGroups) {
+                // Cas 1: Le média est déjà dans un groupe
+                let mediaToMove = null;
+                let oldGroupIndex = -1;
 
-            newGroups.forEach((group, index) => {
-                const foundMedia = group.elements.find(
-                    (elem) => elem.id === mediaId
-                );
-                if (foundMedia) {
-                    mediaToMove = foundMedia;
-                    oldGroupIndex = index;
-                }
-            });
-
-            if (mediaToMove && oldGroupIndex !== -1) {
-                // Retire le média de son ancien groupe
-                newGroups[oldGroupIndex].elements = newGroups[
-                    oldGroupIndex
-                ].elements.filter((elem) => elem.id !== mediaId);
-
-                // Ajoute le média au nouveau groupe
-                newGroups[newGroupIndex].elements.push(mediaToMove);
-
-                // Log le déplacement
-                updateActionsLog({
-                    type: "item_moved_between_groups",
-                    item_id: mediaId,
-                    from_group: oldGroupName,
-                    to_group: newGroups[newGroupIndex].name,
-                    time: Date.now(),
+                // Trouver le groupe actuel du média
+                newGroups.forEach((group, index) => {
+                    const foundMedia = group.elements.find(
+                        (elem) => elem.id === mediaId
+                    );
+                    if (foundMedia) {
+                        mediaToMove = foundMedia;
+                        oldGroupIndex = index;
+                    }
                 });
+
+                if (oldGroupIndex !== -1) {
+                    // Retirer le média de son ancien groupe
+                    newGroups[oldGroupIndex].elements = newGroups[
+                        oldGroupIndex
+                    ].elements.filter((elem) => elem.id !== mediaId);
+
+                    // Ajouter le média au nouveau groupe
+                    newGroups[newGroupIndex].elements.push(mediaToMove);
+
+                    // Logger le déplacement
+                    updateActionsLog({
+                        type: "item_moved_between_groups",
+                        item_id: mediaId,
+                        from_group: oldGroupName,
+                        to_group: newGroups[newGroupIndex].name,
+                        time: Date.now(),
+                    });
+                }
             } else {
+                // Cas 2: Le média n'est pas encore dans un groupe
                 const mediaFromCurrent = currentMediaItems.find(
                     (item) => item.id === mediaId
                 );
+
                 if (mediaFromCurrent && newGroups[newGroupIndex]) {
-                    newGroups[newGroupIndex].elements.push({
+                    // S'assurer que mediaFromCurrent a toutes les propriétés nécessaires
+                    const mediaToAdd = {
                         id: mediaFromCurrent.id,
                         url: mediaFromCurrent.url,
                         type: mediaFromCurrent.type,
-                    });
+                        originalIndex: mediaFromCurrent.originalIndex,
+                        x: mediaFromCurrent.x,
+                        y: mediaFromCurrent.y,
+                        button_size: mediaFromCurrent.button_size,
+                    };
 
-                    // Log l'ajout initial à un groupe
+                    // Ajouter le média au groupe
+                    newGroups[newGroupIndex].elements.push(mediaToAdd);
+
+                    // Logger l'ajout
                     updateActionsLog({
                         type: "item_added_to_group",
                         item_id: mediaId,
