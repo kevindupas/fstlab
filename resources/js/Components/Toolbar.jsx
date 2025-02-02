@@ -16,7 +16,7 @@ function Toolbar({
         <div
             className={clsx(
                 "fixed bottom-0 left-0 bg-gray-800 h-14 flex items-center justify-between gap-4 px-4 shadow-lg z-40",
-                checkIsTablet ? "right-[349px]" : "right-[449px]"
+                checkIsTablet ? "right-[349px]" : "right-[399px]"
             )}
         >
             <div className="flex space-x-4">
