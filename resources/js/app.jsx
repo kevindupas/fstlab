@@ -19,6 +19,15 @@ import ThankYou from "./Pages/ThankYou";
 import { ExperimentStatusProvider } from "./Contexts/ExperimentStatusContext.jsx";
 import ExperimentError from "./Pages/ExperimentError.jsx";
 import { DisableInspectProvider } from "./Contexts/DisableInspectContext.jsx";
+import { PageWrapper } from "./Utils/PageWrapper.jsx";
+
+const ScrollPage = ({ children }) => (
+    <PageWrapper allowScroll={true}>{children}</PageWrapper>
+);
+
+const NoScrollPage = ({ children }) => (
+    <PageWrapper allowScroll={false}>{children}</PageWrapper>
+);
 
 function App() {
     return (
@@ -31,44 +40,88 @@ function App() {
                             <SessionProvider>
                                 <Layout>
                                     <Routes>
-                                        <Route path="/" element={<Home />} />
+                                        {/* Scroll */}
+                                        <Route
+                                            path="/"
+                                            element={
+                                                <ScrollPage>
+                                                    <Home />
+                                                </ScrollPage>
+                                            }
+                                        />
                                         <Route
                                             path="/experiments/"
-                                            element={<ExperimentList />}
+                                            element={
+                                                <ScrollPage>
+                                                    <ExperimentList />
+                                                </ScrollPage>
+                                            }
+                                        />
+                                        <Route
+                                            path="/experiment-detail/:id"
+                                            element={
+                                                <ScrollPage>
+                                                    <ExperimentDetail />
+                                                </ScrollPage>
+                                            }
                                         />
                                         <Route
                                             path="/how-it-work"
-                                            element={<HowItWork />}
+                                            element={
+                                                <ScrollPage>
+                                                    <HowItWork />
+                                                </ScrollPage>
+                                            }
                                         />
 
                                         <Route
                                             path="/changelog"
-                                            element={<Changelog />}
+                                            element={
+                                                <ScrollPage>
+                                                    <Changelog />
+                                                </ScrollPage>
+                                            }
                                         />
-
+                                        {/* No Scroll */}
                                         <Route
                                             path="/login/:sessionId"
-                                            element={<Login />}
-                                        />
-                                        <Route
-                                            path="/experiment-detail/:id"
-                                            element={<ExperimentDetail />}
+                                            element={
+                                                <NoScrollPage>
+                                                    <Login />
+                                                </NoScrollPage>
+                                            }
                                         />
                                         <Route
                                             path="/experiment/:sessionId"
-                                            element={<ExperimentSession />}
+                                            element={
+                                                <NoScrollPage>
+                                                    <ExperimentSession />
+                                                </NoScrollPage>
+                                            }
                                         />
                                         <Route
                                             path="/results"
-                                            element={<Result />}
+                                            element={
+                                                <NoScrollPage>
+                                                    <Result />
+                                                </NoScrollPage>
+                                            }
                                         />
                                         <Route
                                             path="/experiment-error"
-                                            element={<ExperimentError />}
+                                            element={
+                                                <NoScrollPage>
+                                                    <ExperimentError />
+                                                </NoScrollPage>
+                                            }
                                         />
                                         <Route
                                             path="/thank-you"
-                                            element={<ThankYou />}
+                                            element={
+                                                <NoScrollPage>
+                                                    <ThankYou />
+                                                </NoScrollPage>
+                                            }
                                         />
                                     </Routes>
                                 </Layout>
