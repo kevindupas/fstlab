@@ -382,11 +382,11 @@ function KonvaComponent({
             <Modal
                 isOpen={showImageModal}
                 onClose={() => setShowImageModal(false)}
-                title={t("experimentSession.image_preview")}
+                title={t("experimentSession.session.image_preview")}
             >
                 <img
                     src={selectedImage}
-                    alt={t("experimentSession.alt_image_preview")}
+                    alt={t("experimentSession.session.image_preview")}
                     className="w-full h-auto max-h-[70vh] object-contain cursor-pointer"
                     onClick={() => setShowImageModal(false)}
                 />
