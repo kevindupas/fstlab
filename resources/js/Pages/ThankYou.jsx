@@ -1,7 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "../Contexts/LanguageContext";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import {
+    AlertCircle,
+    ArrowBigLeft,
+    ArrowRight,
+    CheckCircle2,
+    Lock,
+} from "lucide-react";
 import Confetti from "../Components/ReactCanvasConfetti";
 
 function ThankYou() {
@@ -17,10 +23,8 @@ function ThankYou() {
                     if (document.exitFullscreen) {
                         await document.exitFullscreen();
                     } else if (document.webkitExitFullscreen) {
-                        // Safari
                         await document.webkitExitFullscreen();
                     } else if (document.msExitFullscreen) {
-                        // IE11
                         await document.msExitFullscreen();
                     }
                 }
@@ -53,12 +57,23 @@ function ThankYou() {
                             ? t("experimentSession.thankYou.messageTest")
                             : t("experimentSession.thankYou.message")}
                     </p>
-                    <button
-                        onClick={() => navigate("/")}
-                        className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-200"
-                    >
-                        {t("experimentSession.thankYou.returnHome")}
-                    </button>
+                    <div className="space-y-4">
+                        <button
+                            onClick={() => navigate("/")}
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-200"
+                        >
+                            {t("experimentSession.thankYou.returnHome")}
+                        </button>
+
+                        <div className="pt-4 border-t flex flex-col justify-center items-center space-y-4">
+                            <a
+                                href="/privacy"
+                                className="items-center text-blue-600 hover:text-blue-800 transition-colors gap-2 text-sm"
+                            >
+                                {t("experimentSession.thankYou.privacyPolicy")}
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
             <Confetti />

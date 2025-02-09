@@ -57,6 +57,7 @@ class EditExperimentAccessRequest extends EditRecord
                     $newExperiment->original_creator_id = $originalExperiment->created_by;
                     $newExperiment->name = $originalExperiment->name . ' ' . __('filament.resources.experiment-access-request.form.duplicate.copy');
                     $newExperiment->doi = null;
+                    $newExperiment->responsible_institution = null;
                     $newExperiment->save();
 
                     // Dupliquer les médias

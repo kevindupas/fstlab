@@ -14,11 +14,14 @@ return [
             'registration_reason' => [
                 'label' => 'Why do you want to register?',
                 'helpMessage' => 'Your description must be at least 50 characters long',
+                'remaining' => 'Your description must be at least 50 characters long',
+                'complete' => 'Description complete'
             ],
             'orcid' => 'ORCID Number',
             'password' => [
                 'label' => 'Password',
                 'helpMessage' => 'Your password must be at least 8 characters long',
+                'requirements' => 'Password must contain at least one uppercase letter, one lowercase letter, one number and be at least 8 characters long'
             ],
             'confirm_password' => [
                 'label' => 'Confirm Password',
@@ -94,7 +97,7 @@ return [
             'name' => "Name",
             'created_by' => "Created By",
             'created_at' => "Created On",
-            'doi' => "DOI",
+            'doi' => "Unique identifier",
             'link' => "Link",
             'type' => [
                 'label' => 'Type',

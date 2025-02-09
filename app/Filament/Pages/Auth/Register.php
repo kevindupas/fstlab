@@ -55,7 +55,20 @@ class Register extends BaseRegister
                             ->label(__('pages.auth.register.registration_reason.label'))
                             ->required()
                             ->minLength(50)
-                            ->helperText(fn($state) => strlen($state) . __('pages.auth.register.registration_reason.helpMessage'))
+                            ->helperText(function ($state) {
+                                $currentLength = strlen($state ?? '');
+                                $remainingChars = 50 - $currentLength;
+                                $progressColor = $remainingChars > 0 ? 'text-danger-500' : 'text-success-500';
+
+                                return view('filament.components.character-counter', [
+                                    'current' => $currentLength,
+                                    'required' => 50,
+                                    'remaining' => $remainingChars,
+                                    'progressColor' => $progressColor
+                                ]);
+                            })
+                            ->live(onBlur: false) // Changement ici
+                            ->debounce(50) // Ajout du debounce pour une meilleure performance
                             ->rules(['required', 'string', 'min:50']),
 
                         TextInput::make('orcid')
@@ -69,6 +82,7 @@ class Register extends BaseRegister
                             ->label(__('pages.auth.register.password.label'))
                             ->password()
                             ->required()
+                            ->helperText(__('pages.auth.register.password.requirements'))
                             ->validationMessages([
                                 'attributes' => __('pages.auth.register.password.helpMessage'),
                             ])

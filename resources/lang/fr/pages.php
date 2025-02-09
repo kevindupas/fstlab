@@ -13,12 +13,14 @@ return [
             'university' => 'Université',
             'registration_reason' => [
                 'label' => 'Pourquoi souhaitez-vous vous inscrire ?',
-                'helpMessage' => 'Votre description doit faire minimum 50 caractères'
+                'remaining' => 'Votre description doit faire minimum 50 caractères',
+                'complete' => 'Description complète'
             ],
             'orcid' => 'Numéro ORCID',
             'password' => [
                 'label' => 'Mot de passe',
-                'helpMessage' => 'Votre mot de passe doit faire minimum 8 caractères'
+                'helpMessage' => 'Votre mot de passe doit faire minimum 8 caractères',
+                'requirements' => 'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et faire minimum 8 caractères'
             ],
             'confirm_password' => [
                 'label' => 'Confirmer mot de passe',
@@ -92,7 +94,7 @@ return [
             'name' => "Nom",
             'created_by' => "Créateur",
             'created_at' => "Créé le",
-            'doi' => "DOI",
+            'doi' => "Identifiant unique",
             'link' => "Lien",
             'type' => [
                 'label' => 'Type',
@@ -138,7 +140,7 @@ return [
         ],
         'documents_section' => [
             'title' => "Documents",
-            'description' => "Documents complémentaires",
+            'description' => "Documents réglementaires",
             'documents' => "Documents"
         ],
         'ban_action' => [

@@ -4,18 +4,15 @@ import { UnfinishedSessionModal } from "../Components/UnfinishedSessionModal";
 import { useSession } from "../Contexts/SessionContext";
 import DeviceOrientationCheck from "../Utils/DeviceOrientationCheck";
 import { useTranslation } from "../Contexts/LanguageContext";
-import { useExperimentStatus } from "../Contexts/ExperimentStatusContext.jsx";
+import { useExperimentStatus } from "../Contexts/ExperimentStatusContext";
 import { getSystemInfo } from "../Utils/getSystemInfo.js";
 
 function Login() {
     const { t } = useTranslation();
     const { checkExperimentStatus } = useExperimentStatus();
-    const {
-        checkExistingSession,
-        setParticipantNumber: resetParticipantNumber,
-    } = useSession();
+    const { checkExistingSession } = useSession();
     const { sessionId } = useParams();
-    const [participantNumber, setParticipantNumber] = useState("");
+    const [participantId, setParticipantId] = useState("");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
@@ -32,15 +29,19 @@ function Login() {
                     return;
                 }
 
-                // On ne vérifie la session existante que si l'expérience est disponible
                 await checkExistingSession(sessionId);
-                setParticipantNumber("");
+                // Generate participant ID automatically
+                const response = await fetch(
+                    `/api/experiment/generate-participant-id/${sessionId}`
+                );
+                const data = await response.json();
+                setParticipantId(data.participantId);
             } catch (error) {
                 console.error("Error verifying experiment status:", error);
                 setError(t("login.generic"));
             } finally {
                 setIsLoading(false);
-                setIsInitialChecking(false); // On arrête le loader initial
+                setIsInitialChecking(false);
             }
         };
 
@@ -69,7 +70,7 @@ function Login() {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        participant_number: participantNumber,
+                        participant_number: participantId,
                         ...systemData,
                         status: "created",
                     }),
@@ -89,18 +90,15 @@ function Login() {
                     if (elem.requestFullscreen) {
                         await elem.requestFullscreen();
                     } else if (elem.webkitRequestFullscreen) {
-                        // Safari
                         await elem.webkitRequestFullscreen();
                     } else if (elem.msRequestFullscreen) {
-                        // IE11
                         await elem.msRequestFullscreen();
                     }
                 } catch (error) {
                     console.warn("Fullscreen request failed:", error);
-                    // On continue même si le fullscreen échoue
                 }
 
-                localStorage.setItem("participantNumber", participantNumber);
+                localStorage.setItem("participantNumber", participantId);
                 localStorage.setItem("isRegistered", "true");
                 localStorage.setItem(
                     "session",
@@ -162,23 +160,23 @@ function Login() {
                     <h2 className="text-2xl font-bold text-gray-900 mb-4">
                         {t("login.title")}
                     </h2>
+
+                    {/* Privacy Notice */}
+                    <p className="mb-6 p-4 bg-blue-50 rounded-lg text-sm text-blue-800">
+                        {t("login.privacy_notice")}
+                    </p>
+
                     <div className="mb-4">
                         <label className="block text-gray-700 mb-2">
-                            {t("login.label")} :
+                            {t("login.participant_id_label")} :
                         </label>
-                        <input
-                            type="text"
-                            placeholder={t("login.placeholder")}
-                            value={participantNumber}
-                            onChange={(e) =>
-                                setParticipantNumber(e.target.value)
-                            }
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                            required
-                            disabled={isLoading}
-                        />
+                        <div className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-700 font-mono">
+                            {participantId}
+                        </div>
                     </div>
+
                     {error && <p className="text-red-500 mb-4">{error}</p>}
+
                     <button
                         type="submit"
                         className={`w-full px-4 py-2 rounded-md font-semibold text-white transition-colors ${

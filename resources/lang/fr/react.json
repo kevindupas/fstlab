@@ -14,53 +14,25 @@
   },
   "footer": {
     "copyright": "Copyright © Université Toulouse 2 Jean Jaurès",
-    "privacy_policy": "Politique de confidentialité",
-    "legal_notices": "Mentions Légales"
+    "cgu": "Conditions Générales d'Utilisation",
+    "personalData": "Politique de confidentialité"
   },
   "home": {
-    "title": "Plateforme de catégorisation",
-    "titleHighlight": "Auditive et Visuelle",
-    "description": "TCL-LabX est un outil dédié à l'étude de la perception auditive, spécialement conçu pour la recherche sur les implants cochléaires. Il permet d'analyser comment les personnes portant des implants cochléaires catégorisent et perçoivent les différents sons naturels de leur environnement.",
+    "title": "Tests de catégorisation libre",
+    "titleHighlight": "Audio et/ou Visio",
+    "description": "« FST/Web » est un outil dédié à la mise en œuvre d’un test de catégorisation libre (Free Sorting Task) avec des stimuli auditifs et/ou visuels.",
+    "description2": " Configurez facilement les tâches, faites passer les participants en laboratoire ou à distance, importer vos résultats, et seulement si vous le souhaitez, partagez vos configurations et vos données avec les autres utilisateurs.",
     "objectives": {
-      "title": "Quel est l'objectif de l'étude ?",
-      "description1": "TCL-LabX est un outil dédié à l'étude de la perception auditive, spécialement conçu pour la recherche sur les implants cochléaires. Il permet d'analyser comment les personnes portant des implants cochléaires catégorisent et perçoivent les différents sons naturels de leur environnement.",
-      "description2": "Cette étude vise à mieux comprendre les stratégies de catégorisation des sons par les patients implantés, contribuant ainsi à l'amélioration des techniques de réhabilitation auditive."
-    },
-    "participation": {
-      "title": "Comment participer ?",
-      "intro": "Votre participation est entièrement volontaire et anonyme. L'expérience se déroule en plusieurs étapes :",
-      "steps": {
-        "step1": "Écoute de différents sons naturels",
-        "step2": "Catégorisation libre selon vos propres critères",
-        "step3": "Bref questionnaire sur votre expérience"
-      },
-      "note": "Vous pouvez interrompre l'expérience à tout moment. Vos données resteront strictement confidentielles et seront utilisées uniquement à des fins de recherche."
+      "title": "Comment utiliser la plateforme (gratuitement)",
+      "description1": "Utilisez le bouton « Inscription » en haut à droite de cet écran pour vous inscrire auprès de la plateforme.",
+      "description2": "Après acceptation de votre inscription, vous pourrez configurer votre prochaine expérimentation!"
     },
     "privacy": {
-      "title": "Vos droits à la confidentialité et au respect de la vie privée",
-      "voluntary": "Votre participation à cette recherche est volontaire. Vous êtes donc libre de refuser de participer sans avoir à vous justifier. Si vous participez, vous pouvez décider à tout moment d'interrompre votre participation sans avoir à vous justifier et sans encourir aucune responsabilité ni aucun préjudice de ce fait.",
-      "dataRetention": "La durée de conservation de vos données est de 10 ans après la publication des résultats de recherche. Au-delà de cette période, elles seront effacées.",
-      "dataAccess": "Seuls le responsable scientifique et les chercheurs associés à ce projet auront accès à vos données. Les données recueillies seront traitées de façon conforme au Règlement général sur la protection des données (RGPD).",
-      "rights": "Si vous estimez, après nous avoir contactés, que vos droits sur vos données ne sont pas respectés, vous pouvez adresser une réclamation (plainte) à la CNIL : https://www.cnil.fr/fr/webform/adresser-une-plainte.",
-      "contact": {
-        "intro": "Pour plus d'informations, n'hésitez pas à nous contacter :",
-        "researcher": "Pascal GAILLARD (MCF, Laboratoire CLLE, Université Toulouse 2 Jean Jaurès - pascal.gaillard@univ-tlse2.fr), Responsable Scientifique du projet"
-      }
+      "gdpr": "Veuillez respecter la règlementation Européenne concernant les données, soit la RGPD (règlement général sur la protection des données)",
+      "link": "https://www.cnil.fr/fr/rgpd-de-quoi-parle-t-on"
     },
-    "consent": {
-      "text": "En cliquant ici, vous indiquez que vous avez bien lu et compris les renseignements donnés et vous consentez à participer à cette recherche",
-      "button": "Commencer l'expérience"
-    },
-    "modal": {
-      "title": "Code d'accès à l'expérience",
-      "placeholder": "Entrez le code d'expérience",
-      "submit": "Valider",
-      "cancel": "Annuler",
-      "loading": "Vérification...",
-      "error": {
-        "invalid": "Code d'expérience invalide",
-        "generic": "Une erreur s'est produite"
-      }
+    "common": {
+      "learn_more": "En savoir plus"
     }
   },
   "experiment": {
@@ -122,12 +94,13 @@
   },
   "login": {
     "title": "S'inscrire pour l'expérience",
-    "label": "Numéro d'identification",
-    "placeholder": "Entrez votre numéro d'identification",
+    "participant_id_label": "Votre numéro d'identification",
+    "privacy_notice": "Vos données resteront anonymes et aucun enregistrement vocal ne sera effectué durant cette expérience.",
     "submit": "Démarrer l'expérience",
     "loading": "Enregistrement en cours...",
-    "error": "Ce numéro a déjà été utilisé pour cette expérience.",
-    "generic": "Une erreur s'est produite lors de l'enregistrement. Veuillez réessayer."
+    "error": "Une erreur est survenue avec ce numéro d'identification.",
+    "generic": "Une erreur s'est produite lors de l'enregistrement. Veuillez réessayer.",
+    "checking": "Vérification de l'expérience..."
   },
   "experimentError": {
     "status": {
@@ -216,7 +189,8 @@
       "titleTest": "Test terminé",
       "message": "Vos résultats ont été enregistrés avec succès. Vous pouvez maintenant fermer cette fenêtre.",
       "messageTest": "Merci d'avoir testé l'expérience. Aucune donnée n'a été enregistrée puisque vous étiez en mode test.",
-      "returnHome": "Retourner à l'accueil"
+      "returnHome": "Retourner à l'accueil",
+      "privacyPolicy": "Vos droits à la confidentialité et au respect de la vie privée"
     }
   },
   "unfinishedModal": {
@@ -286,7 +260,7 @@
     },
     "feedback": {
       "title": "Commentaire global",
-      "placeholder": "Décrivez votre expérience, vos observations ou toute autre remarque pertinente..."
+      "placeholder": "Décrivez votre expérience, vos observations ou toute autre remarque pertinente... (vos données restent anonymes)"
     },
     "technicalIssues": {
       "title": "Problèmes techniques",
@@ -481,6 +455,80 @@
         "Révision de la structure de partage des expérimentations",
         "Amélioration de l'interface utilisateur"
       ]
+    }
+  },
+  "legal": {
+    "title": "Conditions Générales d'Utilisation (CGU)",
+    "article1": {
+      "title": "Article 1 : Objet",
+      "content": "Les présentes Conditions Générales d'Utilisation (CGU) encadrent l'utilisation du site « FST-Web ». En accédant à ce site, vous acceptez ces CGU dans leur intégralité."
+    },
+    "article2": {
+      "title": "Article 2 : Accès au site",
+      "content": "Le site est accessible gratuitement à tout utilisateur disposant d'un accès internet. Les frais liés à l'accès au site (matériel, connexion, etc.) sont à la charge de l'utilisateur."
+    },
+    "article3": {
+      "title": "Article 3 : Contenu du site",
+      "content": "Le contenu publié sur « FST-Web » est protégé par des droits de propriété intellectuelle. Toute reproduction, représentation ou exploitation non autorisée est interdite."
+    },
+    "article4": {
+      "title": "Article 4 : Responsabilité",
+      "intro": "Le site « FST-Web » ne peut être tenu responsable en cas de :",
+      "item1": "Dysfonctionnement technique",
+      "item2": "Perte ou altération de données",
+      "item3": "Utilisation non conforme aux CGU"
+    },
+    "article5": {
+      "title": "Article 5 : Données personnelles",
+      "content": "L'utilisation du site peut impliquer la collecte de données personnelles. Ces données sont traitées conformément à notre Politique de Protection des Données."
+    },
+    "article6": {
+      "title": "Article 6 : Modification des CGU",
+      "content": "Nous nous réservons le droit de modifier ces CGU à tout moment. Les utilisateurs seront informés de toute modification via le site."
+    },
+    "article7": {
+      "title": "Article 7 : Droit applicable",
+      "content": "Les présentes CGU sont régies par le droit français. Tout litige sera soumis aux juridictions compétentes."
+    }
+  },
+  "privacy": {
+    "title": "Protection des données personnelles",
+    "intro": "Les informations recueillies vous concernant font l'objet d'un traitement destiné à la MSHS-T, située au 5 allée Antonio Machado, F-31 058 Toulouse cedex 9, +33 (0)5 61 50 35 28. Des informations peuvent être demandées à la Délégué à la Protection des Données du CNRS – dpd.demandes@cnrs.fr.",
+    "dataCollected": "Des données à caractère personnel tels que les nom, prénom, adresse mél, structure de rattachement ou fonction vont être collectées.",
+    "context": {
+      "title": "Dans le cadre de :",
+      "directory": "la gestion d'un annuaire des personnels de l'UAR et des laboratoires associés (nom, prénom, téléphone, adresse mél, laboratoire, statut, fonction, mission) ;",
+      "newsletter": "l'inscription à la newsletter (nom, prénom, adresse mél) ;",
+      "events": "la participation à un événement scientifique, une conférence et une formation (nom, prénom, adresse mél, établissement/laboratoire/entreprise, fonction)."
+    },
+    "recipients": {
+      "title": "Les destinataires des données",
+      "intro": "Ces données sont accessibles par :",
+      "visitors": "les internautes (excepté pour l'inscription à la newsletter)",
+      "admins": "le webmaster et les administrateurs du site Internet ;",
+      "organizers": "les organisateurs de chaque événement scientifique, conférence ou session de formation."
+    },
+    "legalBasis": {
+      "title": "Base légale",
+      "content": "Le traitement est nécessaire aux fins des intérêts légitimes poursuivis par le responsable du traitement"
+    },
+    "retention": {
+      "title": "Conservation des données",
+      "newsletter": "L'inscription à des newsletters : jusqu'à la demande de désabonnement par la personne concernée",
+      "content": "Le contenu : pour les annuaires, au maximum jusqu'au départ de la personne, pour les autres actualités le temps d'exploitation du site web"
+    },
+    "transfer": {
+      "title": "Transfert des données hors UE",
+      "content": "Les informations publiées sur le site sont susceptibles d'être lues, du fait de leur présence sur Internet, hors de l'Union européenne."
+    },
+    "rights": {
+      "title": "Droit des personnes",
+      "description": "Toute personne concernée par ce traitement de données à caractère personnel peut accéder et obtenir copie des données la concernant, s'opposer au traitement de ces données, les faire rectifier ou les faire effacer. Vous disposez également d'un droit à la limitation du traitement de vos données.",
+      "contact": {
+        "mshs": "Vous pouvez exercer ces droits en vous adressant au service communication de la MSHS-T : ",
+        "dpd": "Vous pouvez contacter également la DPD du CNRS à l'adresse suivante : DPD –2 rue Jean Zay–54519 –Vandoeuvre lès Nancy Cedex – "
+      },
+      "cnil": "Si vous estimez, après nous avoir contactés, que vos droits Informatique et Libertés ne sont pas respectés, vous avez la possibilité d'introduire une réclamation auprès de la CNIL : "
     }
   }
 }

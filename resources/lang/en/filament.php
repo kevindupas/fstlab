@@ -12,7 +12,7 @@ return [
                 'name' => "Name",
                 'created_by' => "Created By",
                 'created_at' => "Created On",
-                'doi' => "DOI",
+                'doi' => "Unique identifier",
                 'link' => "Link",
                 'type' => [
                     'label' => 'Type',
@@ -337,13 +337,17 @@ return [
                 'description' => 'Add your media files (maximum size of 20MB per file)',
             ],
             'section_documents' => [
-                'heading' => 'Additional Documents',
-                'description' => 'Add supplementary documents related to your experiment',
+                'heading' => 'Regulatory documents',
+                'description' => 'Add regulatory documents related to your experiment (Ethics Committee approval and other official documents)',
+            ],
+            'section_responsible' => [
+                'heading' => 'Responsible institution',
+                'description' => 'Identification of the institution responsible for the experiment',
             ],
             'form' => [
-                'doi' => 'DOI',
-                'doi_placeholder' => 'Enter the DOI of your experiment',
-                'doi_helper' => 'The Digital Object Identifier (DOI) is a stable, unique identification mechanism for your experiment.',
+                'doi' => 'Unique identifier',
+                'doi_placeholder' => 'The identifier will be generated automatically',
+                'doi_helper' => 'A unique identifier is automatically assigned to your experiment during creation.',
                 'howitworks' => 'How it works',
                 'howitworks_helper' => 'If enabled, the experiment in "test" mode will be visible on the How it Works? page. Automatically disabled if the status changes.',
                 'is_public' => 'Make it public',
@@ -387,6 +391,9 @@ return [
                 'media_sound_helper' => 'Accepted audio formats: MP3, WAV, AAC, OGG (max 20MB)',
                 'media_image_helper' => 'Accepted image formats: JPG, JPEG, PNG, GIF (max 20MB)',
                 'media_image_sound_helper' => 'Accepted formats: JPG, JPEG, PNG, GIF, WebP, MP3, WAV, AAC, OGG (max 20MB)',
+                'responsible_institution' => 'Institution responsible for the experiment and data collection',
+                'responsible_institution_placeholder' => 'Enter the institution name',
+                'responsible_institution_helper' => 'Specify the institution that will be responsible for this experiment',
                 'documents' => 'Documents',
                 'documents_helper' => 'Accepted formats: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, CSV (max 20MB)',
             ],
@@ -425,7 +432,17 @@ return [
             ],
             'messages' => [
                 'no_active_session' => 'No active session',
-            ]
+            ],
+            'actions' => [
+                'delete' => [
+                    'heading' => 'Delete permanently',
+                    'desc_issues_delete' => 'This experiment cannot be deleted because it is shared or has pending requests.',
+                    'confirm_delete' => 'To delete this experiment, please enter the code below.',
+                    'code_confirm' => 'Confirmation code',
+                    'code' => 'Code',
+                    'code_fail' => 'The code does not match.'
+                ],
+            ],
         ],
         'experiment-access-request' => [
             'label' => 'Access Request',

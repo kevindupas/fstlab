@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ExperimentLink;
 use App\Models\ExperimentSession;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 
 class ExperimentSessionApiController extends Controller
@@ -119,6 +119,25 @@ class ExperimentSessionApiController extends Controller
         }
     }
 
+    public function generateParticipantId($link)
+    {
+        try {
+            $experimentLink = $this->resolveExperiment($link);
+            if (!$experimentLink) {
+                return response()->json(['message' => 'Experiment not found.'], 404);
+            }
+
+            $participantId = 'P-' . now()->format('Ymd') . '-' . strtoupper(Str::random(4));
+
+            return response()->json([
+                'participantId' => $participantId,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error generating participant ID: ' . $e->getMessage());
+            return response()->json(['message' => 'Error generating participant ID.'], 500);
+        }
+    }
+
     public function registerParticipant(Request $request, $link)
     {
         $experimentLink = $this->resolveExperiment($link);
@@ -136,15 +155,6 @@ class ExperimentSessionApiController extends Controller
             'screen_width' => 'required|integer',
             'screen_height' => 'required|integer',
         ]);
-
-        // Vérification si le numéro existe déjà
-        $existingSession = ExperimentSession::where('experiment_id', $experiment->id)
-            ->where('participant_number', $request->participant_number)
-            ->first();
-
-        if ($existingSession) {
-            return response()->json(['message' => 'This number has already been used for this experiment.'], 409);
-        }
 
         $session = ExperimentSession::create([
             'experiment_id' => $experiment->id,

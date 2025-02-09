@@ -1,23 +1,33 @@
-### Article 1: Purpose  
-These Terms of Use govern the use of the [Site Name] website. By accessing this site, you fully accept these Terms of Use.  
+# Terms and Conditions (T&Cs)
 
-### Article 2: Access to the Site  
-The site is freely accessible to any user with internet access. The costs related to accessing the site (equipment, connection, etc.) are the user's responsibility.  
+### Article 1: Purpose
 
-### Article 3: Website Content  
-The content published on [Site Name] is protected by intellectual property rights. Any unauthorized reproduction, representation, or use is prohibited.  
+These Terms and Conditions (T&Cs) govern the use of the "FST-Web" website. By accessing this site, you fully accept these T&Cs.
 
-### Article 4: Liability  
-[Site Name] cannot be held responsible in case of:  
-- Technical malfunctions  
-- Data loss or alteration  
-- Use not compliant with these Terms of Use.  
+### Article 2: Site Access
 
-### Article 5: Personal Data  
-Using the site may involve the collection of personal data. Such data is processed in accordance with our [Privacy Policy](#).  
+The site is freely accessible to any user with internet access. Costs related to accessing the site (hardware, connection, etc.) are the responsibility of the user.
 
-### Article 6: Changes to the Terms  
-We reserve the right to modify these Terms of Use at any time. Users will be informed of any changes via the website.  
+### Article 3: Site Content
 
-### Article 7: Governing Law  
-These Terms of Use are governed by French law. Any disputes will be subject to the competent courts.  
+Content published on "FST-Web" is protected by intellectual property rights. Any unauthorized reproduction, representation, or exploitation is prohibited.
+
+### Article 4: Liability
+
+The "FST-Web" site cannot be held liable in case of:
+
+* Technical malfunction
+* Loss or alteration of data
+* Use that does not comply with the T&Cs
+
+### Article 5: Personal Data
+
+The use of the site may involve the collection of personal data. This data is processed in accordance with our Data Protection Policy.
+
+### Article 6: Modification of T&Cs
+
+We reserve the right to modify these T&Cs at any time. Users will be informed of any modifications via the site.
+
+### Article 7: Applicable Law
+
+These T&Cs are governed by French law. Any dispute will be subject to the jurisdiction of the competent courts.

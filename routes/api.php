@@ -27,10 +27,13 @@ Route::middleware(['web'])->group(function () {
 });
 
 // Récupérer les données d'une expérience en fonction du token
-Route::get('/experiment/session/{token}', [ExperimentSessionApiController::class, 'show']);
+Route::get('/experiment/session/{link}', [ExperimentSessionApiController::class, 'show']);
+
+// Générer un participant ID pour une expérience
+Route::get('/experiment/generate-participant-id/{link}', [ExperimentSessionApiController::class, 'generateParticipantId']);
 
 // Enregistrer un participant pour une expérience
-Route::post('/experiment/register/{token}', [ExperimentSessionApiController::class, 'registerParticipant']);
+Route::post('/experiment/register/{link}', [ExperimentSessionApiController::class, 'registerParticipant']);
 
 // Supprimer une session d'expérience
 Route::delete('/experiment/session/{sessionId}', [ExperimentSessionApiController::class, 'deleteSession']);

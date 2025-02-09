@@ -20,6 +20,8 @@ import { ExperimentStatusProvider } from "./Contexts/ExperimentStatusContext.jsx
 import ExperimentError from "./Pages/ExperimentError.jsx";
 import { DisableInspectProvider } from "./Contexts/DisableInspectContext.jsx";
 import { PageWrapper } from "./Utils/PageWrapper.jsx";
+import LegalNotice from "./Pages/LegalNotice.jsx";
+import Privacy from "./Pages/Privacy.jsx";
 
 const ScrollPage = ({ children }) => (
     <PageWrapper allowScroll={true}>{children}</PageWrapper>
@@ -121,6 +123,22 @@ function App() {
                                                 <NoScrollPage>
                                                     <ThankYou />
                                                 </NoScrollPage>
+                                            }
+                                        />
+                                        <Route
+                                            path="/cgu"
+                                            element={
+                                                <ScrollPage>
+                                                    <LegalNotice />
+                                                </ScrollPage>
+                                            }
+                                        />
+                                        <Route
+                                            path="/privacy"
+                                            element={
+                                                <ScrollPage>
+                                                    <Privacy />
+                                                </ScrollPage>
                                             }
                                         />
                                     </Routes>

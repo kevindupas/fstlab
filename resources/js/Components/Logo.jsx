@@ -1,9 +1,9 @@
 export function Logo({ desc, className }) {
     return (
         <img
-            src="../logo/logo.jpeg"
+            src="../logo/logo.png"
             alt={desc}
-            className={className || "w-48 h-auto"}
+            className={className || "w-56 h-auto"}
         />
     );
 }

@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Filament\Support\Enums\MaxWidth;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Filament\Tables\Actions\DeleteAction;
 
 class MyExperimentResource extends Resource
 {
@@ -71,6 +72,9 @@ class MyExperimentResource extends Resource
                         ->label(__('filament.resources.my_experiment.form.doi'))
                         ->placeholder(__('filament.resources.my_experiment.form.doi_placeholder'))
                         ->helperText(__('filament.resources.my_experiment.form.doi_helper'))
+                        ->default(fn() => Str::random(10))
+                        ->disabled()
+                        ->dehydrated()
                         ->unique(ignorable: fn($record) => $record),
 
                     Forms\Components\Toggle::make('howitwork_page')
@@ -148,7 +152,6 @@ class MyExperimentResource extends Resource
                         ->helperText(__('filament.resources.my_experiment.form.is_public_helper'))
                 ])->collapsible(),
 
-
             Forms\Components\Section::make(__('filament.resources.my_experiment.general_section.heading'))
                 ->description(__('filament.resources.my_experiment.general_section.description'))
                 ->schema([
@@ -169,7 +172,7 @@ class MyExperimentResource extends Resource
                         ->native(false)
                         ->reactive()
                         ->required(),
-                ])->collapsible(),
+                ])->collapsed(),
 
             Forms\Components\Section::make(__('filament.resources.my_experiment.apparence_section.heading'))
                 ->description(__('filament.resources.my_experiment.apparence_section.description'))
@@ -188,7 +191,7 @@ class MyExperimentResource extends Resource
                         ->label(__('filament.resources.my_experiment.form.button_color.label'))
                         ->helperText(__('filament.resources.my_experiment.form.button_color.helper_text'))
                         ->default('#ff1414'),
-                ])->collapsible(),
+                ])->collapsed(),
 
             Forms\Components\Section::make(__('filament.resources.my_experiment.section_description.heading'))
                 ->description(__('filament.resources.my_experiment.section_description.description'))
@@ -208,7 +211,7 @@ class MyExperimentResource extends Resource
                         ->label(__('filament.resources.my_experiment.form.instructions'))
                         ->helperText(__('filament.resources.my_experiment.form.instructions_helper'))
                         ->columnSpan('full'),
-                ])->collapsible(),
+                ])->collapsed(),
 
             Forms\Components\Section::make(__('filament.resources.my_experiment.section_media.heading'))
                 ->description(__('filament.resources.my_experiment.section_media.description'))
@@ -280,7 +283,17 @@ class MyExperimentResource extends Resource
                         ->maxFiles(30)
                         ->columnSpan('full')
                         ->visible(fn($get) => $get('type') === 'image_sound'),
-                ])->collapsible(),
+                ])->collapsed(),
+
+            Forms\Components\Section::make(__('filament.resources.my_experiment.section_responsible.heading'))
+                ->description(__('filament.resources.my_experiment.section_responsible.description'))
+                ->schema([
+                    TextInput::make('responsible_institution')
+                        ->label(__('filament.resources.my_experiment.form.responsible_institution'))
+                        ->placeholder(__('filament.resources.my_experiment.form.responsible_institution_placeholder'))
+                        ->helperText(__('filament.resources.my_experiment.form.responsible_institution_helper'))
+                        ->required()
+                ])->collapsed(),
 
             Forms\Components\Section::make(__('filament.resources.my_experiment.section_documents.heading'))
                 ->description(__('filament.resources.my_experiment.section_documents.description'))
@@ -303,7 +316,7 @@ class MyExperimentResource extends Resource
                         ])
                         ->maxFiles(20)
                         ->columnSpan('full')
-                ])->collapsible(),
+                ])->collapsed(),
         ]);
     }
 
@@ -518,15 +531,18 @@ class MyExperimentResource extends Resource
                                     Forms\Components\Toggle::make('export_xml')
                                         ->label(__('actions.export_experiment.xml'))
                                         ->reactive(),
+                                    Forms\Components\Toggle::make('export_yaml')
+                                        ->label(__('actions.export_experiment.yaml'))
+                                        ->reactive(),
                                 ])
-                                ->columns(2),
+                                ->columns(3),
                             Forms\Components\Placeholder::make(__('actions.export_experiment.media_export_info'))
                                 ->content(new HtmlString(__('actions.export_experiment.media_info')))
-                                ->visible(fn($get) => $get('export_json') || $get('export_xml'))
+                                ->visible(fn($get) => $get('export_json') || $get('export_xml') || $get('export_yaml'))
                                 ->columnSpan('full'),
                             Forms\Components\Toggle::make('include_media')
                                 ->label(__('actions.export_experiment.include_media'))
-                                ->visible(fn($get) => $get('export_json') || $get('export_xml'))
+                                ->visible(fn($get) => $get('export_json') || $get('export_xml') || $get('export_yaml'))
                                 ->columnSpan('full'),
                         ])
                         ->action(function ($data, Experiment $record) {
@@ -566,25 +582,31 @@ class MyExperimentResource extends Resource
                         ->modalDescription(
                             fn($record) =>
                             $record->access_requests_count()->count() > 0 || $record->shared_links_count()->count() > 0
-                                ? __('actions.delete.desc_issues_delete')
-                                : __('actions.delete.confirm_delete')
+                                ? __('filament.resources.my_experiment.actions.delete.desc_issues_delete')
+                                : __('filament.resources.my_experiment.actions.delete.confirm_delete')
                         )
                         ->hidden(fn($record) => $record->access_requests_count()->count() > 0 || $record->shared_links_count()->count() > 0)
                         ->form([
                             TextInput::make('confirmation_code')
-                                ->label(__('actions.delete.code_confirm'))
+                                ->label(__('filament.resources.my_experiment.actions.delete.code_confirm'))
                                 ->required()
                                 ->helperText(function () {
                                     $code = Str::random(6);
-                                    return __('actions.delete.code') . ' : ' . $code;
+                                    session(['delete_confirmation_code' => $code]);
+                                    return __('filament.resources.my_experiment.actions.delete.code') . ' : ' . $code;
                                 })
-                                ->rules(['required', 'string', fn($get) => function ($attribute, $value, $fail) use ($get) {
-                                    $code = Str::random(6);
-                                    if ($value !== $code) {
-                                        $fail(__('actions.delete.code_fail'));
-                                    }
-                                }])
+                                ->rules(['required', 'string'])
                         ])
+                        ->before(function (array $data, DeleteAction $action) {
+                            if ($data['confirmation_code'] !== session('delete_confirmation_code')) {
+                                Notification::make()
+                                    ->title(__('filament.resources.my_experiment.actions.delete.code_fail'))
+                                    ->danger()
+                                    ->send();
+
+                                $action->halt();
+                            }
+                        })
                 ])
                     ->dropdownWidth(MaxWidth::ExtraSmall)
                     ->icon('heroicon-m-ellipsis-vertical')

@@ -14,6 +14,11 @@ class CreateMyExperiment extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['created_by'] = Auth::id();
+
+        if (!isset($data['doi'])) {
+            $data['doi'] = Str::random(10);
+        }
+
         return $data;
     }
 

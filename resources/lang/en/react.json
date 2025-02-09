@@ -14,53 +14,25 @@
   },
   "footer": {
     "copyright": "Copyright © University Toulouse 2 Jean Jaurès",
-    "privacy_policy": "Privacy Policy",
-    "legal_notices": "Legal Notices"
+    "cgu": "Terms and Conditions",
+    "personalData": "Privacy Policy"
   },
   "home": {
-    "title": "Auditory and Visual",
-    "titleHighlight": "Categorization Platform",
-    "description": "TCL-LabX is a tool dedicated to studying auditory perception, specially designed for research on cochlear implants. It allows analysis of how people with cochlear implants categorize and perceive various natural sounds in their environment.",
+    "title": "Free Sorting Task",
+    "titleHighlight": "Audio and/or Visio",
+    "description": "“FST/Web” is a tool dedicated to the implementation of a free sorting task (or Free Categorisation Task) with auditory and/or visual stimuli.",
+    "description2": "Easily configure tasks, take participants inside the lab or remotely, download your results, and only if you want, share your configurations and data with other users.",
     "objectives": {
-      "title": "What is the study's objective?",
-      "description1": "TCL-LabX is a tool dedicated to studying auditory perception, specially designed for research on cochlear implants. It allows analysis of how people with cochlear implants categorize and perceive various natural sounds in their environment.",
-      "description2": "This study aims to better understand sound categorization strategies by implanted patients, thus contributing to the improvement of auditory rehabilitation techniques."
-    },
-    "participation": {
-      "title": "How to participate?",
-      "intro": "Your participation is entirely voluntary and anonymous. The experiment takes place in several steps:",
-      "steps": {
-        "step1": "Listening to different natural sounds",
-        "step2": "Free categorization according to your own criteria",
-        "step3": "Brief questionnaire about your experience"
-      },
-      "note": "You can stop the experiment at any time. Your data will remain strictly confidential and will be used only for research purposes."
+      "title": "How to use the platform (freely)",
+      "description1": "Use the 'Register' button at the top right of this screen to register with the platform.",
+      "description2": "After accepting your registration, you will be able to configure your next experiment!"
     },
     "privacy": {
-      "title": "Your rights to privacy and confidentiality",
-      "voluntary": "Your participation in this research is voluntary. You are free to refuse to participate without having to justify yourself. If you participate, you can decide to stop your participation at any time without having to justify yourself and without incurring any liability or prejudice.",
-      "dataRetention": "Your data will be retained for 10 years after the publication of research results. Beyond this period, they will be deleted.",
-      "dataAccess": "Only the scientific supervisor and researchers associated with this project will have access to your data. The collected data will be processed in accordance with the General Data Protection Regulation (GDPR).",
-      "rights": "If you believe, after contacting us, that your data rights are not being respected, you can file a complaint with the CNIL: https://www.cnil.fr/fr/webform/adresser-une-plainte.",
-      "contact": {
-        "intro": "For more information, don't hesitate to contact us:",
-        "researcher": "Pascal GAILLARD (MCF, CLLE Laboratory, University Toulouse 2 Jean Jaurès - pascal.gaillard@univ-tlse2.fr), Scientific Project Manager"
-      }
+      "gdpr": "Please respect the European regulations regarding data, i.e. the GDPR (General Data Protection Regulation)",
+      "link": "https://gdpr.eu/what-is-gdpr"
     },
-    "consent": {
-      "text": "By clicking here, you indicate that you have read and understood the information provided and consent to participate in this research",
-      "button": "Start the experiment"
-    },
-    "modal": {
-      "title": "Experiment Access Code",
-      "placeholder": "Enter experiment code",
-      "submit": "Validate",
-      "cancel": "Cancel",
-      "loading": "Verifying...",
-      "error": {
-        "invalid": "Invalid experiment code",
-        "generic": "An error occurred"
-      }
+    "common": {
+      "learn_more": "Learn more"
     }
   },
   "experiment": {
@@ -122,12 +94,13 @@
   },
   "login": {
     "title": "Register for the experiment",
-    "label": "Identification number",
-    "placeholder": "Enter your identification number",
+    "participant_id_label": "Your identification number",
+    "privacy_notice": "Your data will remain anonymous and no voice recording will be made during this experiment.",
     "submit": "Start experiment",
     "loading": "Registration in progress...",
-    "error": "This number has already been used for this experiment.",
-    "generic": "An error occurred during registration. Please try again."
+    "error": "An error occurred with this identification number.",
+    "generic": "An error occurred during registration. Please try again.",
+    "checking": "Verifying experiment..."
   },
   "experimentError": {
     "status": {
@@ -216,7 +189,8 @@
       "titleTest": "Test completed",
       "message": "Your results have been successfully recorded. You can now close this window.",
       "messageTest": "Thank you for testing the experiment. No data was recorded as you were in test mode.",
-      "returnHome": "Return to home"
+      "returnHome": "Return to home",
+      "privacyPolicy": "Your privacy rights and data protection"
     }
   },
   "unfinishedModal": {
@@ -286,7 +260,7 @@
     },
     "feedback": {
       "title": "Overall feedback",
-      "placeholder": "Describe your experience, observations, or any other relevant remarks..."
+      "placeholder": "Describe your experience, observations, or any other relevant comments... (your data remains anonymous)"
     },
     "technicalIssues": {
       "title": "Technical issues",
@@ -407,6 +381,80 @@
     },
     "version_two": {
       "date": "January 4, 2025"
+    }
+  },
+  "legal": {
+    "title": "Terms and Conditions (T&Cs)",
+    "article1": {
+      "title": "Article 1: Purpose",
+      "content": "These Terms and Conditions (T&Cs) govern the use of the 'FST-Web' website. By accessing this site, you fully accept these T&Cs."
+    },
+    "article2": {
+      "title": "Article 2: Site Access",
+      "content": "The site is freely accessible to any user with internet access. Costs related to accessing the site (hardware, connection, etc.) are the responsibility of the user."
+    },
+    "article3": {
+      "title": "Article 3: Site Content",
+      "content": "Content published on 'FST-Web' is protected by intellectual property rights. Any unauthorized reproduction, representation, or exploitation is prohibited."
+    },
+    "article4": {
+      "title": "Article 4: Liability",
+      "intro": "The 'FST-Web' site cannot be held liable in case of:",
+      "item1": "Technical malfunction",
+      "item2": "Loss or alteration of data",
+      "item3": "Use that does not comply with the T&Cs"
+    },
+    "article5": {
+      "title": "Article 5: Personal Data",
+      "content": "The use of the site may involve the collection of personal data. This data is processed in accordance with our Data Protection Policy."
+    },
+    "article6": {
+      "title": "Article 6: Modification of T&Cs",
+      "content": "We reserve the right to modify these T&Cs at any time. Users will be informed of any modifications via the site."
+    },
+    "article7": {
+      "title": "Article 7: Applicable Law",
+      "content": "These T&Cs are governed by French law. Any dispute will be subject to the jurisdiction of the competent courts."
+    }
+  },
+  "privacy": {
+    "title": "Personal Data Protection",
+    "intro": "The information collected about you is processed by MSHS-T, located at 5 allée Antonio Machado, F-31 058 Toulouse cedex 9, +33 (0)5 61 50 35 28. Information can be requested from the CNRS Data Protection Officer – dpd.demandes@cnrs.fr.",
+    "dataCollected": "Personal data such as name, first name, email address, affiliated organization or function will be collected.",
+    "context": {
+      "title": "In the context of:",
+      "directory": "managing a directory of UAR staff and associated laboratories (name, first name, phone, email address, laboratory, status, function, mission);",
+      "newsletter": "newsletter subscription (name, first name, email address);",
+      "events": "participation in scientific events, conferences and training (name, first name, email address, institution/laboratory/company, function)."
+    },
+    "recipients": {
+      "title": "Data Recipients",
+      "intro": "This data is accessible by:",
+      "visitors": "website visitors (except for newsletter subscription)",
+      "admins": "the webmaster and website administrators;",
+      "organizers": "organizers of each scientific event, conference or training session."
+    },
+    "legalBasis": {
+      "title": "Legal Basis",
+      "content": "The processing is necessary for the legitimate interests pursued by the data controller"
+    },
+    "retention": {
+      "title": "Data Retention",
+      "newsletter": "Newsletter subscription: until unsubscribe request by the concerned person",
+      "content": "Content: for directories, until the person's departure at the latest, for other news during the website's operational period"
+    },
+    "transfer": {
+      "title": "Data Transfer Outside EU",
+      "content": "Information published on the website may be read outside the European Union due to its presence on the Internet."
+    },
+    "rights": {
+      "title": "Individual Rights",
+      "description": "Any person concerned by this personal data processing can access and obtain a copy of their data, object to the processing of this data, have it rectified or deleted. You also have the right to limit the processing of your data.",
+      "contact": {
+        "mshs": "You can exercise these rights by contacting the MSHS-T communication service: ",
+        "dpd": "You can also contact the CNRS DPO at the following address: DPD –2 rue Jean Zay–54519 –Vandoeuvre lès Nancy Cedex – "
+      },
+      "cnil": "If you believe, after contacting us, that your Data Protection rights are not being respected, you have the option to file a complaint with the CNIL: "
     }
   }
 }

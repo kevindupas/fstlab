@@ -6,6 +6,7 @@ use App\Filament\Resources\MyExperimentResource;
 use App\Models\ExperimentLink;
 use Filament\Actions;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -22,23 +23,32 @@ class EditMyExperiment extends EditRecord
                 ->modalDescription(
                     fn($record) =>
                     $record->access_requests_count()->count() > 0 || $record->shared_links_count()->count() > 0
-                        ? "Cette expérimentation ne peut pas être supprimée car elle est partagée ou a des demandes en attente."
-                        : "Pour supprimer cette expérimentation, veuillez saisir le code ci-dessous."
+                        ? __('filament.resources.my_experiment.actions.delete.desc_issues_delete')
+                        : __('filament.resources.my_experiment.actions.delete.confirm_delete')
                 )
-                ->modalSubmitActionLabel('Supprimer définitivement')
+                ->modalSubmitActionLabel(__('actions.delete.heading'))
                 ->hidden(fn($record) => $record->access_requests_count()->count() > 0 || $record->shared_links_count()->count() > 0)
                 ->form([
                     TextInput::make('confirmation_code')
-                        ->label('Code de confirmation')
+                        ->label(__('filament.resources.my_experiment.actions.delete.code_confirm'))
                         ->required()
-                        ->helperText(fn() => 'Code: ' . Str::random(6))
-                        ->rules(['required', 'string', fn($get) => function ($attribute, $value, $fail) use ($get) {
+                        ->helperText(function () {
                             $code = Str::random(6);
-                            if ($value !== $code) {
-                                $fail("Le code ne correspond pas.");
-                            }
-                        }])
-                ]),
+                            session(['delete_code' => $code]);
+                            return __('filament.resources.my_experiment.actions.delete.code') . ' : ' . $code;
+                        })
+                        ->rules(['required', 'string'])
+                ])
+                ->before(function (array $data) {
+                    if ($data['confirmation_code'] !== session('delete_code')) {
+                        Notification::make()
+                            ->title(__('filament.resources.my_experiment.actions.delete.code_fail'))
+                            ->danger()
+                            ->send();
+
+                        $this->halt();
+                    }
+                })
         ];
     }
 

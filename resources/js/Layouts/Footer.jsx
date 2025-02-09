@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "../Contexts/LanguageContext";
+import { Link } from "react-router-dom";
 
 function Footer() {
     const { t } = useTranslation();
@@ -16,19 +17,19 @@ function Footer() {
         <footer className="md:fixed md:bottom-0 md:inset-x-0 text-center py-2 px-4 bg-slate-100">
             <small className="text-gray-500">
                 {t("footer.copyright")} {dates.start} {" - "} {dates.current} ·{" "}
-                <a
-                    href="https://synesthesies.3rgo.tech/legal"
+                <Link
+                    to="cgu"
                     className="hover:text-gray-700 transition-colors"
                 >
-                    {t("footer.legal_notices")}
-                </a>{" "}
+                    {t("footer.cgu")}
+                </Link>{" "}
                 ·{" "}
-                <a
-                    href="https://synesthesies.3rgo.tech/privacy"
+                <Link
+                    to="privacy"
                     className="hover:text-gray-700 transition-colors"
                 >
-                    {t("footer.privacy_policy")}
-                </a>
+                    {t("footer.personalData")}
+                </Link>
             </small>
         </footer>
     );

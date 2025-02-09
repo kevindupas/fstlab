@@ -12,7 +12,7 @@ return [
                 'name' => "Nom",
                 'created_by' => "Créateur",
                 'created_at' => "Créé le",
-                'doi' => "DOI",
+                'doi' => "Identifiant unique",
                 'link' => "Lien",
                 'type' => [
                     'label' => 'Type',
@@ -58,7 +58,7 @@ return [
             ],
             'documents_section' => [
                 'title' => "Documents",
-                'description' => "Documents complémentaires",
+                'description' => "Documents réglementaires",
                 'documents' => "Documents"
             ],
             'ban_action' => [
@@ -337,13 +337,17 @@ return [
                 'description' => 'Ajoutez vos fichiers médias (limite de 20Mo par fichier)',
             ],
             'section_documents' => [
-                'heading' => 'Documents complémentaires',
-                'description' => 'Ajoutez des documents supplémentaires liés à votre expérience',
+                'heading' => 'Documents réglementaires',
+                'description' => 'Ajoutez les documents réglementaires liés à votre expérience (CER et autres documents officiels)',
+            ],
+            'section_responsible' => [
+                'heading' => 'Établissement responsable',
+                'description' => 'Identification de l\'établissement responsable de l\'expérience',
             ],
             'form' => [
-                'doi' => 'DOI',
-                'doi_placeholder' => 'Saisissez le DOI de votre expérimentation',
-                'doi_helper' => 'Le digital object identifier (DOI) est un mécanisme d\'identification de ressources stable, unique pour votre expérimentation.',
+                'doi' => 'Identifiant unique',
+                'doi_placeholder' => 'L\'identifiant sera généré automatiquement',
+                'doi_helper' => 'Un identifiant unique est automatiquement attribué à votre expérimentation lors de sa création.',
                 'howitworks' => 'Comment ça marche',
                 'howitworks_helper' => 'Si activé, l\'expérimentation en mode "test" sera visible sur la page Comment ça marche ?. Désactivé automatiquement si le status change.',
                 'is_public' => 'Rendre publique',
@@ -387,6 +391,9 @@ return [
                 'media_sound_helper' => 'Formats audio acceptés : MP3, WAV, AAC, OGG (max 20Mo)',
                 'media_image_helper' => 'Formats image acceptés : JPG, JPEG, PNG, GIF (max 20Mo)',
                 'media_image_sound_helper' => 'Formats acceptés : JPG, JPEG, PNG, GIF, WebP, MP3, WAV, AAC, OGG (max 20Mo)',
+                'responsible_institution' => 'Établissement responsable de l\'expérience et de la collecte',
+                'responsible_institution_placeholder' => 'Saisissez le nom de l\'établissement',
+                'responsible_institution_helper' => 'Indiquez l\'établissement qui sera responsable de cette expérience',
                 'documents' => 'Documents',
                 'documents_helper' => 'Formats acceptés : PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, CSV (max 20Mo)',
             ],
@@ -425,7 +432,17 @@ return [
             ],
             'messages' => [
                 'no_active_session' => 'Aucune session active'
-            ]
+            ],
+            'actions' => [
+                'delete' => [
+                    'heading' => 'Supprimer définitivement',
+                    'desc_issues_delete' => 'Cette expérimentation ne peut pas être supprimée car elle est partagée ou a des demandes en attente.',
+                    'confirm_delete' => 'Pour supprimer cette expérimentation, veuillez saisir le code ci-dessous.',
+                    'code_confirm' => 'Code de confirmation',
+                    'code' => 'Code',
+                    'code_fail' => 'Le code ne correspond pas.'
+                ],
+            ],
         ],
         'experiment-access-request' => [
             'label' => 'Demande d\'accès',

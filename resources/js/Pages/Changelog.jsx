@@ -13,7 +13,6 @@ import FloatingLanguageButton from "../Components/FloatingLanguageButton";
 function Changelog() {
     const { t } = useTranslation();
 
-    // Construire les données avec les traductions
     const releaseData = useMemo(
         () => [
             {

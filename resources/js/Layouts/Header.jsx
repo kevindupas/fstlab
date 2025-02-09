@@ -52,7 +52,7 @@ const Header = () => {
     };
 
     return (
-        <header className="py-4 px-4 md:py-6 md:px-6 bg-white">
+        <header className="py-4 px-4 md:py-6 md:px-6 bg-white fixed w-full z-50">
             <nav className="relative z-50 flex justify-between items-center max-w-7xl mx-auto">
                 <Link to="/" aria-label="Home" className="flex-shrink-0">
                     <Logo
@@ -85,9 +85,9 @@ const Header = () => {
                     <NavLink href="/how-it-work" isReactRoute>
                         {t("header.how_it_work")}
                     </NavLink>
-                    <NavLink href="/changelog" isReactRoute>
+                    {/* <NavLink href="/changelog" isReactRoute>
                         {t("header.changelog")}
-                    </NavLink>
+                    </NavLink> */}
                 </div>
 
                 {/* Desktop Auth Buttons */}

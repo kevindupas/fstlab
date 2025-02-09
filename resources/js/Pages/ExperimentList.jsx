@@ -167,7 +167,7 @@ function ExperimentList() {
     }
 
     return (
-        <div className="bg-white">
+        <div className="bg-white my-20">
             <div className="relative isolate">
                 <div className="py-12 sm:py-20">
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -321,18 +321,18 @@ function ExperimentList() {
                                         {/* En-tête avec avatar et titre */}
                                         <div className="flex flex-col sm:flex-row gap-4">
                                             <div className="flex-1 min-w-0">
-                                                <h3 className="text-xl font-semibold text-gray-900 break-words">
+                                                {/* <h3 className="text-xl font-semibold text-gray-900 break-words">
                                                     {experiment.name}
-                                                </h3>
+                                                </h3> */}
                                                 <div className="mt-2 flex flex-wrap items-center gap-3">
-                                                    <span className="text-sm font-medium text-gray-500">
+                                                    {/* <span className="text-sm font-medium text-gray-500">
                                                         {t("experimentList.by")}
                                                         <span className="ml-1 font-semibold text-indigo-600">
                                                             {
                                                                 experiment.creator_name
                                                             }
                                                         </span>
-                                                    </span>
+                                                    </span> */}
 
                                                     {user &&
                                                         experiment.created_by ===
