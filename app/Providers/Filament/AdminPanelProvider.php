@@ -65,6 +65,7 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
+            ->favicon(asset('logo/favicon.png'))
             ->brandLogo(fn() => view('filament.logo.logo'))
             ->plugins($plugins)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
