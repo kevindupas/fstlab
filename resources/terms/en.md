@@ -2,7 +2,7 @@
 
 ### Article 1: Purpose
 
-These Terms and Conditions (T&Cs) govern the use of the "FST-Web" website. By accessing this site, you fully accept these T&Cs.
+These Terms and Conditions (T&Cs) govern the use of the "FST-LAB" website. By accessing this site, you fully accept these T&Cs.
 
 ### Article 2: Site Access
 
@@ -10,11 +10,11 @@ The site is freely accessible to any user with internet access. Costs related to
 
 ### Article 3: Site Content
 
-Content published on "FST-Web" is protected by intellectual property rights. Any unauthorized reproduction, representation, or exploitation is prohibited.
+Content published on "FST-LAB" is protected by intellectual property rights. Any unauthorized reproduction, representation, or exploitation is prohibited.
 
 ### Article 4: Liability
 
-The "FST-Web" site cannot be held liable in case of:
+The "FST-LAB" site cannot be held liable in case of:
 
 * Technical malfunction
 * Loss or alteration of data

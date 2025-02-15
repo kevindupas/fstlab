@@ -10,6 +10,7 @@ use App\Filament\Pages\ContactUser;
 use App\Filament\Pages\Experiments\Sessions\ExperimentSessionExport;
 use App\Filament\Pages\Experiments\Sessions\ExperimentSessions;
 use App\Filament\Pages\Profile;
+use App\Filament\Widgets\AssignedExperimentsTableWidget;
 use App\Filament\Widgets\BannedUserWidget;
 use App\Filament\Widgets\DashboardStatsWidget;
 use App\Filament\Widgets\ExperimentAccessRequestsWidget;
@@ -105,6 +106,7 @@ class AdminPanelProvider extends PanelProvider
                 BannedUserWidget::class,
                 ExperimentTableWidget::class,
                 ExperimentAccessRequestsWidget::class,
+                AssignedExperimentsTableWidget::class,
                 DashboardStatsWidget::class,
             ])
             ->middleware([

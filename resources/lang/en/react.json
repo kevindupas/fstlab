@@ -20,7 +20,7 @@
   "home": {
     "title": "Free Sorting Task",
     "titleHighlight": "Audio and/or Visio",
-    "description": "“FST/Web” is a tool dedicated to the implementation of a free sorting task (or Free Categorisation Task) with auditory and/or visual stimuli.",
+    "description": "“FST-LAB” is a tool dedicated to the implementation of a free sorting task (or Free Categorisation Task) with auditory and/or visual stimuli.",
     "description2": "Easily configure tasks, take participants inside the lab or remotely, download your results, and only if you want, share your configurations and data with other users.",
     "objectives": {
       "title": "How to use the platform (freely)",
@@ -387,7 +387,7 @@
     "title": "Terms and Conditions (T&Cs)",
     "article1": {
       "title": "Article 1: Purpose",
-      "content": "These Terms and Conditions (T&Cs) govern the use of the 'FST-Web' website. By accessing this site, you fully accept these T&Cs."
+      "content": "These Terms and Conditions (T&Cs) govern the use of the 'FST-LAB' website. By accessing this site, you fully accept these T&Cs."
     },
     "article2": {
       "title": "Article 2: Site Access",
@@ -395,11 +395,11 @@
     },
     "article3": {
       "title": "Article 3: Site Content",
-      "content": "Content published on 'FST-Web' is protected by intellectual property rights. Any unauthorized reproduction, representation, or exploitation is prohibited."
+      "content": "Content published on 'FST-LAB' is protected by intellectual property rights. Any unauthorized reproduction, representation, or exploitation is prohibited."
     },
     "article4": {
       "title": "Article 4: Liability",
-      "intro": "The 'FST-Web' site cannot be held liable in case of:",
+      "intro": "The 'FST-LAB' site cannot be held liable in case of:",
       "item1": "Technical malfunction",
       "item2": "Loss or alteration of data",
       "item3": "Use that does not comply with the T&Cs"

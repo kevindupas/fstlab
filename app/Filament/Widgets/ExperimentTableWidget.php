@@ -29,6 +29,8 @@ class ExperimentTableWidget extends BaseWidget
 
     protected static string $recordRouteKeyName = 'id';
 
+    protected static ?int $sort = 3;
+
     public static function getIdColumn(): string
     {
         return 'id';

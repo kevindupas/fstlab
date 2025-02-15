@@ -227,6 +227,12 @@ class ExperimentSessionResource extends Resource
             ->whereIn('type', ['results', 'access'])
             ->exists();
 
+        // Vérifie si l'utilisateur a la permission can_pass
+        $hasPassPermission = $experiment->users()
+            ->where('users.id', $user->id)
+            ->wherePivot('can_pass', true)
+            ->exists();
+
         // Utilisation du trait HasExperimentAccess
         $instance = new class {
             use HasExperimentAccess;
@@ -235,9 +241,11 @@ class ExperimentSessionResource extends Resource
         // Retourne true si :
         // - l'utilisateur a accès via HasExperimentAccess OU
         // - c'est un compte secondaire OU
-        // - il a une demande d'accès approuvée
+        // - il a une demande d'accès approuvée OU
+        // - il a la permission can_pass
         return $instance->canAccessExperiment($experiment)
             || $isSecondaryAccount
-            || $hasApprovedAccess;
+            || $hasApprovedAccess
+            || $hasPassPermission;
     }
 }

@@ -44,6 +44,10 @@ class ExperimentDetails extends Page
             $record->accessRequests()
             ->where('user_id', $user->id)
             ->where('status', 'approved')
+            ->exists() ||
+            // C'est un utilisateur qui a été ajouté directement à l'expérimentation
+            $record->users()
+            ->where('users.id', $user->id)
             ->exists();
 
         if (!$hasAccess) {
@@ -54,6 +58,7 @@ class ExperimentDetails extends Page
 
         $this->record = $record;
     }
+
     public function experimentInfolist(Infolist $infolist): Infolist
     {
         return $infolist

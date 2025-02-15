@@ -22,7 +22,8 @@ class UserSeeder extends Seeder
             'registration_reason' => 'Overseeing research operations',
             'orcid' => null,
             'status' => 'approved',
-            'created_by' => null
+            'created_by' => null,
+            'email_verified_at' => now()
         ]);
         $supervisor->assignRole('supervisor');
 

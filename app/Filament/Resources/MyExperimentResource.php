@@ -60,6 +60,11 @@ class MyExperimentResource extends Resource
         return __('filament.resources.my_experiment.plural');
     }
 
+    public static function getRecordRouteKeyName(): ?string
+    {
+        return 'id';
+    }
+
     public static function form(Form $form): Form
     {
         /** @var \App\Models\User */
@@ -621,22 +626,35 @@ class MyExperimentResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->where(function ($query) {
-                $query->where('created_by', Auth::id())
-                    ->orWhereHas('users', function ($q) {
-                        $q->where('user_id', Auth::id())
-                            ->where(function ($q) {
-                                $q->where('can_configure', true)
-                                    ->orWhere('can_pass', true);
-                            });
-                    });
-            });
+        $query = parent::getEloquentQuery();
+
+        // Si on est dans une page d'édition, on permet l'accès aux expérimentations où on a can_configure
+        if (request()->route()->getName() === 'filament.admin.resources.my-experiments.edit') {
+            return $query;
+        }
+
+        // Sinon, on ne montre que les expérimentations qu'on a créées
+        return $query->where('created_by', Auth::id());
     }
 
     public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
     {
-        return Auth::id() === $ownerRecord->created_by;
+        return Auth::id() === $ownerRecord->created_by
+            || $ownerRecord->users()
+            ->where('users.id', Auth::id())
+            ->where('can_configure', true)  // C'est can_configure !
+            ->exists();
+    }
+
+    public static function resolveRecordRouting($record): array
+    {
+        // Cette méthode permet de retrouver l'enregistrement même s'il n'est pas
+        // dans la query principale (qui ne montre que ceux qu'on a créés)
+        return [
+            'edit' => Pages\EditMyExperiment::getUrl(
+                ['record' => $record->id]
+            ),
+        ];
     }
 
     public static function getPages(): array
@@ -713,6 +731,23 @@ class MyExperimentResource extends Resource
         /** @var \App\Models\User */
         $user = Auth::user();
 
+        // Si on est sur la page d'édition et qu'on a can_configure, on permet l'accès
+        if (request()->route()->getName() === 'filament.admin.resources.my-experiments.edit') {
+            $experimentId = request()->route('record');
+            if ($experimentId) {
+                $hasConfigureAccess = Experiment::find($experimentId)
+                    ->users()
+                    ->where('users.id', $user->id)
+                    ->where('can_configure', true)
+                    ->exists();
+
+                if ($hasConfigureAccess) {
+                    return true;
+                }
+            }
+        }
+
+        // Sinon, on vérifie le rôle comme avant
         if ($user->hasRole('secondary_experimenter')) {
             abort(403, "En tant que compte secondaire, vous n'avez pas accès à cette section. Utilisez le tableau de bord pour gérer vos expérimentations.");
         }
@@ -720,16 +755,41 @@ class MyExperimentResource extends Resource
         return true;
     }
 
-    // Et aussi pour bien s'assurer que même l'accès à la liste est bloqué
     public static function canViewAny(): bool
     {
         /** @var \App\Models\User */
         $user = Auth::user();
 
+        // Si on est sur la page d'édition et qu'on a can_configure, on permet l'accès
+        if (request()->route()->getName() === 'filament.admin.resources.my-experiments.edit') {
+            $experimentId = request()->route('record');
+            if ($experimentId) {
+                $hasConfigureAccess = Experiment::find($experimentId)
+                    ->users()
+                    ->where('users.id', $user->id)
+                    ->where('can_configure', true)
+                    ->exists();
+
+                if ($hasConfigureAccess) {
+                    return true;
+                }
+            }
+        }
+
+        // Sinon, on vérifie le rôle comme avant
         if ($user->hasRole('secondary_experimenter')) {
             abort(403, "En tant que compte secondaire, vous n'avez pas accès à cette section. Utilisez le tableau de bord pour gérer vos expérimentations.");
         }
 
         return true;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return Auth::id() === $record->created_by
+            || $record->users()
+            ->where('users.id', Auth::id())
+            ->where('can_configure', true)
+            ->exists();
     }
 }

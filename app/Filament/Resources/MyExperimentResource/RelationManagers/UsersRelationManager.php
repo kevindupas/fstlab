@@ -2,6 +2,9 @@
 
 namespace App\Filament\Resources\MyExperimentResource\RelationManagers;
 
+use App\Models\User;
+use App\Notifications\AddedToExperimentNotification;
+use App\Notifications\ResetPasswordNotification;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -11,6 +14,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
 
 class UsersRelationManager extends RelationManager
 {
@@ -35,93 +40,134 @@ class UsersRelationManager extends RelationManager
             ->recordTitleAttribute('name')
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\TextColumn::make('email'),
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->label('Role'),
                 Tables\Columns\ToggleColumn::make('can_configure')
                     ->afterStateUpdated(function ($record, $state) {
-                        if (!$state && !$record->pivot->can_pass) {
-                            \App\Models\ExperimentLink::where('experiment_id', $this->getOwnerRecord()->id)
-                                ->where('user_id', $record->id)
-                                ->delete();
-                        } elseif ($state) {
-                            // Si on active une permission
-                            $currentStatus = \App\Models\ExperimentLink::where('experiment_id', $this->getOwnerRecord()->id)
-                                ->where('user_id', $this->getOwnerRecord()->created_by)
-                                ->first();
-
-                            if ($currentStatus) {
-                                \App\Models\ExperimentLink::updateOrCreate(
-                                    [
-                                        'experiment_id' => $this->getOwnerRecord()->id,
-                                        'user_id' => $record->id,
-                                    ],
-                                    [
-                                        'status' => $currentStatus->status,
-                                        'link' => Str::random(6),
-                                        'is_creator' => false,
-                                        'is_secondary' => true,
-                                        'is_collaborator' => false
-                                    ]
-                                );
-                            }
-                        }
+                        $this->handlePermissionChange($record, $state);
                     }),
                 Tables\Columns\ToggleColumn::make('can_pass')
                     ->afterStateUpdated(function ($record, $state) {
-                        if (!$state && !$record->pivot->can_configure) {
-                            \App\Models\ExperimentLink::where('experiment_id', $this->getOwnerRecord()->id)
-                                ->where('user_id', $record->id)
-                                ->delete();
-                        } elseif ($state) {
-                            // Si on active une permission
-                            $currentStatus = \App\Models\ExperimentLink::where('experiment_id', $this->getOwnerRecord()->id)
-                                ->where('user_id', $this->getOwnerRecord()->created_by)
-                                ->first();
-
-                            if ($currentStatus) {
-                                \App\Models\ExperimentLink::updateOrCreate(
-                                    [
-                                        'experiment_id' => $this->getOwnerRecord()->id,
-                                        'user_id' => $record->id,
-                                    ],
-                                    [
-                                        'status' => $currentStatus->status,
-                                        'link' => Str::random(6),
-                                        'is_creator' => false,
-                                        'is_secondary' => true,
-                                        'is_collaborator' => false
-                                    ]
-                                );
-                            }
-                        }
+                        $this->handlePermissionChange($record, $state);
                     }),
             ])
             ->headerActions([
-                Tables\Actions\AttachAction::make()
-                    ->preloadRecordSelect()
-                    ->recordSelectOptionsQuery(fn(Builder $query) => $query->where('created_by', Auth::id()))
-                    ->form(fn(Tables\Actions\AttachAction $action): array => [
-                        $action->getRecordSelect(),
+                // Bouton pour ajouter un nouvel utilisateur
+                Tables\Actions\CreateAction::make('create_user')
+                    ->label('Créer un utilisateur')
+                    ->form([
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('email')
+                            ->email()
+                            ->required()
+                            ->unique('users', 'email'),
+                        Forms\Components\TextInput::make('university')
+                            ->required(),
                         Forms\Components\Toggle::make('can_configure'),
                         Forms\Components\Toggle::make('can_pass'),
                     ])
-                    ->after(function ($data) {
-                        $currentStatus = \App\Models\ExperimentLink::where('experiment_id', $this->getOwnerRecord()->id)
-                            ->where('user_id', $this->getOwnerRecord()->created_by)
+                    ->action(function (array $data): void {
+                        // Création de l'utilisateur
+                        $userData = [
+                            'name' => $data['name'],
+                            'email' => $data['email'],
+                            'university' => $data['university'],
+                            'password' => bcrypt(Str::random(32)),
+                            'created_by' => Auth::id(),
+                            'status' => 'approved',
+                            'email_verified_at' => now(),
+                        ];
+
+                        $user = User::create($userData);
+                        $user->assignRole('secondary_experimenter');
+                        $user->notify(new ResetPasswordNotification());
+                        $user->notify(new AddedToExperimentNotification($this->getOwnerRecord()->name));
+
+                        // Attacher l'utilisateur à l'expérience
+                        $this->getOwnerRecord()->users()->attach($user->id, [
+                            'can_configure' => $data['can_configure'] ?? false,
+                            'can_pass' => $data['can_pass'] ?? false,
+                        ]);
+
+                        // Créer le lien d'expérience si nécessaire
+                        if ($data['can_configure'] || $data['can_pass']) {
+                            $this->createExperimentLink($user->id);
+                        }
+
+                        Notification::make()
+                            ->title('Utilisateur créé et attaché avec succès')
+                            ->success()
+                            ->send();
+                    }),
+
+                // Bouton pour attacher un utilisateur existant
+                Tables\Actions\Action::make('attach_user')
+                    ->label('Attacher un utilisateur')
+                    ->form([
+                        Forms\Components\TextInput::make('email')
+                            ->label('Email de l\'utilisateur')
+                            ->email()
+                            ->required(),
+                        Forms\Components\Toggle::make('can_configure'),
+                        Forms\Components\Toggle::make('can_pass'),
+                    ])
+                    ->action(function (array $data): void {
+                        // Recherche de l'utilisateur avec le bon rôle
+                        $user = User::where('email', $data['email'])
+                            ->whereHas('roles', function ($query) {
+                                $query->whereIn('name', ['principal_experimenter', 'secondary_experimenter']);
+                            })
                             ->first();
 
-                        if ($currentStatus) {
-                            \App\Models\ExperimentLink::create([
-                                'experiment_id' => $this->getOwnerRecord()->id,
-                                'user_id' => $data['recordId'],
-                                'status' => $currentStatus->status,
-                                'link' => Str::random(6),
-                                'is_creator' => false,
-                                'is_secondary' => true,
-                                'is_collaborator' => false
+                        if (!$user) {
+                            Notification::make()
+                                ->title('Utilisateur non trouvé ou non autorisé')
+                                ->warning()
+                                ->send();
+                            return;
+                        }
+
+                        try {
+                            // Attacher l'utilisateur à l'expérience
+                            $this->getOwnerRecord()->users()->attach($user->id, [
+                                'can_configure' => $data['can_configure'] ?? false,
+                                'can_pass' => $data['can_pass'] ?? false,
                             ]);
+
+                            // Créer le lien d'expérience si nécessaire
+                            if ($data['can_configure'] || $data['can_pass']) {
+                                $this->createExperimentLink($user->id);
+                            }
+
+                            $user->notify(new AddedToExperimentNotification($this->getOwnerRecord()->name));
+
+
+                            Notification::make()
+                                ->title('Utilisateur attaché avec succès')
+                                ->success()
+                                ->send();
+                        } catch (\Exception $e) {
+                            Notification::make()
+                                ->title('Erreur lors de l\'attachement')
+                                ->danger()
+                                ->send();
                         }
                     }),
             ])
             ->actions([
+                Tables\Actions\Action::make('contact')
+                    ->label(__('filament.resources.users.actions.contact'))
+                    ->icon('heroicon-o-envelope')
+                    ->color('warning')
+                    ->url(fn(User $record) => "/admin/contact-user?user={$record->id}"),
+                // ->visible(
+                //     fn(User $record) =>
+                //     Auth::user()->hasRole('supervisor') ||
+                //         ($record->created_by === Auth::id())
+                // ),
                 Tables\Actions\EditAction::make()
                     ->before(function ($data, $record) {
                         $this->initialState = [
@@ -134,29 +180,58 @@ class UsersRelationManager extends RelationManager
                             ($this->initialState['can_configure'] || $this->initialState['can_pass']) &&
                             !$data['can_configure'] && !$data['can_pass']
                         ) {
-                            \App\Models\ExperimentLink::where('experiment_id', $this->getOwnerRecord()->id)
-                                ->where('user_id', $record->id)
-                                ->delete();
+                            $this->deleteExperimentLink($record->id);
                         }
                     }),
                 Tables\Actions\DetachAction::make()
                     ->before(function ($record) {
-                        // Avant de détacher, on supprime le lien
-                        \App\Models\ExperimentLink::where('experiment_id', $this->getOwnerRecord()->id)
-                            ->where('user_id', $record->id)
-                            ->delete();
+                        $this->deleteExperimentLink($record->id);
                     }),
             ])
             ->bulkActions([
                 Tables\Actions\DetachBulkAction::make()
                     ->before(function (Collection $records) {
-                        // Avant de détacher en masse, on supprime tous les liens concernés
-                        $records->each(function ($record) {
-                            \App\Models\ExperimentLink::where('experiment_id', $this->getOwnerRecord()->id)
-                                ->where('user_id', $record->id)
-                                ->delete();
-                        });
+                        $records->each(fn($record) => $this->deleteExperimentLink($record->id));
                     }),
             ]);
+    }
+
+    protected function handlePermissionChange($record, $state): void
+    {
+        if (!$state && !$record->pivot->can_pass && !$record->pivot->can_configure) {
+            $this->deleteExperimentLink($record->id);
+        } elseif ($state) {
+            $this->createExperimentLink($record->id);
+        }
+    }
+
+    protected function createExperimentLink($userId): void
+    {
+        $currentStatus = \App\Models\ExperimentLink::where('experiment_id', $this->getOwnerRecord()->id)
+            ->where('user_id', $this->getOwnerRecord()->created_by)
+            ->first();
+
+        if ($currentStatus) {
+            \App\Models\ExperimentLink::updateOrCreate(
+                [
+                    'experiment_id' => $this->getOwnerRecord()->id,
+                    'user_id' => $userId,
+                ],
+                [
+                    'status' => $currentStatus->status,
+                    'link' => Str::random(6),
+                    'is_creator' => false,
+                    'is_secondary' => true,
+                    'is_collaborator' => false
+                ]
+            );
+        }
+    }
+
+    protected function deleteExperimentLink($userId): void
+    {
+        \App\Models\ExperimentLink::where('experiment_id', $this->getOwnerRecord()->id)
+            ->where('user_id', $userId)
+            ->delete();
     }
 }

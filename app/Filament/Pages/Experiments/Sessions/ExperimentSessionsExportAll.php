@@ -2,7 +2,6 @@
 
 namespace App\Filament\Pages\Experiments\Sessions;
 
-use App\Models\Experiment;
 use App\Models\ExperimentSession;
 use App\Traits\HasExperimentAccess;
 use Filament\Forms\Components\Radio;
@@ -86,9 +85,40 @@ class ExperimentSessionsExportAll extends Page
 
     private function exportMatrix($sessions)
     {
-        return response()->streamDownload(function () use ($sessions) {
-            $this->writeMatrixContent($sessions);
-        }, 'matrice_' . date('Y-m-d') . '.csv');
+        // Si le fichier R n'existe pas, on retourne directement la matrice en CSV
+        $rScriptPath = storage_path('app/scripts/FST-Script Shiny FST-LAB.R');
+        if (!file_exists($rScriptPath)) {
+            return response()->streamDownload(function () use ($sessions) {
+                $this->writeMatrixContent($sessions);
+            }, 'matrice_' . date('Y-m-d') . '.csv');
+        }
+
+        // Si le fichier R existe, on crée un ZIP avec les deux fichiers
+        $tempDir = storage_path('app/temp');
+        if (!file_exists($tempDir)) {
+            mkdir($tempDir, 0755, true);
+        }
+
+        $zip = new ZipArchive();
+        $zipFileName = $tempDir . '/export_' . uniqid() . '.zip';
+
+        if ($zip->open($zipFileName, ZipArchive::CREATE) !== true) {
+            throw new \RuntimeException("Could not create ZIP archive");
+        }
+
+        // Ajoute la matrice
+        ob_start();
+        $this->writeMatrixContent($sessions);
+        $matrixContent = ob_get_clean();
+        $zip->addFromString('matrice.csv', $matrixContent);
+
+        // Ajoute le script R
+        $zip->addFile($rScriptPath, 'FST-Script Shiny FST-LAB.R');
+
+        $zip->close();
+
+        return response()->download($zipFileName, 'export_matrice_' . date('Y-m-d') . '.zip')
+            ->deleteFileAfterSend();
     }
 
     private function writeMatrixContent($sessions)
@@ -157,11 +187,18 @@ class ExperimentSessionsExportAll extends Page
             $zip->addFromString($participantId . '-comment.csv', $commentContent);
         }
 
+        // Ajoute le script R s'il existe
+        $rScriptPath = storage_path('app/scripts/FST-Script Shiny FST-LAB.R');
+        if (file_exists($rScriptPath)) {
+            $zip->addFile($rScriptPath, 'FST-Script Shiny FST-LAB.R');
+        }
+
         $zip->close();
 
         return response()->download($zipFileName, 'export_participants_' . date('Y-m-d') . '.zip')
             ->deleteFileAfterSend();
     }
+
 
     private function exportBoth($sessions)
     {
@@ -195,6 +232,12 @@ class ExperimentSessionsExportAll extends Page
             // Fichier commentaires
             $commentContent = $this->generateParticipantContent($participantId, $groupData, true);
             $zip->addFromString('participants/' . $participantId . '-comment.csv', $commentContent);
+        }
+
+        // Ajoute le script R s'il existe
+        $rScriptPath = storage_path('app/scripts/FST-Script Shiny FST-LAB.R');
+        if (file_exists($rScriptPath)) {
+            $zip->addFile($rScriptPath, 'FST-Script Shiny FST-LAB.R');
         }
 
         $zip->close();

@@ -14,6 +14,8 @@ class DashboardStatsWidget extends BaseWidget
 {
     use HasExperimentAccess;
 
+    protected static ?int $sort = 0;
+
     protected function getStats(): array
     {
         /** @var User */

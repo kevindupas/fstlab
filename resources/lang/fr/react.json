@@ -20,7 +20,7 @@
   "home": {
     "title": "Tests de catégorisation libre",
     "titleHighlight": "Audio et/ou Visio",
-    "description": "« FST/Web » est un outil dédié à la mise en œuvre d’un test de catégorisation libre (Free Sorting Task) avec des stimuli auditifs et/ou visuels.",
+    "description": "« FST-LAB » est un outil dédié à la mise en œuvre d’un test de catégorisation libre (Free Sorting Task) avec des stimuli auditifs et/ou visuels.",
     "description2": " Configurez facilement les tâches, faites passer les participants en laboratoire ou à distance, importer vos résultats, et seulement si vous le souhaitez, partagez vos configurations et vos données avec les autres utilisateurs.",
     "objectives": {
       "title": "Comment utiliser la plateforme (gratuitement)",
@@ -458,37 +458,50 @@
     }
   },
   "legal": {
-    "title": "Conditions Générales d'Utilisation (CGU)",
+    "title": "Informations légales",
     "article1": {
-      "title": "Article 1 : Objet",
-      "content": "Les présentes Conditions Générales d'Utilisation (CGU) encadrent l'utilisation du site « FST-Web ». En accédant à ce site, vous acceptez ces CGU dans leur intégralité."
+      "title": "1. Présentation du site",
+      "content": "En vertu de l'article 6 de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique, il est précisé aux utilisateurs du site FST-LAB l'identité des différents intervenants dans le cadre de sa réalisation et de son suivi : Propriétaire : CNRS USR 3414 MSHS-T - SIRET 18008901300676 – 16 av. Edouard Belin 31 400 Toulouse. Créateur : Maison des Sciences de l'Homme et de la Société. Le responsable publication est une personne physique ou une personne morale. Hébergeur : Université Toulouse - Jean Jaurès – 5 allées Antion Machado - 31058 TOULOUSE - CEDEX 1. Crédits : Pascal Gaillard - pascal.gaillard@univ-tlse2.fr et Kévin Dupas - dupas.dev@gmail.com"
     },
     "article2": {
-      "title": "Article 2 : Accès au site",
-      "content": "Le site est accessible gratuitement à tout utilisateur disposant d'un accès internet. Les frais liés à l'accès au site (matériel, connexion, etc.) sont à la charge de l'utilisateur."
+      "title": "2. Conditions générales d'utilisation du site et des services proposés",
+      "content": "L'utilisation du site FST-LAB implique l'acceptation pleine et entière des conditions générales d'utilisation ci-après décrites. Ces conditions d'utilisation sont susceptibles d'être modifiées ou complétées à tout moment, les utilisateurs du site FST-LAB sont donc invités à les consulter de manière régulière. Ce site est normalement accessible à tout moment aux utilisateurs. Une interruption pour raison de maintenance technique peut être toutefois décidée par la MSHS-T, qui s'efforcera alors de communiquer préalablement aux utilisateurs les dates et heures de l'intervention."
     },
     "article3": {
-      "title": "Article 3 : Contenu du site",
-      "content": "Le contenu publié sur « FST-Web » est protégé par des droits de propriété intellectuelle. Toute reproduction, représentation ou exploitation non autorisée est interdite."
+      "title": "3. Description des services fournis",
+      "content": "Le site FST-LAB a pour objet de fournir une application pour la création, la passation et le partage d'expérimentation utilisant le protocole dit de « catégorisation libre ». La MSHS-T s'efforce de fournir sur le site FST-LAB des informations aussi précises que possible. Toutefois, il ne pourra être tenue responsable des omissions, des inexactitudes et des carences dans la mise à jour, qu'elles soient de son fait ou du fait des tiers partenaires qui lui fournissent ces informations. Tous les informations indiquées sur le site FST-LAB sont données à titre indicatif, et sont susceptibles d'évoluer."
     },
     "article4": {
-      "title": "Article 4 : Responsabilité",
-      "intro": "Le site « FST-Web » ne peut être tenu responsable en cas de :",
-      "item1": "Dysfonctionnement technique",
-      "item2": "Perte ou altération de données",
-      "item3": "Utilisation non conforme aux CGU"
+      "title": "4. Limitations contractuelles sur les données techniques",
+      "content": "Le site utilise la technologie JavaScript. Le site Internet ne pourra être tenu responsable de dommages matériels liés à l'utilisation du site. De plus, l'utilisateur du site s'engage à accéder au site en utilisant un matériel récent, ne contenant pas de virus et avec un navigateur de dernière génération mis-à-jour"
     },
     "article5": {
-      "title": "Article 5 : Données personnelles",
-      "content": "L'utilisation du site peut impliquer la collecte de données personnelles. Ces données sont traitées conformément à notre Politique de Protection des Données."
+      "title": "5. Propriété intellectuelle et contrefaçons",
+      "content": "La MSHS-T est propriétaire des droits de propriété intellectuelle ou détient les droits d'usage sur tous les éléments accessibles sur le site, notamment les textes, images, graphismes, logo, icônes, sons, logiciels. Toute reproduction, représentation, modification, publication, adaptation de tout ou partie des éléments du site, quel que soit le moyen ou le procédé utilisé, est interdite, sauf autorisation écrite préalable à la MSHS-T."
     },
     "article6": {
-      "title": "Article 6 : Modification des CGU",
-      "content": "Nous nous réservons le droit de modifier ces CGU à tout moment. Les utilisateurs seront informés de toute modification via le site."
+      "title": "6. Limitations de responsabilité",
+      "content": "La MSHS-T ne pourra être tenue responsable des dommages directs et indirects causés au matériel de l'utilisateur, lors de l'accès au site FST-LAB, et résultant soit de l'utilisation d'un matériel ne répondant pas aux spécifications indiquées au point 4, soit de l'apparition d'un bug ou d'une incompatibilité. La MSHS-T ne pourra également être tenue responsable des dommages indirects (tels par exemple qu'une perte de marché ou perte d'une chance) consécutifs à l'utilisation du site FST-LAB."
     },
     "article7": {
-      "title": "Article 7 : Droit applicable",
-      "content": "Les présentes CGU sont régies par le droit français. Tout litige sera soumis aux juridictions compétentes."
+      "title": "7. Gestion des données personnelles",
+      "content": "Les informations recueillies vous concernant vont faire l'objet d'un traitement destiné au directeur de la MSHS-T et au Délégué à la Protection des Données – dpd.demandes@cnrs.fr. Les données à caractère personnel sont collectées et traitées pour la finalité suivante : gérer les profils des utilisateurs de la plateforme. Conformément à l'article 6 du Règlement (UE) 2016/679 du Parlement européen et du Conseil du 27 avril 2016, ce traitement relève de l'intérêt légitime poursuivi par le responsable de traitement. Les données collectées vous concernant sont votre nom, prénom, votre statut, votre laboratoire d'appartenance. Aucun transfert de données hors de l'Union européenne n'est réalisé. Les données sont conservées 24 mois."
+    },
+    "article8": {
+      "title": "8. Liens hypertextes et cookies",
+      "content": "Le site FST-LAB contient un certain nombre de liens hypertextes vers d'autres sites, mis en place avec l'autorisation de La MSHS-T. Cependant, la MSHS-T n'a pas la possibilité de vérifier le contenu des sites ainsi visités, et n'assumera en conséquence aucune responsabilité de ce fait. La navigation sur le site FST-LAB est susceptible de provoquer l'installation de cookie(s) sur l'ordinateur de l'utilisateur. Un cookie est un fichier de petite taille, qui ne permet pas l'identification de l'utilisateur, mais qui enregistre des informations relatives à la navigation d'un ordinateur sur un site."
+    },
+    "article9": {
+      "title": "9. Droit applicable et attribution de juridiction",
+      "content": "Tout litige en relation avec l'utilisation du site FST-LAB est soumis au droit français. Il est fait attribution exclusive de juridiction aux tribunaux compétents de Paris."
+    },
+    "article10": {
+      "title": "10. Les principales lois concernées",
+      "content": "Loi n° 78-17 du 6 janvier 1978, notamment modifiée par la loi n° 2004-801 du 6 août 2004 relative à l'informatique, aux fichiers et aux libertés. Règlement (UE) 2016/679 du parlement européen et du conseil du 27 avril 2016. Loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique."
+    },
+    "article11": {
+      "title": "11. Lexique",
+      "content": "Utilisateur : Internaute se connectant, utilisant le site susnommé. Informations personnelles : « les informations qui permettent, sous quelque forme que ce soit, directement ou non, l'identification des personnes physiques auxquelles elles s'appliquent » (article 4 de la loi n° 78-17 du 6 janvier 1978)."
     }
   },
   "privacy": {

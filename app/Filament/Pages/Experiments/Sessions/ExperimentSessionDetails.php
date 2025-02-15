@@ -59,7 +59,13 @@ class ExperimentSessionDetails extends Page
             ->where('status', 'approved')
             ->exists();
 
-        if (!$isCreatorOrSecondary && !$hasApprovedAccess) {
+        // Check if user has been given access with can_pass
+        $hasPassPermission = $record->experiment->users()
+            ->where('users.id', $user->id)
+            ->wherePivot('can_pass', true)
+            ->exists();
+
+        if (!$isCreatorOrSecondary && !$hasApprovedAccess && !$hasPassPermission) {
             abort(403, 'You do not have permission to access these statistics.');
         }
 

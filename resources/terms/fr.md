@@ -2,7 +2,7 @@
 
 ### Article 1 : Objet
 
-Les présentes Conditions Générales d'Utilisation (CGU) encadrent l'utilisation du site « FST-Web ». En accédant à ce site, vous acceptez ces CGU dans leur intégralité.
+Les présentes Conditions Générales d'Utilisation (CGU) encadrent l'utilisation du site « FST-LAB ». En accédant à ce site, vous acceptez ces CGU dans leur intégralité.
 
 ### Article 2 : Accès au site
 
@@ -10,11 +10,11 @@ Le site est accessible gratuitement à tout utilisateur disposant d'un accès in
 
 ### Article 3 : Contenu du site
 
-Le contenu publié sur « FST-Web » est protégé par des droits de propriété intellectuelle. Toute reproduction, représentation ou exploitation non autorisée est interdite.
+Le contenu publié sur « FST-LAB » est protégé par des droits de propriété intellectuelle. Toute reproduction, représentation ou exploitation non autorisée est interdite.
 
 ### Article 4 : Responsabilité
 
-Le site « FST-Web » ne peut être tenu responsable en cas de :
+Le site « FST-LAB » ne peut être tenu responsable en cas de :
 
 * Dysfonctionnement technique
 * Perte ou altération de données
