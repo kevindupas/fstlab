@@ -22,15 +22,17 @@ class UsersRelationManager extends RelationManager
     protected static string $relationship = 'users';
     protected array $initialState = [];
 
+    public function getTableHeading(): string
+    {
+        return "Utilisateurs associés à l'expérimentation";
+    }
+
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Toggle::make('can_configure'),
-                Forms\Components\Toggle::make('can_pass'),
+                Forms\Components\Toggle::make('can_configure')->label("Configuration de l'expérimentation"),
+                Forms\Components\Toggle::make('can_pass')->label('Faire passer des sessions'),
             ]);
     }
 
@@ -41,13 +43,15 @@ class UsersRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('email'),
-                Tables\Columns\TextColumn::make('roles.name')
-                    ->label('Role'),
+                //Tables\Columns\TextColumn::make('roles.name')
+                    //->label('Role'),
                 Tables\Columns\ToggleColumn::make('can_configure')
+                    ->label("Configuration de l'expérimentation")
                     ->afterStateUpdated(function ($record, $state) {
                         $this->handlePermissionChange($record, $state);
                     }),
                 Tables\Columns\ToggleColumn::make('can_pass')
+                    ->label('Faire passer des sessions')
                     ->afterStateUpdated(function ($record, $state) {
                         $this->handlePermissionChange($record, $state);
                     }),
@@ -59,15 +63,18 @@ class UsersRelationManager extends RelationManager
                     ->form([
                         Forms\Components\TextInput::make('name')
                             ->required()
+                            ->label("Nom de l'utilisateur")
                             ->maxLength(255),
                         Forms\Components\TextInput::make('email')
                             ->email()
                             ->required()
+                            ->label("Adresse email")
                             ->unique('users', 'email'),
                         Forms\Components\TextInput::make('university')
+                            ->label("Univeristé")
                             ->required(),
-                        Forms\Components\Toggle::make('can_configure'),
-                        Forms\Components\Toggle::make('can_pass'),
+                        Forms\Components\Toggle::make('can_configure')->label("Configuration de l'expérimentation"),
+                        Forms\Components\Toggle::make('can_pass')->label('Faire passer des sessions'),
                     ])
                     ->action(function (array $data): void {
                         // Création de l'utilisateur
@@ -111,8 +118,8 @@ class UsersRelationManager extends RelationManager
                             ->label('Email de l\'utilisateur')
                             ->email()
                             ->required(),
-                        Forms\Components\Toggle::make('can_configure'),
-                        Forms\Components\Toggle::make('can_pass'),
+                        Forms\Components\Toggle::make('can_configure')->label("Configuration de l'expérimentation"),
+                        Forms\Components\Toggle::make('can_pass')->label('Faire passer des sessions'),
                     ])
                     ->action(function (array $data): void {
                         // Recherche de l'utilisateur avec le bon rôle
