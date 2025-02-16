@@ -18,6 +18,18 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
     protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static ?int $navigationSort = -1;
+
+    public static function getNavigationGroup(): string
+    {
+        return __('navigation.group.users');
+    }
+
+
+    public static function getModelLabel(): string
+    {
+        return __('navigation.approved_user');
+    }
 
     public static function shouldRegisterNavigation(): bool
     {
