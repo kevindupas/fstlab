@@ -9,7 +9,7 @@
     "register": "Inscription",
     "admin_panel": "Panneau d'administration",
     "logo": {
-      "logo_alt": "Logo de la plateforme TCL-LabX Web"
+      "logo_alt": "Logo de la plateforme FST-LAB"
     }
   },
   "footer": {
@@ -20,7 +20,7 @@
   "home": {
     "title": "Tests de catégorisation libre",
     "titleHighlight": "Audio et/ou Visio",
-    "description": "« FST-LAB » est un outil dédié à la mise en œuvre d’un test de catégorisation libre (Free Sorting Task) avec des stimuli auditifs et/ou visuels.",
+    "description": "«FST-LAB» est un outil dédié à la mise en œuvre d’un test de catégorisation libre (Free Sorting Task) avec des stimuli auditifs et/ou visuels.",
     "description2": " Configurez facilement les tâches, faites passer les participants en laboratoire ou à distance, importer vos résultats, et seulement si vous le souhaitez, partagez vos configurations et vos données avec les autres utilisateurs.",
     "objectives": {
       "title": "Comment utiliser la plateforme (gratuitement)",

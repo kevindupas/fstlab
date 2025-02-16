@@ -9,18 +9,18 @@
     "register": "Register",
     "admin_panel": "Admin Panel",
     "logo": {
-      "logo_alt": "TCL-LabX Web Platform Logo"
+      "logo_alt": "FST-LAB Platform Logo"
     }
   },
   "footer": {
     "copyright": "Copyright © University Toulouse 2 Jean Jaurès",
-    "cgu": "Terms and Conditions",
+    "cgu": "Legal Notices",
     "personalData": "Privacy Policy"
   },
   "home": {
     "title": "Free Sorting Task",
     "titleHighlight": "Audio and/or Visio",
-    "description": "“FST-LAB” is a tool dedicated to the implementation of a free sorting task (or Free Categorisation Task) with auditory and/or visual stimuli.",
+    "description": "«FST-LAB» is a tool dedicated to the implementation of a free sorting task (or Free Categorisation Task) with auditory and/or visual stimuli.",
     "description2": "Easily configure tasks, take participants inside the lab or remotely, download your results, and only if you want, share your configurations and data with other users.",
     "objectives": {
       "title": "How to use the platform (freely)",
