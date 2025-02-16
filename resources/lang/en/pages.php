@@ -48,6 +48,7 @@ return [
                 'principal_banned' => 'Principal Experimenter Banned',
                 'question' => 'General Question',
                 'other' => 'Other',
+                'secondary_option' => 'Apply to become a master account and create experiments'
             ],
             'message' => [
                 'label' => 'Request Description',

@@ -47,6 +47,7 @@ return [
                 'principal_banned' => 'Principal expérimentateur banni',
                 'question' => 'Question Générale',
                 'other' => 'Autre',
+                'secondary_option' => 'Demander à devenir un compte principal et pouvoir créer des expérimentations'
             ],
             'message' => [
                 'label' => 'Description de la demande',

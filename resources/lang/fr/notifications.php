@@ -151,11 +151,18 @@ return [
         'line3' => 'Vous pouvez répondre via la page "Contacter l\'administrateur" de la plateforme.',
     ],
     'admin_contact_message' => [
-        'subject' => 'Nouveau message : :subject',
+        'subject' => ':subject',
         'line1' => 'Message de : :sender_name (:sender_email)',
         'line2' => 'Sujet : :subject',
         'line3' => 'Message :',
         'action' => 'Gérer l\'utilisateur',
+        'subjects' => [
+            'unban' => 'Demande de débannissement',
+            'principal_banned' => 'Principal expérimentateur banni',
+            'question' => 'Question Générale',
+            'other' => 'Autre',
+            'secondary_option' => 'Demande de compte principal'
+        ],
     ],
     'user_message' => [
         'supervisor' => 'superviseur',

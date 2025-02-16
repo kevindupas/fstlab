@@ -61,9 +61,25 @@ class ContactUser extends Page
                                 ->where('status', 'approved')
                                 ->pluck('name', 'id');
                         } else {
-                            // Pour les principaux, montrer leurs comptes secondaires
-                            return User::where('created_by', $user->id)
-                                ->pluck('name', 'id');
+                            // Pour les principaux :
+                            return User::where(function($query) use ($user) {
+                                // Leurs comptes secondaires
+                                $query->where('created_by', $user->id)
+                                    // Les principaux ajoutés à leurs expérimentations
+                                    ->orWhereHas('experiments', function($q) use ($user) {
+                                        $q->where('experiments.created_by', $user->id);
+                                    })
+                                    // Les créateurs des expérimentations où ils sont ajoutés
+                                    ->orWhereHas('createdExperiments', function($q) use ($user) {
+                                        $q->whereHas('users', function($sq) use ($user) {
+                                            $sq->where('users.id', $user->id);
+                                        });
+                                    });
+                            })
+                                ->get()
+                                ->mapWithKeys(function ($user) {
+                                    return [$user->id => "{$user->name} ({$user->email})"];
+                                });
                         }
                     })
                     ->native(false)
@@ -85,10 +101,19 @@ class ContactUser extends Page
                         if ($user->hasRole('supervisor')) {
                             return Experiment::where('created_by', $userId)->pluck('name', 'id');
                         } else {
-                            // Pour les secondaires, montrer les expériences où ils sont assignés
-                            return Experiment::whereHas('users', function ($query) use ($userId) {
-                                $query->where('users.id', $userId);
-                            })->pluck('name', 'id');
+                            return Experiment::where(function($query) use ($user, $userId) {
+                                $query->where('created_by', $userId)
+                                    ->whereHas('users', function($q) use ($user) {
+                                        $q->where('users.id', $user->id);
+                                    });
+                            })
+                                ->orWhere(function($query) use ($user, $userId) {
+                                    $query->where('created_by', $user->id)
+                                        ->whereHas('users', function($q) use ($userId) {
+                                            $q->where('users.id', $userId);
+                                        });
+                                })
+                                ->pluck('name', 'id');
                         }
                     })
                     ->searchable()

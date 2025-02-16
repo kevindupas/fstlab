@@ -12,56 +12,54 @@ class AdminContactMessage extends Notification
 {
     use Queueable;
 
-    /**
-     * Create a new notification instance.
-     */
     public function __construct(
         private User $sender,
         private string $subject,
         private string $message
     ) {}
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
     public function via(object $notifiable): array
     {
         return ['mail'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
     public function toMail($notifiable): MailMessage
     {
+        // Vérification et définition de la langue
+        $locale = $notifiable->locale ?? 'en';
+        app()->setLocale($locale);
 
-        app()->setLocale($notifiable->locale ?? config('app.locale'));
+        // Traduction du sujet selon le type de message
+        $translatedSubject = match($this->subject) {
+            'info' => $locale === 'fr' ? 'Information' : 'Information',
+            'warning' => $locale === 'fr' ? 'Avertissement' : 'Warning',
+            'other' => $locale === 'fr' ? 'Autre' : 'Other',
+            default => $this->subject
+        };
 
-        $emailBuilder = (new MailMessage)
-            ->subject(__('notifications.admin_contact_message.subject', ['subject' => $this->subject]))
-            ->line(__('notifications.admin_contact_message.line1', ['sender_name' => $this->sender->name, 'sender_email' => $this->sender->email]))
-            ->line(__('notifications.admin_contact_message.line2', ['subject' => $this->subject]))
-            ->line(__('notifications.admin_contact_message.line3'))
-            ->line($this->message);
-
-        // Si c'est une demande de débannissement, ajouter le lien vers le profil
-        if ($this->subject === 'unban' && $this->sender->status === 'banned') {
-            $emailBuilder->action(
-                __('notifications.admin_contact_message.action'),
-                route('filament.admin.resources.banned-users.edit', ['record' => $this->sender])
-            );
+        // Si la langue est en français
+        if ($locale === 'fr') {
+            return (new MailMessage)
+                ->greeting(' ')
+                ->subject('Message administratif : ' . $translatedSubject)
+                ->line('Message de : ' . $this->sender->name . ' (' . $this->sender->email . ')')
+                ->line('Sujet : ' . $translatedSubject)
+                ->line('Message :')
+                ->line($this->message)
+                ->salutation(config('app.name'));
         }
 
-        return $emailBuilder;
+        // Si la langue est en anglais
+        return (new MailMessage)
+            ->greeting(' ')
+            ->subject('Administrative message: ' . $translatedSubject)
+            ->line('Message from: ' . $this->sender->name . ' (' . $this->sender->email . ')')
+            ->line('Subject: ' . $translatedSubject)
+            ->line('Message:')
+            ->line($this->message)
+            ->salutation(config('app.name'));
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(object $notifiable): array
     {
         return [

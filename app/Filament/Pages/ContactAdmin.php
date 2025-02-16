@@ -50,13 +50,26 @@ class ContactAdmin extends Page
             ->schema([
                 Select::make('subject')
                     ->label(__('pages.admin_contact.form.subject'))
-                    ->options([
-                        'unban' => __('pages.admin_contact.form.options.unban'),
-                        'principal_banned' => __('pages.admin_contact.form.options.principal_banned'),
-                        'question' => __('pages.admin_contact.form.options.question'),
-                        'other' => __('pages.admin_contact.form.options.other'),
-                    ])
+                    ->options(function ($get) {
+                        $userId = Auth::id();
+                        $selectedUser = $userId ? User::find($userId) : null;
+
+                        $options = [
+                            'unban' => __('pages.admin_contact.form.options.unban'),
+                            'principal_banned' => __('pages.admin_contact.form.options.principal_banned'),
+                            'question' => __('pages.admin_contact.form.options.question'),
+                            'other' => __('pages.admin_contact.form.options.other'),
+                        ];
+
+                        // Ajouter l'option seulement si l'utilisateur est un compte secondaire
+                        if ($selectedUser && $selectedUser->hasRole('secondary_experimenter')) {
+                            $options['secondary_option'] = __('pages.admin_contact.form.options.secondary_option');
+                        }
+
+                        return $options;
+                    })
                     ->native(false)
+                    ->reactive()
                     ->required(),
 
                 MarkdownEditor::make('message')
