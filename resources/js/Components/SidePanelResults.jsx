@@ -383,7 +383,7 @@ function SidePanelResults({
                                                                     {t(
                                                                         "sidePanelResults.groups.elements.prefix.image"
                                                                     )}
-                                                                    {item.originalIndex +
+                                                                    {item.displayIndex +
                                                                         1}
                                                                 </div>
                                                             </div>

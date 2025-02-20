@@ -137,7 +137,7 @@ function MediaGroup({
                         cornerRadius={4}
                     />
                     <Text
-                        text={`p${index + 1}`}
+                        text={`p${item.displayIndex + 1}`}
                         fontSize={14}
                         x={8}
                         y={parseInt(item.button_size || size) - 22}
@@ -154,7 +154,7 @@ function MediaGroup({
                         strokeWidth={2}
                     />
                     <Text
-                        text={`s${index + 1}`}
+                        text={`s${item.displayIndex + 1}`}
                         fontSize={20}
                         x={parseInt(item.button_size || size) / 2 - 15}
                         y={parseInt(item.button_size || size) / 2 - 10}
