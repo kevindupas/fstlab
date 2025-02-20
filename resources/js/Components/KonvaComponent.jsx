@@ -21,6 +21,7 @@ function KonvaComponent({
     onInteractionsUpdate,
     onCanvasSizeChange,
     checkIsTablet,
+    isRandom,
 }) {
     const sidebarWidth = checkIsTablet ? 350 : 400;
 
@@ -46,12 +47,7 @@ function KonvaComponent({
     useEffect(() => {
         if (!mediaArray.length) return;
 
-        const shuffledItems = shuffleWithSeed(mediaArray, 12213).map(
-            (item, originalIndex) => ({
-                ...item,
-                originalIndex,
-            })
-        );
+        const shuffledItems = shuffleWithSeed(mediaArray, 12213, isRandom);
 
         const arrangedItems = arrangeItemsInGrid(
             shuffledItems,
@@ -61,7 +57,7 @@ function KonvaComponent({
         );
 
         setMediaItems(arrangedItems);
-    }, [mediaArray, size]);
+    }, [mediaArray, size, isRandom]);
 
     useEffect(() => {
         if (onMediaItemsChange && mediaItems.length > 0) {

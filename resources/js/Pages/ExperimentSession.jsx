@@ -517,6 +517,7 @@ function ExperimentSession() {
                                 groups={groups}
                                 editingGroupIndex={editingGroupIndex}
                                 onMediaGroupChange={handleMediaGroupChange}
+                                isRandom={experiment?.experiment?.is_random}
                             />
                         </div>
 

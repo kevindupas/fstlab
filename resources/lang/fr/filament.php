@@ -366,6 +366,8 @@ return [
                 'link_copied' => "Copié dans le presse-papier",
                 'name' => 'Nom',
                 'name_helper' => 'Donnez un nom unique et descriptif à votre expérimentation',
+                'is_random' => 'Ordre aléatoire des stimuli',
+                'is_random_helper' => 'Si activé, les stimuli seront présentés dans un ordre aléatoire pour chaque participant',
                 'type' => [
                     'label' => 'Type de médias',
                     'helper_text' => 'Choisissez le type de médias pour votre expérience. Cela déterminera les types de fichiers que vous pourrez uploader.',

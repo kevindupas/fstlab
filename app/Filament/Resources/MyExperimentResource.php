@@ -164,7 +164,10 @@ class MyExperimentResource extends Resource
                         ->label(__('filament.resources.my_experiment.form.name'))
                         ->helperText(__('filament.resources.my_experiment.form.name_helper'))
                         ->required(),
-                    //->unique(ignorable: fn($record) => $record),
+
+                    Forms\Components\Toggle::make('is_random')
+                        ->label(__('filament.resources.my_experiment.form.is_random'))
+                        ->helperText(__('filament.resources.my_experiment.form.is_random_helper')),
 
                     Forms\Components\Select::make('type')
                         ->label(__('filament.resources.my_experiment.form.type.label'))

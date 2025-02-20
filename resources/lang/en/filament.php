@@ -366,6 +366,8 @@ return [
                 'link_copied' => 'Copied to clipboard',
                 'name' => 'Name',
                 'name_helper' => 'Provide a unique and descriptive name for your experiment',
+                'is_random' => 'Random order of stimuli',
+                'is_random_helper' => 'If enabled, stimuli will be presented in random order for each participant',
                 'type' => [
                     'label' => 'Media type',
                     'helper_text' => 'Choose the type of media for your experiment. This will determine the types of files you can upload.',

@@ -8,8 +8,16 @@ export const seededRandom = (seed) => {
     return ((seed * a) % m) / m;
 };
 
-// Fonction pour mélanger un tableau avec une seed
-export const shuffleWithSeed = (array, seed) => {
+// Fonction pour obtenir une seed basée sur un timestamp
+const getRandomSeed = () => {
+    return Math.floor(Date.now() * Math.random());
+};
+
+// Fonction pour mélanger un tableau avec une seed ou aléatoirement
+export const shuffleWithSeed = (array, defaultSeed, isRandom = false) => {
+    // Utiliser une seed aléatoire si isRandom est true, sinon utiliser la seed par défaut
+    let seed = isRandom ? getRandomSeed() : defaultSeed;
+    
     // Ajouter l'index original à chaque élément
     const arrayWithIndices = array.map((item, index) => ({
         ...item,
