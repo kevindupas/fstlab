@@ -13,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class UserResource extends Resource
 {
@@ -33,7 +34,9 @@ class UserResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()->hasRole('supervisor');
+        /** @var \App\Models\User */
+        $user = Auth::user();
+        return $user->hasRole('supervisor');
     }
 
     public static function form(Form $form): Form
@@ -80,7 +83,7 @@ class UserResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'approved' => 'success',
                         'pending' => 'warning',
                         'rejected', 'banned' => 'danger',
@@ -139,8 +142,10 @@ class UserResource extends Resource
                     ])
                     ->modalWidth('3xl') // Pour avoir une modale plus large
                     ->action(function (User $record, array $data) {
+                        /** @var \App\Models\User */
+                        $user = Auth::user();
                         $record->notify(new AdminContactMessage(
-                            auth()->user(),
+                            $user,
                             $data['subject'],
                             $data['message']
                         ));

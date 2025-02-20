@@ -44,7 +44,7 @@ class UsersRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('email'),
                 //Tables\Columns\TextColumn::make('roles.name')
-                    //->label('Role'),
+                //->label('Role'),
                 Tables\Columns\ToggleColumn::make('can_configure')
                     ->label("Configuration de l'expérimentation")
                     ->afterStateUpdated(function ($record, $state) {
@@ -71,7 +71,7 @@ class UsersRelationManager extends RelationManager
                             ->label("Adresse email")
                             ->unique('users', 'email'),
                         Forms\Components\TextInput::make('university')
-                            ->label("Univeristé")
+                            ->label("Université")
                             ->required(),
                         Forms\Components\Toggle::make('can_configure')->label("Configuration de l'expérimentation"),
                         Forms\Components\Toggle::make('can_pass')->label('Faire passer des sessions'),
