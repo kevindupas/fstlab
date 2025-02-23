@@ -7,6 +7,7 @@ use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Auth\Register;
 use App\Filament\Pages\ContactAdmin;
 use App\Filament\Pages\ContactUser;
+use App\Filament\Pages\Experiments\Sessions\ExperimentSessionDelete;
 use App\Filament\Pages\Experiments\Sessions\ExperimentSessionExport;
 use App\Filament\Pages\Experiments\Sessions\ExperimentSessions;
 use App\Filament\Pages\Profile;
@@ -76,6 +77,7 @@ class AdminPanelProvider extends PanelProvider
                 ContactAdmin::class,
                 ContactUser::class,
                 ExperimentSessionExport::class,
+                ExperimentSessionDelete::class,
             ])
             ->renderHook(
                 'panels::global-search.after',

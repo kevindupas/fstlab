@@ -15,9 +15,11 @@ use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Columns\ViewColumn;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\HtmlString;
 use League\Csv\Writer;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -71,8 +73,7 @@ class ExperimentSessionResource extends Resource
             })
             ->columns([
                 Tables\Columns\TextColumn::make('participant_number')
-                    ->label(__('filament.pages.experiments_sessions.columns.participant_number'))
-                    ->sortable(),
+                    ->label(__('filament.pages.experiments_sessions.columns.participant_number')),
                 Tables\Columns\IconColumn::make('status')
                     ->icons([
                         'heroicon-o-check-circle' => fn($state): bool => $state === 'completed',
@@ -86,12 +87,10 @@ class ExperimentSessionResource extends Resource
                 // ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('filament.pages.experiments_sessions.columns.created_at'))
-                    ->dateTime('d/m/Y H:i')
-                    ->sortable(),
+                    ->dateTime('d/m/Y H:i'),
                 Tables\Columns\TextColumn::make('completed_at')
                     ->label(__('filament.pages.experiments_sessions.columns.completed_at'))
-                    ->dateTime('d/m/Y H:i')
-                    ->sortable(),
+                    ->dateTime('d/m/Y H:i'),
                 Tables\Columns\TextColumn::make('experimentLink.user.name')
                     ->label(__('pages.experiments_sessions.columns.experimenter'))
                     ->description(function ($record) {
@@ -113,22 +112,10 @@ class ExperimentSessionResource extends Resource
 
                         return __('pages.experiments_sessions.columns.experimenter_types.collaborator');
                     }),
-            ])
-            ->actions([
-                Action::make('export')
-                    ->label(__('filament.pages.experiments_sessions.actions.export'))
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->color('success')
-                    ->hidden(fn(ExperimentSession $record): bool => $record->status !== 'completed')
-                    ->url(fn(ExperimentSession $record): string =>
-                    ExperimentSessionExport::getUrl(['record' => $record->id])),
 
-                Action::make('details')
-                    ->label(__('filament.pages.experiments_sessions.actions.details'))
-                    ->hidden(fn(ExperimentSession $record): bool => $record->status !== 'completed')
-                    ->url(fn(ExperimentSession $record): string =>
-                    ExperimentSessionDetails::getUrl(['record' => $record]))
-                    ->icon('heroicon-o-eye')
+                ViewColumn::make('custom_actions')
+                    ->label('Actions')
+                    ->view('filament.components.custom-session-actions'),
             ])
             ->bulkActions([
                 BulkAction::make('exportSelection')
@@ -151,7 +138,30 @@ class ExperimentSessionResource extends Resource
                         return redirect()->route('filament.admin.pages.bulk-experiment-session-export', [
                             'record' => request()->query('record')
                         ]);
+                    }),
+
+                BulkAction::make('custom_bulk_actions')
+                    ->label('Supprimer les sessions sélectionnées')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->action(function (Collection $records) {
+                        $recordIds = $records->pluck('id')->toArray();
+
+                        if (empty($recordIds)) {
+                            Notification::make()
+                                ->warning()
+                                ->title(__('filament.pages.experiments_sessions.notifications.no_selection_completed'))
+                                ->send();
+                            return null;
+                        }
+
+                        session(['selected_sessions' => $recordIds]);
+
+                        return redirect()->route('filament.admin.pages.delete-selected-sessions', [
+                            'record' => request()->query('record')
+                        ]);
                     })
+
             ])
             ->reorderable()
             ->defaultSort('created_at', 'desc')

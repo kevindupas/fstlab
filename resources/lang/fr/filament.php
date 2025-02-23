@@ -88,7 +88,14 @@ return [
                 'export' => 'Exporter les données',
                 'details' => 'Détails',
                 'export_all' => 'Exporter tous',
-                'export_selection' => 'Exporter la sélection'
+                'export_selection' => 'Exporter la sélection',
+                'delete_selection' => 'Supprimer la sélection',
+                'delete_all' => 'Supprimer tous',
+                'delete' => 'Supprimer',
+                'delete_selected' => 'Supprimer la sélection',
+                'delete_all' => 'Supprimer tous',
+                'delete_selected_confirm' => 'Êtes-vous sûr de vouloir supprimer les sessions sélectionnées ?',
+                'delete_all_confirm' => 'Êtes-vous sûr de vouloir supprimer toutes les sessions ?',
             ],
             'notifications' => [
                 'no_completed_sessions' => 'Aucune session complétée à exporter',

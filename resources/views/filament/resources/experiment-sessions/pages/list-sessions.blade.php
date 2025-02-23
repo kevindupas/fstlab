@@ -322,6 +322,57 @@
             </svg>
             {{ __('pages.experiments_sessions.buttons.export_list') }}
         </a>
+
+        @if ($isCreator && $counts['all'] > 0)
+            <button type="button" wire:click="$dispatch('open-modal', { id: 'confirm-delete-all-sessions' })"
+                class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-red-800 dark:text-red-200 dark:border-red-600 dark:hover:bg-red-700">
+                <x-heroicon-o-trash class="h-5 w-5 mr-2" />
+                Supprimer toutes les sessions
+            </button>
+
+            <x-filament::modal id="confirm-delete-all-sessions" width="xl">
+                <x-slot name="heading">
+                    Confirmer la suppression de toutes les sessions
+                </x-slot>
+                <x-slot name="description">
+                    Êtes-vous sûr de vouloir supprimer toutes les sessions de cette expérimentation ? Cette action est
+                    irréversible.
+                </x-slot>
+                <x-slot name="footer">
+                    <div class="flex justify-end gap-x-2">
+                        <x-filament::button type="button" color="gray"
+                            wire:click="$dispatch('close-modal', { id: 'confirm-delete-all-sessions' })">
+                            Annuler
+                        </x-filament::button>
+                        <x-filament::button type="button" color="danger" wire:click="$dispatch('deleteAllSessions')">
+                            Supprimer tout
+                        </x-filament::button>
+                    </div>
+                </x-slot>
+            </x-filament::modal>
+        @endif
+
+        <x-filament::modal id="confirm-delete-selected-sessions" width="xl">
+            <x-slot name="heading">
+                Confirmer la suppression des sessions sélectionnées
+            </x-slot>
+            <x-slot name="description">
+                Êtes-vous sûr de vouloir supprimer les sessions sélectionnées ? Cette action est irréversible.
+            </x-slot>
+            <x-slot name="footer">
+                <div class="flex justify-end gap-x-2">
+                    <x-filament::button type="button" color="gray"
+                        wire:click="$dispatch('close-modal', { id: 'confirm-delete-selected-sessions' })">
+                        Annuler
+                    </x-filament::button>
+                    <x-filament::button type="button" color="danger"
+                        wire:click="$dispatch('deleteSelectedSessions')">
+                        Supprimer la sélection
+                    </x-filament::button>
+                </div>
+            </x-slot>
+        </x-filament::modal>
+
     </div>
 
     {{ $this->table }}
