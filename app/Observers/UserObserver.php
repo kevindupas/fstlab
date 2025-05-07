@@ -33,7 +33,10 @@ class UserObserver
 
             // On notifie
             $user->notify(new RegistrationSubmitted());
-            User::role('supervisor')->first()?->notify(new NewRegistrationRequest($user));
+
+            User::role('supervisor')->get()->each(function ($supervisor) use ($user) {
+                $supervisor->notify(new NewRegistrationRequest($user));
+            });
 
             // Déconnexion avec message
             Auth::logout();
