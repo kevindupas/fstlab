@@ -11,6 +11,10 @@ use App\Livewire\ExperimentSession;
 //     return view('app');
 // });
 
+Route::get('/login', function () {
+    return redirect()->route('filament.admin.auth.login');
+})->name('login');
+
 Route::get('/admin/export-sessions', [ExportSessionsController::class, 'export'])
     ->middleware(['web', 'auth']) // Important d'ajouter les middlewares
     ->name('export.sessions');
