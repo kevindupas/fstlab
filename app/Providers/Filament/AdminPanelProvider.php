@@ -123,6 +123,7 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
                 \App\Http\Middleware\RedirectIfPendingApproval::class,
                 \App\Http\Middleware\SetLocale::class,
+                \App\Http\Middleware\TrustProxies::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
