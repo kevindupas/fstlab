@@ -7,13 +7,17 @@ use App\Models\User;
 use App\Observers\ExperimentObserver;
 use App\Observers\UserObserver;
 use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        if (env('APP_ENV') === 'production') {
+            URL::forceScheme('https');
+        }
+
         User::observe(UserObserver::class);
         Experiment::observe(ExperimentObserver::class);
         LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
