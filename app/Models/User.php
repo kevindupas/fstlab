@@ -65,7 +65,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function canAccessFilament(): bool
     {
-        return $this->hasRole('superviseur');
+        return $this->hasRole('supervisor');
     }
 
     public function experiments()
