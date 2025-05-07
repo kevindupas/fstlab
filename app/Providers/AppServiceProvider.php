@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Observers\ExperimentObserver;
 use App\Observers\UserObserver;
 use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -16,6 +17,12 @@ class AppServiceProvider extends ServiceProvider
     {
         if (env('APP_ENV') === 'production') {
             URL::forceScheme('https');
+
+            \Livewire\Livewire::setUpdateRoute(function ($handle) {
+                return Route::post('/livewire/update', $handle)
+                    ->middleware(['web', 'auth'])
+                    ->name('livewire.update');
+            });
         }
 
         User::observe(UserObserver::class);
