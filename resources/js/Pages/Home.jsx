@@ -108,21 +108,134 @@ export default function Home() {
                     width={2245}
                     height={1636}
                 />
-                <Container className="relative">
-                    <div className="max-w-3xl md:mx-auto md:text-center xl:max-w-none">
-                        <h2 className="font-display text-3xl tracking-tight text-white sm:text-4xl md:text-4xl mb-8">
-                            {t("home.objectives.title")}
-                        </h2>
-                        <div className="space-y-6 flex flex-col justify-center">
-                            <p className="text-lg tracking-tight text-blue-50">
-                                1. {t("home.objectives.description1")}
-                            </p>
-                            <p className="text-lg tracking-tight text-blue-50">
-                                2. {t("home.objectives.description2")}
-                            </p>
+                <section className="relative overflow-hidden bg-blue-600 py-20">
+                    <img
+                        className="absolute left-1/2 top-1/2 max-w-none translate-x-[-44%] translate-y-[-42%] opacity-25"
+                        src={backgroundImage}
+                        alt=""
+                        width={2245}
+                        height={1636}
+                    />
+                    <Container className="relative">
+                        <div className="max-w-4xl mx-auto">
+                            <h2 className="font-display text-3xl tracking-tight text-white sm:text-4xl md:text-4xl mb-12 text-center">
+                                {t("home.features.title")}
+                            </h2>
+
+                            <div className="space-y-12">
+                                {/* Création */}
+                                <div>
+                                    <h3 className="text-xl font-semibold text-white mb-6 text-center">
+                                        {t("home.features.creation.title")}
+                                    </h3>
+                                    <ul className="space-y-3 text-blue-50 max-w-3xl mx-auto">
+                                        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                                            <li
+                                                key={i}
+                                                className="flex items-center"
+                                            >
+                                                <div className="w-2 h-2 bg-blue-300 rounded-full mr-3 flex-shrink-0"></div>
+                                                <span>
+                                                    {t(
+                                                        `home.features.creation.item${i}`
+                                                    )}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                {/* Pendant l'expérience */}
+                                <div>
+                                    <h3 className="text-xl font-semibold text-white mb-6 text-center">
+                                        {t("home.features.during.title")}
+                                    </h3>
+                                    <ul className="space-y-3 text-blue-50 max-w-3xl mx-auto">
+                                        {[1, 2].map((i) => (
+                                            <li
+                                                key={i}
+                                                className="flex items-center"
+                                            >
+                                                <div className="w-2 h-2 bg-blue-300 rounded-full mr-3 flex-shrink-0"></div>
+                                                <span>
+                                                    {t(
+                                                        `home.features.during.item${i}`
+                                                    )}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                {/* Fin de l'expérience */}
+                                <div>
+                                    <h3 className="text-xl font-semibold text-white mb-6 text-center">
+                                        {t("home.features.end.title")}
+                                    </h3>
+                                    <ul className="space-y-3 text-blue-50 max-w-3xl mx-auto">
+                                        {[1, 2, 3].map((i) => (
+                                            <li
+                                                key={i}
+                                                className="flex items-center"
+                                            >
+                                                <div className="w-2 h-2 bg-blue-300 rounded-full mr-3 flex-shrink-0"></div>
+                                                <span>
+                                                    {t(
+                                                        `home.features.end.item${i}`
+                                                    )}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                {/* Fin de chaque exécution */}
+                                <div>
+                                    <h3 className="text-xl font-semibold text-white mb-6 text-center">
+                                        {t("home.features.run.title")}
+                                    </h3>
+                                    <ul className="space-y-3 text-blue-50 max-w-3xl mx-auto">
+                                        {[1, 2, 3].map((i) => (
+                                            <li
+                                                key={i}
+                                                className="flex items-center"
+                                            >
+                                                <div className="w-2 h-2 bg-blue-300 rounded-full mr-3 flex-shrink-0"></div>
+                                                <span>
+                                                    {t(
+                                                        `home.features.run.item${i}`
+                                                    )}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                {/* Globalement */}
+                                <div>
+                                    <h3 className="text-xl font-semibold text-white mb-6 text-center">
+                                        {t("home.features.global.title")}
+                                    </h3>
+                                    <ul className="space-y-3 text-blue-50 max-w-3xl mx-auto">
+                                        {[1, 2, 3, 4].map((i) => (
+                                            <li
+                                                key={i}
+                                                className="flex items-center"
+                                            >
+                                                <div className="w-2 h-2 bg-blue-300 rounded-full mr-3 flex-shrink-0"></div>
+                                                <span>
+                                                    {t(
+                                                        `home.features.global.item${i}`
+                                                    )}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </Container>
+                    </Container>
+                </section>
             </section>
 
             <section className="bg-white py-16">

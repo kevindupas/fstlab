@@ -168,7 +168,7 @@ function ExperimentList() {
     }
 
     return (
-        <div className="bg-white my-20">
+        <div className="bg-white my-20 mt-20">
             <div className="relative isolate">
                 <div className="py-12 sm:py-20">
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">

@@ -27,6 +27,44 @@
       "description1": "Use the 'Register' button at the top right of this screen to register with the platform.",
       "description2": "After accepting your registration, you will be able to configure your next experiment!"
     },
+    "features": {
+      "title": "What you can do with FST-LAB",
+      "creation": {
+        "title": "During the creation of the experiment (as experimenters):",
+        "item1": "you can choose sounds, pictures or both in the same experiment",
+        "item2": "you can choose a random order of stimuli (or not)",
+        "item3": "you can choose the size and color of the buttons on the screen",
+        "item4": "you can upload sounds or pictures up to 20 MB by file",
+        "item5": "you can set the instructions for the participant",
+        "item6": "you can insert in your experience all the files connected to your work (articles, agreements, etc.)",
+        "item7": "you can manage session of experiment with different modes (start, pause, stop, test)",
+        "item8": "you can generate and send a link to run experiment (only), where you want"
+      },
+      "during": {
+        "title": "During the experiment by itself (as participants):",
+        "item1": "you can see/listen stimuli",
+        "item2": "you can move stimuli on the fullscreen view"
+      },
+      "end": {
+        "title": "At the end of the experiment (as experimenters):",
+        "item1": "groups of stimuli are made automatically (if the icons are close enough to each other) and can be modified if necessary",
+        "item2": "you can add a comment on each group using keyboard or voice dictation",
+        "item3": "you can comment on all the experiments"
+      },
+      "run": {
+        "title": "At the end of each run (as experimenters):",
+        "item1": "you can view results",
+        "item2": "you can see basic statistics on the running, including time and a number of groups",
+        "item3": "you can download results in various formats with a little R script to easily visualize data"
+      },
+      "global": {
+        "title": "Globally (as experimenters):",
+        "item1": "you can make your experiment public so that it can be seen by all users of FST-LAB",
+        "item2": "you can share your experiment with another user for limited collaboration (read and download results)",
+        "item3": "you can share your experiment with another user for full collaboration (read, download results and edit experiment)",
+        "item4": "you can download all your experiment files (JSON or XML)"
+      }
+    },
     "privacy": {
       "gdpr": "Please respect the European regulations regarding data, i.e. the GDPR (General Data Protection Regulation)",
       "link": "https://gdpr.eu/what-is-gdpr"
@@ -372,15 +410,120 @@
   },
   "changelog": {
     "title": "Changelog",
-    "subtitle": "Discover the latest updates and improvements made to the platform",
+    "subtitle": "Follow the evolution of our experimentation platform",
     "version": "Version",
-    "upcoming_features": "What's new",
+    "upcoming_features": "Coming Soon",
+    "new_features": "New Features",
+    "fixes": "Fixes",
     "version_one": {
       "date": "December 14, 2024",
-      "description": "First stable version of the experimentation platform"
+      "description": "First stable version of the experimentation platform",
+      "categories": {
+        "auth_users": {
+          "title": "Authentication System and User Management",
+          "features": [
+            "Registration with ORCID verification and university affiliation",
+            "Approval system for new accounts by the supervisor",
+            "Email notifications for registration and approval steps",
+            "Role management: Supervisor, Main Experimenter, Secondary Experimenter",
+            "Ban system with justification and notifications",
+            "Administrator contact page for special requests"
+          ]
+        },
+        "experiments": {
+          "title": "Experiment Management",
+          "features": [
+            "Creation of experiments with multimedia support (images and sounds)",
+            "Customization of interaction parameters",
+            "Unique DOI system for each experiment",
+            "Test mode with visualization in How It Works",
+            "Supporting documents management",
+            "Session control interface"
+          ]
+        },
+        "monitoring": {
+          "title": "Monitoring and Analysis",
+          "features": [
+            "Detailed session dashboard",
+            "Participant interaction tracking",
+            "Data export in CSV format",
+            "Visualization of groups and interactions",
+            "Detailed activity logs",
+            "Usage statistics"
+          ]
+        },
+        "participant": {
+          "title": "Participant Interface",
+          "features": [
+            "Intuitive ranking interface",
+            "Optimized sound and image management",
+            "Group system (C1, C2, etc.)",
+            "Instructions display",
+            "Visual feedback of interactions",
+            "Multi-device compatibility"
+          ]
+        },
+        "notifications": {
+          "title": "Notifications and Communications",
+          "features": [
+            "Email notification system",
+            "Supervisor-user communication",
+            "Ban alerts",
+            "Status change notifications",
+            "Access request system"
+          ]
+        }
+      }
     },
     "version_two": {
-      "date": "January 4, 2025"
+      "date": "January 4, 2025",
+      "description": "Interface improvements and fixes",
+      "categories": {
+        "ui": {
+          "title": "User Interface",
+          "features": [
+            "Multilingual support (French, English)",
+            "Improved experiment structure",
+            "New access request management",
+            "Improved shared widgets",
+            "Integration of Terms of Service during registration",
+            "Revised experiment sharing structure",
+            "Improved notification system",
+            "Messaging system"
+          ]
+        },
+        "fixes": {
+          "title": "Fixes",
+          "features": [
+            "Fixed display bugs for secondary experimenters",
+            "Fixed experiment duplication bug",
+            "Resolved data export issues",
+            "Fixed access permissions",
+            "Fixed widget display bug",
+            "Improved user contact management"
+          ]
+        }
+      }
+    },
+    "upcoming_version": {
+      "version": "1.0.2",
+      "date": "February 20, 2025",
+      "title": "Upcoming Features",
+      "features": [
+        "Added random mode for experiments",
+        "When exporting results as ZIP, option to choose export format with or without participants",
+        "When exporting results, an R file is added to the ZIP archive",
+        "Added confetti when participant completes the experiment",
+        "In experiment creation, it is now mandatory to provide the institution responsible for the experiment",
+        "In experiment creation, you can provide regulatory documents (CER and other official documents)",
+        "Advanced statistics on participant results",
+        "Advanced statistics on the experiment as a whole"
+      ],
+      "fixes": [
+        "Fixed a display bug on the results page",
+        "Improved performance when loading data",
+        "When the user completes the experiment, the clustering algorithm to determine group membership has been improved"
+      ]
     }
   },
   "legal": {

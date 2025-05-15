@@ -16,67 +16,182 @@ function Changelog() {
     const releaseData = useMemo(
         () => [
             {
+                version: "1.0.1",
+                date: t("changelog.version_two.date"),
+                description: t("changelog.version_two.description"),
+                categories: [
+                    {
+                        title: t("changelog.version_two.categories.ui.title"),
+                        icon: <LanguageIcon className="w-6 h-6" />,
+                        features: [
+                            t("changelog.version_two.categories.ui.features.0"),
+                            t("changelog.version_two.categories.ui.features.1"),
+                            t("changelog.version_two.categories.ui.features.2"),
+                            t("changelog.version_two.categories.ui.features.3"),
+                            t("changelog.version_two.categories.ui.features.4"),
+                            t("changelog.version_two.categories.ui.features.5"),
+                            t("changelog.version_two.categories.ui.features.6"),
+                            t("changelog.version_two.categories.ui.features.7"),
+                        ],
+                    },
+                    {
+                        title: t(
+                            "changelog.version_two.categories.fixes.title"
+                        ),
+                        icon: <ShieldCheckIcon className="w-6 h-6" />,
+                        features: [
+                            t(
+                                "changelog.version_two.categories.fixes.features.0"
+                            ),
+                            t(
+                                "changelog.version_two.categories.fixes.features.1"
+                            ),
+                            t(
+                                "changelog.version_two.categories.fixes.features.2"
+                            ),
+                            t(
+                                "changelog.version_two.categories.fixes.features.3"
+                            ),
+                            t(
+                                "changelog.version_two.categories.fixes.features.4"
+                            ),
+                            t(
+                                "changelog.version_two.categories.fixes.features.5"
+                            ),
+                        ],
+                    },
+                ],
+            },
+            {
                 version: "1.0.0",
                 date: t("changelog.version_one.date"),
                 description: t("changelog.version_one.description"),
                 categories: [
                     {
-                        title: "Système d'Authentification et Gestion des Utilisateurs",
+                        title: t(
+                            "changelog.version_one.categories.auth_users.title"
+                        ),
                         icon: <UserGroupIcon className="w-6 h-6" />,
                         features: [
-                            "Inscription avec vérification ORCID et affiliation universitaire",
-                            "Système d'approbation des nouveaux comptes par le superviseur",
-                            "Notifications par email pour les étapes d'inscription et d'approbation",
-                            "Gestion des rôles : Superviseur, Expérimentateur Principal, Expérimentateur Secondaire",
-                            "Système de bannissement avec justification et notifications",
-                            "Page de contact administrateur pour les demandes spéciales",
+                            t(
+                                "changelog.version_one.categories.auth_users.features.0"
+                            ),
+                            t(
+                                "changelog.version_one.categories.auth_users.features.1"
+                            ),
+                            t(
+                                "changelog.version_one.categories.auth_users.features.2"
+                            ),
+                            t(
+                                "changelog.version_one.categories.auth_users.features.3"
+                            ),
+                            t(
+                                "changelog.version_one.categories.auth_users.features.4"
+                            ),
+                            t(
+                                "changelog.version_one.categories.auth_users.features.5"
+                            ),
                         ],
                     },
                     {
-                        title: "Gestion des Expériences",
+                        title: t(
+                            "changelog.version_one.categories.experiments.title"
+                        ),
                         icon: <BeakerIcon className="w-6 h-6" />,
                         features: [
-                            "Création d'expériences avec support multimédia (images et sons)",
-                            "Personnalisation des paramètres d'interaction",
-                            "Système de DOI unique pour chaque expérience",
-                            "Mode test avec visualisation dans How It Works",
-                            "Gestion des documents complémentaires",
-                            "Interface de contrôle des sessions",
+                            t(
+                                "changelog.version_one.categories.experiments.features.0"
+                            ),
+                            t(
+                                "changelog.version_one.categories.experiments.features.1"
+                            ),
+                            t(
+                                "changelog.version_one.categories.experiments.features.2"
+                            ),
+                            t(
+                                "changelog.version_one.categories.experiments.features.3"
+                            ),
+                            t(
+                                "changelog.version_one.categories.experiments.features.4"
+                            ),
+                            t(
+                                "changelog.version_one.categories.experiments.features.5"
+                            ),
                         ],
                     },
                     {
-                        title: "Suivi et Analyse",
+                        title: t(
+                            "changelog.version_one.categories.monitoring.title"
+                        ),
                         icon: <ShieldCheckIcon className="w-6 h-6" />,
                         features: [
-                            "Tableau de bord détaillé des sessions",
-                            "Suivi des interactions participants",
-                            "Export des données au format CSV",
-                            "Visualisation des groupes et interactions",
-                            "Logs d'activité détaillés",
-                            "Statistiques d'utilisation",
+                            t(
+                                "changelog.version_one.categories.monitoring.features.0"
+                            ),
+                            t(
+                                "changelog.version_one.categories.monitoring.features.1"
+                            ),
+                            t(
+                                "changelog.version_one.categories.monitoring.features.2"
+                            ),
+                            t(
+                                "changelog.version_one.categories.monitoring.features.3"
+                            ),
+                            t(
+                                "changelog.version_one.categories.monitoring.features.4"
+                            ),
+                            t(
+                                "changelog.version_one.categories.monitoring.features.5"
+                            ),
                         ],
                     },
                     {
-                        title: "Interface Participant",
+                        title: t(
+                            "changelog.version_one.categories.participant.title"
+                        ),
                         icon: <GiftIcon className="w-6 h-6" />,
                         features: [
-                            "Interface intuitive de classement",
-                            "Gestion optimisée des sons et images",
-                            "Système de groupes (C1, C2, etc.)",
-                            "Affichage des consignes",
-                            "Retour visuel des interactions",
-                            "Compatibilité multi-appareils",
+                            t(
+                                "changelog.version_one.categories.participant.features.0"
+                            ),
+                            t(
+                                "changelog.version_one.categories.participant.features.1"
+                            ),
+                            t(
+                                "changelog.version_one.categories.participant.features.2"
+                            ),
+                            t(
+                                "changelog.version_one.categories.participant.features.3"
+                            ),
+                            t(
+                                "changelog.version_one.categories.participant.features.4"
+                            ),
+                            t(
+                                "changelog.version_one.categories.participant.features.5"
+                            ),
                         ],
                     },
                     {
-                        title: "Notifications et Communications",
+                        title: t(
+                            "changelog.version_one.categories.notifications.title"
+                        ),
                         icon: <BellIcon className="w-6 h-6" />,
                         features: [
-                            "Système de notifications par email",
-                            "Communication superviseur-utilisateurs",
-                            "Alertes de bannissement",
-                            "Notifications de changements de statut",
-                            "Système de demandes d'accès",
+                            t(
+                                "changelog.version_one.categories.notifications.features.0"
+                            ),
+                            t(
+                                "changelog.version_one.categories.notifications.features.1"
+                            ),
+                            t(
+                                "changelog.version_one.categories.notifications.features.2"
+                            ),
+                            t(
+                                "changelog.version_one.categories.notifications.features.3"
+                            ),
+                            t(
+                                "changelog.version_one.categories.notifications.features.4"
+                            ),
                         ],
                     },
                 ],
@@ -87,33 +202,31 @@ function Changelog() {
 
     const upcomingFeatures = useMemo(
         () => ({
-            version: "1.0.1",
-            title: "Fonctionnalités à venir",
-            icon: <LanguageIcon className="w-6 h-6" />,
+            version: t("changelog.upcoming_version.version"),
+            title: t("changelog.upcoming_version.title"),
+            date: t("changelog.upcoming_version.date"),
+            icon: <BeakerIcon className="w-6 h-6" />,
             features: [
-                "Support multilingue (Français, Anglais)",
-                "Amélioration de la structure des expérimentations",
-                "Nouvelle gestion des demandes d'accès",
-                "Ajout des confettis pour les sessions terminées",
-                "Amélioration des widgets partagés",
-                "Intégration des CGU à l'inscription",
-                "Révision de la structure de partage des expérimentations",
-                "Amélioration de l'interface utilisateur",
+                t("changelog.upcoming_version.features.0"),
+                t("changelog.upcoming_version.features.1"),
+                t("changelog.upcoming_version.features.2"),
+                t("changelog.upcoming_version.features.3"),
+                t("changelog.upcoming_version.features.4"),
+                t("changelog.upcoming_version.features.5"),
+                t("changelog.upcoming_version.features.6"),
+                t("changelog.upcoming_version.features.7"),
             ],
             fixes: [
-                "Correction des bugs d'affichage pour les expérimentateurs secondaires",
-                "Correction du bug de duplication des expériences",
-                "Résolution des problèmes d'export de données",
-                "Correction des permissions d'accès",
-                "Correction du bug d'affichage des widgets",
-                "Amélioration de la gestion des contacts entre utilisateurs",
+                t("changelog.upcoming_version.fixes.0"),
+                t("changelog.upcoming_version.fixes.1"),
+                t("changelog.upcoming_version.fixes.2"),
             ],
         }),
-        []
+        [t]
     );
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-12 px-4 mb-12">
+        <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-12 px-4 mb-12 mt-28">
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-12">
                     <h1 className="text-4xl font-bold text-gray-900 mb-4">
@@ -136,14 +249,14 @@ function Changelog() {
                             <span className="text-sm bg-blue-300 text-white px-3 py-1 rounded-full -mt-4 inline-block">
                                 {t("changelog.version")}{" "}
                                 {upcomingFeatures.version} -{" "}
-                                {t("changelog.version_two.date")}
+                                {upcomingFeatures.date}
                             </span>
                         </div>
                     </div>
                     <div className="space-y-6">
                         <div>
                             <h3 className="text-xl font-semibold text-white mb-4">
-                                Nouvelles fonctionnalités
+                                {t("changelog.new_features")}
                             </h3>
                             <ul className="grid gap-4 md:grid-cols-2">
                                 {upcomingFeatures.features.map(
@@ -159,22 +272,26 @@ function Changelog() {
                                 )}
                             </ul>
                         </div>
-                        <div>
-                            <h3 className="text-xl font-semibold text-white mb-4">
-                                Corrections
-                            </h3>
-                            <ul className="grid gap-4 md:grid-cols-2">
-                                {upcomingFeatures.fixes.map((fix, index) => (
-                                    <li
-                                        key={index}
-                                        className="flex items-start gap-2 text-white"
-                                    >
-                                        <span>•</span>
-                                        <span>{fix}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                        {upcomingFeatures.fixes.length > 0 && (
+                            <div>
+                                <h3 className="text-xl font-semibold text-white mb-4">
+                                    {t("changelog.fixes")}
+                                </h3>
+                                <ul className="grid gap-4 md:grid-cols-2">
+                                    {upcomingFeatures.fixes.map(
+                                        (fix, index) => (
+                                            <li
+                                                key={index}
+                                                className="flex items-start gap-2 text-white"
+                                            >
+                                                <span>•</span>
+                                                <span>{fix}</span>
+                                            </li>
+                                        )
+                                    )}
+                                </ul>
+                            </div>
+                        )}
                     </div>
                 </div>
 

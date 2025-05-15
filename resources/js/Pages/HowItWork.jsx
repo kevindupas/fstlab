@@ -55,7 +55,7 @@ function HowItWork() {
     }
 
     return (
-        <div className="min-h-[80vh] bg-gradient-to-b from-white to-gray-50 py-12 px-4 mt-5">
+        <div className="min-h-[80vh] bg-gradient-to-b from-white to-gray-50 py-12 px-4 mt-20">
             <div className="max-w-7xl mx-auto">
                 {/* En-tête */}
                 <div className="text-center mb-16">

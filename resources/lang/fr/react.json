@@ -27,6 +27,44 @@
       "description1": "Utilisez le bouton « Inscription » en haut à droite de cet écran pour vous inscrire auprès de la plateforme.",
       "description2": "Après acceptation de votre inscription, vous pourrez configurer votre prochaine expérimentation!"
     },
+    "features": {
+      "title": "Ce que l'on peut faire avec FST-LAB",
+      "creation": {
+        "title": "Lors de la création de l'expérience (en tant qu'expérimentateur) :",
+        "item1": "vous pouvez choisir des sons, des images ou les deux dans la même expérience",
+        "item2": "vous pouvez choisir un ordre aléatoire de stimuli (ou non)",
+        "item3": "vous pouvez choisir la taille et la couleur des boutons à l'écran",
+        "item4": "vous pouvez télécharger des sons ou des images jusqu'à 20 Mo par fichier",
+        "item5": "vous pouvez définir les instructions pour le participant",
+        "item6": "vous pouvez insérer dans votre expérience tous les fichiers liés à votre travail (articles, accords, etc.)",
+        "item7": "vous pouvez gérer la session de l'expérience avec différents modes (démarrage, pause, arrêt, test)",
+        "item8": "vous pouvez générer et envoyer un lien pour exécuter l'expérience (uniquement), où vous le souhaitez"
+      },
+      "during": {
+        "title": "Pendant l'expérience par elle-même (en tant que participant) :",
+        "item1": "vous pouvez voir/écouter des stimuli",
+        "item2": "vous pouvez déplacer des stimuli sur la vue en plein écran"
+      },
+      "end": {
+        "title": "À la fin de l'expérience (en tant qu'expérimentateur) :",
+        "item1": "des groupes de stimuli sont créés automatiquement (si les icônes sont assez proches les unes des autres) et peuvent être modifiés si nécessaire",
+        "item2": "vous pouvez commenter chaque groupe à l'aide du clavier ou de la dictée vocale",
+        "item3": "vous pouvez commenter toute l'expérience"
+      },
+      "run": {
+        "title": "À la fin de chaque exécution (en tant qu'expérimentateur) :",
+        "item1": "vous pouvez voir les résultats",
+        "item2": "vous pouvez voir les statistiques de base sur l'expérimentation, y compris le temps et le nombre de groupes",
+        "item3": "vous pouvez télécharger les résultats sur différents formats avec un petit script R pour visualiser facilement les données"
+      },
+      "global": {
+        "title": "Globalement (en tant qu'expérimentateur) :",
+        "item1": "vous pouvez rendre votre expérience publique afin qu'elle puisse être vue par tous les utilisateurs de FST-LAB",
+        "item2": "vous pouvez partager votre expérience avec un autre utilisateur pour une collaboration limitée (lire et télécharger les résultats)",
+        "item3": "vous pouvez partager votre expérience avec un autre utilisateur pour une collaboration complète (lire, télécharger les résultats et éditer l'expérience)",
+        "item4": "vous pouvez télécharger tous les fichiers d'expérience (JSON ou XML)"
+      }
+    },
     "privacy": {
       "gdpr": "Veuillez respecter la règlementation Européenne concernant les données, soit la RGPD (règlement général sur la protection des données)",
       "link": "https://www.cnil.fr/fr/rgpd-de-quoi-parle-t-on"
@@ -375,6 +413,8 @@
     "subtitle": "Suivez l'évolution de notre plateforme d'expérimentation",
     "version": "Version",
     "upcoming_features": "Nouveautés",
+    "new_features": "Nouvelles fonctionnalités",
+    "fixes": "Corrections",
     "version_one": {
       "date": "14 Décembre 2024",
       "description": "Première version stable de la plateforme d'expérimentation",
@@ -437,23 +477,52 @@
     },
     "version_two": {
       "date": "4 Janvier 2025",
-      "fixes": [
-        "Correction des bugs d'affichage pour les expérimentateurs secondaires",
-        "Correction du bug de duplication des expériences",
-        "Résolution des problèmes d'export de données",
-        "Correction des permissions d'accès",
-        "Correction du bug d'affichage des widgets",
-        "Amélioration de la gestion des contacts entre utilisateurs"
-      ],
+      "description": "Améliorations de l'interface et corrections",
+      "categories": {
+        "ui": {
+          "title": "Interface Utilisateur",
+          "features": [
+            "Support multilingue (Français, Anglais)",
+            "Amélioration de la structure des expérimentations",
+            "Nouvelle gestion des demandes d'accès",
+            "Amélioration des widgets partagés",
+            "Intégration des CGU à l'inscription",
+            "Révision de la structure de partage des expérimentations",
+            "Système de notifications amélioré",
+            "Système de messagaerie"
+          ]
+        },
+        "fixes": {
+          "title": "Corrections",
+          "features": [
+            "Correction des bugs d'affichage pour les expérimentateurs secondaires",
+            "Correction du bug de duplication des expériences",
+            "Résolution des problèmes d'export de données",
+            "Correction des permissions d'accès",
+            "Correction du bug d'affichage des widgets",
+            "Amélioration de la gestion des contacts entre utilisateurs"
+          ]
+        }
+      }
+    },
+    "upcoming_version": {
+      "version": "1.0.2",
+      "date": "20 Février 2025",
+      "title": "Fonctionnalités à venir",
       "features": [
-        "Support multilingue (Français, Anglais, Espagnol)",
-        "Amélioration de la structure des expérimentations",
-        "Nouvelle gestion des demandes d'accès",
-        "Ajout des confettis pour les sessions terminées",
-        "Amélioration des widgets partagés",
-        "Intégration des CGU à l'inscription",
-        "Révision de la structure de partage des expérimentations",
-        "Amélioration de l'interface utilisateur"
+        "Ajout d'un mode aléatoire pour les expérimentations",
+        "Lors de l'export des résultats en ZIP, possibilité de choisir le format d'export avec ou sans les participants",
+        "Lors de l'export des résultats un fichier R est ajouté à l'archive ZIP",
+        "Ajout de confettis quand le participant a terminé l'expérimentation",
+        "Dans la création d'une expérimentation, il est maintenant obligatoire de fournir l'établissement responsable de l'expérimentation",
+        "Dans la création d'une expérimentation, vous pouvez fournir des documents réglementaires (CER et autres documents officiels)",
+        "Statistiques avancées sur les résultats des participants",
+        "Statistiques avancées sur l'expérimentation au global"
+      ],
+      "fixes": [
+        "Correction d'un bug d'affichage sur la page des résultats",
+        "Amélioration de la performance lors du chargement des données",
+        "Lorsque l'utilisateur a terminé l'expérimentation, l'algorithme de clustering pour déterminer le groupe d'appartenance a été amélioré"
       ]
     }
   },

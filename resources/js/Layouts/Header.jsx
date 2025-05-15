@@ -85,9 +85,9 @@ const Header = () => {
                     <NavLink href="/how-it-work" isReactRoute>
                         {t("header.how_it_work")}
                     </NavLink>
-                    {/* <NavLink href="/changelog" isReactRoute>
+                    <NavLink href="/changelog" isReactRoute>
                         {t("header.changelog")}
-                    </NavLink> */}
+                    </NavLink>
                 </div>
 
                 {/* Desktop Auth Buttons */}
