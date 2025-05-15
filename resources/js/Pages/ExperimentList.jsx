@@ -32,7 +32,7 @@ function ExperimentList() {
     const [maxPossibleSessions, setMaxPossibleSessions] = useState(0);
 
     useEffect(() => {
-        if (experiments.length) {
+        if (experiments && experiments.length) {
             const max = Math.max(
                 ...experiments.map((e) => e.completed_sessions_count)
             );
@@ -64,23 +64,24 @@ function ExperimentList() {
 
     // Filtrer les expériences en fonction de la recherche et des filtres
     const filteredExperiments = useMemo(() => {
-        return experiments.filter((experiment) => {
+        return (experiments || []).filter((experiment) => {
             const matchesSearch =
-                experiment.name
+                (experiment.name || "")
                     .toLowerCase()
                     .includes(searchQuery.toLowerCase()) ||
-                experiment.description
+                (experiment.description || "")
                     .toLowerCase()
                     .includes(searchQuery.toLowerCase()) ||
-                experiment.creator_name
+                (experiment.creator_name || "")
                     .toLowerCase()
                     .includes(searchQuery.toLowerCase());
 
             const matchesType =
-                !selectedType || experiment.type === selectedType;
+                !selectedType || (experiment.type || "") === selectedType;
             const matchesSessions =
-                experiment.completed_sessions_count >= sessionsRange.min &&
-                experiment.completed_sessions_count <= sessionsRange.max;
+                (experiment.completed_sessions_count || 0) >=
+                    sessionsRange.min &&
+                (experiment.completed_sessions_count || 0) <= sessionsRange.max;
 
             return matchesSearch && matchesType && matchesSessions;
         });
