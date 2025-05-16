@@ -37,6 +37,7 @@ return [
         'label' => 'Export',
         'json' => 'Export to JSON',
         'xml' => 'Export to XML',
+        'yaml' => 'Export to YAML',
         'desc' => 'Select the format in which you want to export the experiment data.',
         'media_export_info' => 'Exporting media will add all associated media files to the export.',
         'media_info' => 'Including media will add all associated media files to the export.',

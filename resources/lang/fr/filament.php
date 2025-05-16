@@ -453,6 +453,35 @@ return [
                 ],
             ],
         ],
+        'add_user_to_experiment' => [
+            // En-têtes et titres
+            'heading' => 'Utilisateurs associés à l\'expérimentation',
+
+            // Permissions
+            'can_pass' => 'Partager l\'expérimentation (passations et résultats)',
+            'can_configure' => 'Autoriser les modifications',
+
+            // Actions d'en-tête de tableau
+            'create_user' => 'Créer un utilisateur',
+            'attach_user' => 'Attacher un utilisateur existant',
+
+            // Champs de formulaire
+            'name' => 'Nom de l\'utilisateur',
+            'email' => 'Adresse email',
+            'user_email' => 'Email de l\'utilisateur',
+            'university' => 'Université',
+
+            // Messages de notification
+            'user_created' => 'Utilisateur créé et attaché avec succès',
+            'user_not_found' => 'Utilisateur non trouvé ou non autorisé',
+            'user_attached' => 'Utilisateur attaché avec succès',
+            'attachment_error' => 'Erreur lors de l\'attachement',
+
+            // Actions
+            'contact_user' => 'Contacter l\'utilisateur',
+            'edit_user' => 'Modifier l\'utilisateur',
+            'detach_user' => 'Détacher l\'utilisateur',
+        ],
         'experiment-access-request' => [
             'label' => 'Demande d\'accès',
             'plural' => 'Demandes d\'accès',

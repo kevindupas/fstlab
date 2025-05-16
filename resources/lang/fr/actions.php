@@ -36,6 +36,7 @@ return [
         'label' => 'Exporter l\'expérimentation',
         'json' => 'Exporter en JSON',
         'xml' => 'Exporter en XML',
+        'yaml' => 'Exporter en YAML',
         'desc' => 'Sélectionnez le format dans lequel vous souhaitez exporter les données de l\'expérience.',
         'media_export_info' => 'L\'exportation des médias ajoutera tous les fichiers médias associés à l\'exportation.',
         'media_info' => 'L\'inclusion des médias ajoutera tous les fichiers médias associés à l\'export.',

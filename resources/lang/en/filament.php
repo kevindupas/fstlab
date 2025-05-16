@@ -446,6 +446,33 @@ return [
                 ],
             ],
         ],
+        'add_user_to_experiment' => [
+            // En-têtes et titres
+            'heading' => 'Users associated with the experiment',
+
+            // Permissions
+            'can_pass' => 'Share the experiment (sessions and results)',
+            'can_configure' => 'Allow modifications',
+
+            // Actions d'en-tête de tableau
+            'create_user' => 'Create a user',
+            'attach_user' => 'Attach existing user',
+
+            // Champs de formulaire
+            'name' => 'User name',
+            'email' => 'Email address',
+            'user_email' => 'User email',
+            'university' => 'University',
+
+            // Messages de notification
+            'user_created' => 'User created and attached successfully',
+            'user_not_found' => 'User not found or not authorized',
+            'user_attached' => 'User attached successfully',
+            'attachment_error' => 'Error during attachment',
+
+            // Actions
+            'contact_user' => 'Contact user',
+        ],
         'experiment-access-request' => [
             'label' => 'Access Request',
             'plural' => 'Access Requests',

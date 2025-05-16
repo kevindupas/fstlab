@@ -527,77 +527,126 @@
     }
   },
   "legal": {
-    "title": "Terms and Conditions (T&Cs)",
+    "title": "Legal Information",
     "article1": {
-      "title": "Article 1: Purpose",
-      "content": "These Terms and Conditions (T&Cs) govern the use of the 'FST-LAB' website. By accessing this site, you fully accept these T&Cs."
+      "title": "1. Website Presentation",
+      "para1": "Pursuant to Article 6 of Law No. 2004-575 of June 21, 2004 on confidence in the digital economy, users of the FST-LAB website are informed of the identity of the various parties involved in its creation and monitoring:",
+      "owner_label": "Owner:",
+      "owner": "CNRS USR 3414 MSHS-T - SIRET 18008901300676 – 16 av. Edouard Belin 31 400 Toulouse",
+      "creator_label": "Creator:",
+      "creator": "House of Human and Social Sciences",
+      "publisher": "The publication manager is either a natural person or a legal entity.",
+      "host_label": "Host:",
+      "host": "Toulouse - Jean Jaurès University – 5 allées Antion Machado - 31058 TOULOUSE - CEDEX 1",
+      "credits_label": "Credits:",
+      "credits_html": "Pascal Gaillard - <a href=\"mailto:pascal.gaillard@univ-tlse2.fr\" class=\"underline\">pascal.gaillard@univ-tlse2.fr</a> and Kévin Dupas - <a href=\"mailto:dupas.dev@gmail.com\" class=\"underline\">dupas.dev@gmail.com</a>",
+      "logo_label": "Application logo:",
+      "logo_html": "Benoit Colas <a href=\"mailto:benoit.colas@univ-tlse2.fr\" class=\"underline\">benoit.colas@univ-tlse2.fr</a>",
+      "notice_html": "The legal notice template is provided by <a href=\"https://www.subdelirium.com\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline\">Subdelirium.com</a> Legal Notice Generator"
     },
     "article2": {
-      "title": "Article 2: Site Access",
-      "content": "The site is freely accessible to any user with internet access. Costs related to accessing the site (hardware, connection, etc.) are the responsibility of the user."
+      "title": "2. General Terms of Use for the Website and Services",
+      "para1": "Using the FST-LAB website implies full acceptance of the general terms of use described below. These terms of use may be modified or supplemented at any time, so users of the FST-LAB website are invited to consult them regularly.",
+      "para2": "This site is normally accessible to users at all times. However, MSHS-T may decide to interrupt access for technical maintenance and will endeavor to communicate the dates and times of such interventions to users in advance."
     },
     "article3": {
-      "title": "Article 3: Site Content",
-      "content": "Content published on 'FST-LAB' is protected by intellectual property rights. Any unauthorized reproduction, representation, or exploitation is prohibited."
+      "title": "3. Description of Services Provided",
+      "para1": "The FST-LAB website aims to provide an application for creating, conducting, and sharing experiments using the \"free categorization\" protocol.",
+      "para2": "MSHS-T strives to provide information on the FST-LAB website that is as accurate as possible. However, it cannot be held responsible for omissions, inaccuracies, or deficiencies in updates, whether caused by itself or by third-party partners who provide this information.",
+      "para3": "All information indicated on the FST-LAB website is provided for informational purposes only and is subject to change."
     },
     "article4": {
-      "title": "Article 4: Liability",
-      "intro": "The 'FST-LAB' site cannot be held liable in case of:",
-      "item1": "Technical malfunction",
-      "item2": "Loss or alteration of data",
-      "item3": "Use that does not comply with the T&Cs"
+      "title": "4. Contractual Limitations on Technical Data",
+      "para1": "The website uses JavaScript technology. The website cannot be held responsible for material damage related to the use of the site. Additionally, the user agrees to access the site using recent equipment, free of viruses, and with an up-to-date browser.",
+      "item1": "The FST-LAB website is optimized for modern browsers and may not function properly on outdated browsers.",
+      "item2": "For an optimal experience, we recommend using the latest versions of Chrome, Firefox, Safari, or Edge.",
+      "item3": "JavaScript must be enabled in your browser to enjoy all the features of the site."
     },
     "article5": {
-      "title": "Article 5: Personal Data",
-      "content": "The use of the site may involve the collection of personal data. This data is processed in accordance with our Data Protection Policy."
+      "title": "5. Intellectual Property and Infringement",
+      "para1": "MSHS-T owns the intellectual property rights or holds usage rights for all elements accessible on the site, including texts, images, graphics, logos, icons, sounds, and software.",
+      "para2": "Any reproduction, representation, modification, publication, or adaptation of all or part of the elements of the site, regardless of the means or process used, is prohibited without prior written authorization from MSHS-T. Any unauthorized use of the site or any of its elements will be considered as constituting an infringement and prosecuted in accordance with the provisions of Articles L.335-2 et seq. of the Intellectual Property Code."
     },
     "article6": {
-      "title": "Article 6: Modification of T&Cs",
-      "content": "We reserve the right to modify these T&Cs at any time. Users will be informed of any modifications via the site."
+      "title": "6. Limitations of Liability",
+      "para1": "MSHS-T cannot be held responsible for direct or indirect damage caused to the user's equipment when accessing the FST-LAB website, resulting either from the use of equipment that does not meet the specifications indicated in point 4, or from the occurrence of a bug or incompatibility.",
+      "para2": "MSHS-T cannot also be held responsible for indirect damages (such as loss of market or loss of opportunity) resulting from the use of the FST-LAB website.",
+      "para3": "Interactive spaces (ability to ask questions in the contact area) are available to users. MSHS-T reserves the right to remove, without prior notice, any content posted in this space that would violate applicable law in France, particularly provisions relating to data protection. If necessary, MSHS-T also reserves the right to question the civil and/or criminal liability of the user, especially in the case of messages of a racist, offensive, defamatory, or pornographic nature, regardless of the medium used (text, photograph, etc.)."
     },
     "article7": {
-      "title": "Article 7: Applicable Law",
-      "content": "These T&Cs are governed by French law. Any dispute will be subject to the jurisdiction of the competent courts."
+      "title": "7. Personal Data Management",
+      "para1_html": "The information collected about you will be processed by the director of MSHS-T and the Data Protection Officer – <a href=\"mailto:dpd.demandes@cnrs.fr\" class=\"underline\">dpd.demandes@cnrs.fr</a>. Personal data is collected and processed for the following purpose: managing user profiles on the platform.",
+      "para2": "In accordance with Article 6 of Regulation (EU) 2016/679 of the European Parliament and of the Council of April 27, 2016, this processing is based on the legitimate interest pursued by the data controller. The data collected about you includes your first and last name, your status, and your affiliated laboratory. No data is transferred outside the European Union.",
+      "para3": "Data is retained for 24 months. Beyond this period, all personal data concerning you will be removed from the site. Any person concerned by this personal data processing can access and obtain a copy of their data, object to the processing of this data, have it rectified, or have it erased. You also have the right to limit the processing of your data.",
+      "para4_html": "You can exercise these rights by contacting Pascal Gaillard - <a href=\"mailto:pascal.gaillard@univ-tlse2.fr\" class=\"underline\">pascal.gaillard@univ-tlse2.fr</a>. If you believe, after contacting us, that your Information Technology and Freedom rights have not been respected, you can submit a complaint to the CNIL: <a href=\"https://www.cnil.fr/fr/webform/adresser-une-plainte\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline\">https://www.cnil.fr/fr/webform/adresser-une-plainte</a>. Databases are protected by the provisions of the law of July 1, 1998, transposing Directive 96/9 of March 11, 1996 on the legal protection of databases."
+    },
+    "article8": {
+      "title": "8. Hyperlinks and Cookies",
+      "para1": "The FST-LAB website contains a number of hyperlinks to other sites, set up with the authorization of MSHS-T. However, MSHS-T does not have the ability to verify the content of the sites visited, and therefore assumes no responsibility for this fact.",
+      "para2": "Browsing the FST-LAB website may cause cookies to be installed on the user's computer. A cookie is a small file that does not allow identification of the user but records information related to the navigation of a computer on a site. The data obtained in this way aims to facilitate subsequent navigation on the site and is also intended to allow various measures of site traffic.",
+      "para3": "Refusing to install a cookie may make it impossible to access certain services. The user can, however, configure their computer as follows to refuse the installation of cookies:",
+      "browser_settings": "Browser Settings:",
+      "ie": "In Internet Explorer: tool tab (gear icon in the top right) / internet options. Click on Privacy and choose Block all cookies. Confirm with Ok.",
+      "firefox": "In Firefox: at the top of the browser window, click on the Firefox button, then go to the Options tab. Click on the Privacy tab. Set the Rules for history to: use custom settings for history. Finally, uncheck the box to disable cookies.",
+      "safari": "In Safari: Click at the top right of the browser on the menu icon (symbolized by a gear). Select Settings. Click on Show advanced settings. In the \"Privacy\" section, click on Content settings. In the \"Cookies\" section, you can block cookies.",
+      "chrome": "In Chrome: Click at the top right of the browser on the menu icon (symbolized by three horizontal lines). Select Settings. Click on Show advanced settings. In the \"Privacy\" section, click on preferences. In the \"Privacy\" tab, you can block cookies."
+    },
+    "article9": {
+      "title": "9. Applicable Law and Jurisdiction",
+      "content": "Any dispute relating to the use of the FST-LAB website is subject to French law. Exclusive jurisdiction is given to the competent courts of Paris."
+    },
+    "article10": {
+      "title": "10. Main Laws Concerned",
+      "law1": "Law No. 78-17 of January 6, 1978, as amended by Law No. 2004-801 of August 6, 2004 relating to information technology, files, and freedoms.",
+      "law2": "Regulation (EU) 2016/679 of the European Parliament and of the Council of April 27, 2016.",
+      "law3": "Law No. 2004-575 of June 21, 2004 for confidence in the digital economy."
+    },
+    "article11": {
+      "title": "11. Glossary",
+      "user_label": "User:",
+      "user": "Internet user connecting to and using the aforementioned site.",
+      "personal_info_label": "Personal Information:",
+      "personal_info": "\"Information that allows, in any form whatsoever, directly or indirectly, the identification of the natural persons to whom it applies\" (Article 4 of Law No. 78-17 of January 6, 1978)."
     }
   },
   "privacy": {
     "title": "Personal Data Protection",
-    "intro": "The information collected about you is processed by MSHS-T, located at 5 allée Antonio Machado, F-31 058 Toulouse cedex 9, +33 (0)5 61 50 35 28. Information can be requested from the CNRS Data Protection Officer – dpd.demandes@cnrs.fr.",
-    "dataCollected": "Personal data such as name, first name, email address, affiliated organization or function will be collected.",
+    "intro": "The information collected about you is processed by MSHS-T, located at 5 allée Antonio Machado, F-31 058 Toulouse cedex 9, +33 (0)5 61 50 35 28. Information can be requested from the CNRS Data Protection Officer – <a href=\"mailto:dpd.demandes@cnrs.fr\" class=\"text-blue-500 font-semibold\">dpd.demandes@cnrs.fr</a>.",
+    "dataCollected": "Personal data such as last name, first name, email address, affiliation structure, or function will be collected.",
     "context": {
       "title": "In the context of:",
-      "directory": "managing a directory of UAR staff and associated laboratories (name, first name, phone, email address, laboratory, status, function, mission);",
-      "newsletter": "newsletter subscription (name, first name, email address);",
-      "events": "participation in scientific events, conferences and training (name, first name, email address, institution/laboratory/company, function)."
+      "directory": "managing a directory of UAR personnel and associated laboratories (last name, first name, telephone, email address, laboratory, status, function, mission);",
+      "newsletter": "newsletter subscription (last name, first name, email address);",
+      "events": "participation in a scientific event, conference, or training session (last name, first name, email address, institution/laboratory/company, function)."
     },
     "recipients": {
       "title": "Data Recipients",
       "intro": "This data is accessible by:",
       "visitors": "website visitors (except for newsletter subscription)",
       "admins": "the webmaster and website administrators;",
-      "organizers": "organizers of each scientific event, conference or training session."
+      "organizers": "the organizers of each scientific event, conference, or training session."
     },
     "legalBasis": {
       "title": "Legal Basis",
-      "content": "The processing is necessary for the legitimate interests pursued by the data controller"
+      "content": "The processing is necessary for the purposes of the legitimate interests pursued by the data controller"
     },
     "retention": {
       "title": "Data Retention",
-      "newsletter": "Newsletter subscription: until unsubscribe request by the concerned person",
-      "content": "Content: for directories, until the person's departure at the latest, for other news during the website's operational period"
+      "newsletter": "Newsletter subscription: until the data subject requests to unsubscribe",
+      "content": "Content: for directories, at maximum until the person's departure; for other news items, for the duration of the website's operation"
     },
     "transfer": {
-      "title": "Data Transfer Outside EU",
+      "title": "Data Transfer Outside the EU",
       "content": "Information published on the website may be read outside the European Union due to its presence on the Internet."
     },
     "rights": {
       "title": "Individual Rights",
-      "description": "Any person concerned by this personal data processing can access and obtain a copy of their data, object to the processing of this data, have it rectified or deleted. You also have the right to limit the processing of your data.",
+      "description": "Any person concerned by this personal data processing can access and obtain a copy of their data, object to the processing of this data, have it rectified, or have it erased. You also have the right to limit the processing of your data.",
       "contact": {
         "mshs": "You can exercise these rights by contacting the MSHS-T communication service: ",
         "dpd": "You can also contact the CNRS DPO at the following address: DPD –2 rue Jean Zay–54519 –Vandoeuvre lès Nancy Cedex – "
       },
-      "cnil": "If you believe, after contacting us, that your Data Protection rights are not being respected, you have the option to file a complaint with the CNIL: "
+      "cnil": "If you believe, after contacting us, that your Information Technology and Freedom rights are not being respected, you have the possibility to file a complaint with the CNIL: "
     }
   }
 }

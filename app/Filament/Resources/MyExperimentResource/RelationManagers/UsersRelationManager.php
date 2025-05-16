@@ -10,11 +10,9 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 
 class UsersRelationManager extends RelationManager
@@ -24,15 +22,15 @@ class UsersRelationManager extends RelationManager
 
     public function getTableHeading(): string
     {
-        return "Utilisateurs associés à l'expérimentation";
+        return __('filament.resources.add_user_to_experiment.heading');
     }
 
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Toggle::make('can_configure')->label("Configuration de l'expérimentation"),
-                Forms\Components\Toggle::make('can_pass')->label('Faire passer des sessions'),
+                Forms\Components\Toggle::make('can_pass')->label(__('filament.resources.add_user_to_experiment.can_pass')),
+                Forms\Components\Toggle::make('can_configure')->label(__('filament.resources.add_user_to_experiment.can_configure')),
             ]);
     }
 
@@ -41,17 +39,15 @@ class UsersRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('email'),
-                //Tables\Columns\TextColumn::make('roles.name')
-                //->label('Role'),
-                Tables\Columns\ToggleColumn::make('can_configure')
-                    ->label("Configuration de l'expérimentation")
+                Tables\Columns\TextColumn::make('name')->label(__('filament.resources.add_user_to_experiment.name')),
+                Tables\Columns\TextColumn::make('email')->label(__('filament.resources.add_user_to_experiment.email')),
+                Tables\Columns\ToggleColumn::make('can_pass')
+                    ->label(__('filament.resources.add_user_to_experiment.can_pass'))
                     ->afterStateUpdated(function ($record, $state) {
                         $this->handlePermissionChange($record, $state);
                     }),
-                Tables\Columns\ToggleColumn::make('can_pass')
-                    ->label('Faire passer des sessions')
+                Tables\Columns\ToggleColumn::make('can_configure')
+                    ->label(__('filament.resources.add_user_to_experiment.can_configure'))
                     ->afterStateUpdated(function ($record, $state) {
                         $this->handlePermissionChange($record, $state);
                     }),
@@ -59,22 +55,23 @@ class UsersRelationManager extends RelationManager
             ->headerActions([
                 // Bouton pour ajouter un nouvel utilisateur
                 Tables\Actions\CreateAction::make('create_user')
-                    ->label('Créer un utilisateur')
+                    ->label(__('filament.resources.add_user_to_experiment.create_user'))
+                    ->modalHeading(__('filament.resources.add_user_to_experiment.create_user'))
                     ->form([
                         Forms\Components\TextInput::make('name')
                             ->required()
-                            ->label("Nom de l'utilisateur")
+                            ->label(__('filament.resources.add_user_to_experiment.name'))
                             ->maxLength(255),
                         Forms\Components\TextInput::make('email')
                             ->email()
                             ->required()
-                            ->label("Adresse email")
+                            ->label(__('filament.resources.add_user_to_experiment.email'))
                             ->unique('users', 'email'),
                         Forms\Components\TextInput::make('university')
-                            ->label("Université")
+                            ->label(__('filament.resources.add_user_to_experiment.university'))
                             ->required(),
-                        Forms\Components\Toggle::make('can_configure')->label("Configuration de l'expérimentation"),
-                        Forms\Components\Toggle::make('can_pass')->label('Faire passer des sessions'),
+                        Forms\Components\Toggle::make('can_pass')->label(__('filament.resources.add_user_to_experiment.can_pass')),
+                        Forms\Components\Toggle::make('can_configure')->label(__('filament.resources.add_user_to_experiment.can_configure')),
                     ])
                     ->action(function (array $data): void {
                         // Création de l'utilisateur
@@ -95,31 +92,31 @@ class UsersRelationManager extends RelationManager
 
                         // Attacher l'utilisateur à l'expérience
                         $this->getOwnerRecord()->users()->attach($user->id, [
-                            'can_configure' => $data['can_configure'] ?? false,
                             'can_pass' => $data['can_pass'] ?? false,
+                            'can_configure' => $data['can_configure'] ?? false,
                         ]);
 
                         // Créer le lien d'expérience si nécessaire
-                        if ($data['can_configure'] || $data['can_pass']) {
+                        if ($data['can_pass'] || $data['can_configure']) {
                             $this->createExperimentLink($user->id);
                         }
 
                         Notification::make()
-                            ->title('Utilisateur créé et attaché avec succès')
+                            ->title(__('filament.resources.add_user_to_experiment.user_created'))
                             ->success()
                             ->send();
                     }),
 
                 // Bouton pour attacher un utilisateur existant
                 Tables\Actions\Action::make('attach_user')
-                    ->label('Attacher un utilisateur')
+                    ->label(__('filament.resources.add_user_to_experiment.attach_user'))
                     ->form([
                         Forms\Components\TextInput::make('email')
-                            ->label('Email de l\'utilisateur')
+                            ->label(__('filament.resources.add_user_to_experiment.user_email'))
                             ->email()
                             ->required(),
-                        Forms\Components\Toggle::make('can_configure')->label("Configuration de l'expérimentation"),
-                        Forms\Components\Toggle::make('can_pass')->label('Faire passer des sessions'),
+                        Forms\Components\Toggle::make('can_pass')->label(__('filament.resources.add_user_to_experiment.can_pass')),
+                        Forms\Components\Toggle::make('can_configure')->label(__('filament.resources.add_user_to_experiment.can_configure')),
                     ])
                     ->action(function (array $data): void {
                         // Recherche de l'utilisateur avec le bon rôle
@@ -131,7 +128,7 @@ class UsersRelationManager extends RelationManager
 
                         if (!$user) {
                             Notification::make()
-                                ->title('Utilisateur non trouvé ou non autorisé')
+                                ->title(__('filament.resources.add_user_to_experiment.user_not_found'))
                                 ->warning()
                                 ->send();
                             return;
@@ -140,8 +137,8 @@ class UsersRelationManager extends RelationManager
                         try {
                             // Attacher l'utilisateur à l'expérience
                             $this->getOwnerRecord()->users()->attach($user->id, [
-                                'can_configure' => $data['can_configure'] ?? false,
                                 'can_pass' => $data['can_pass'] ?? false,
+                                'can_configure' => $data['can_configure'] ?? false,
                             ]);
 
                             // Créer le lien d'expérience si nécessaire
@@ -153,12 +150,12 @@ class UsersRelationManager extends RelationManager
 
 
                             Notification::make()
-                                ->title('Utilisateur attaché avec succès')
+                                ->title(__('filament.resources.add_user_to_experiment.user_attached'))
                                 ->success()
                                 ->send();
                         } catch (\Exception $e) {
                             Notification::make()
-                                ->title('Erreur lors de l\'attachement')
+                                ->title(__('filament.resources.add_user_to_experiment.attachment_error'))
                                 ->danger()
                                 ->send();
                         }
@@ -166,31 +163,28 @@ class UsersRelationManager extends RelationManager
             ])
             ->actions([
                 Tables\Actions\Action::make('contact')
-                    ->label(__('filament.resources.users.actions.contact'))
+                    ->label(__('filament.resources.add_user_to_experiment.contact_user'))
                     ->icon('heroicon-o-envelope')
                     ->color('warning')
                     ->url(fn(User $record) => "/admin/contact-user?user={$record->id}"),
-                // ->visible(
-                //     fn(User $record) =>
-                //     Auth::user()->hasRole('supervisor') ||
-                //         ($record->created_by === Auth::id())
-                // ),
                 Tables\Actions\EditAction::make()
+                    ->label(__('filament.resources.add_user_to_experiment.edit_user'))
                     ->before(function ($data, $record) {
                         $this->initialState = [
-                            'can_configure' => $record->pivot->can_configure,
                             'can_pass' => $record->pivot->can_pass,
+                            'can_configure' => $record->pivot->can_configure,
                         ];
                     })
                     ->after(function ($data, $record) {
                         if (
-                            ($this->initialState['can_configure'] || $this->initialState['can_pass']) &&
-                            !$data['can_configure'] && !$data['can_pass']
+                            ($this->initialState['can_pass'] || $this->initialState['can_configure']) &&
+                            !$data['can_pass'] && !$data['can_configure']
                         ) {
                             $this->deleteExperimentLink($record->id);
                         }
                     }),
                 Tables\Actions\DetachAction::make()
+                    ->label(__('filament.resources.add_user_to_experiment.detach_user'))
                     ->before(function ($record) {
                         $this->deleteExperimentLink($record->id);
                     }),

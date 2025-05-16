@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "../Contexts/LanguageContext";
 import { Container } from "../Components/Container";
+import FloatingLanguageButton from "../Components/FloatingLanguageButton";
 
 function Privacy() {
     const { t } = useTranslation();
@@ -14,9 +15,12 @@ function Privacy() {
                             <h1 className="text-2xl font-bold text-slate-900 mb-4">
                                 {t("privacy.title")}
                             </h1>
-                            <p className="text-slate-600 leading-relaxed">
-                                {t("privacy.intro")}
-                            </p>
+                            <p
+                                className="text-slate-600 leading-relaxed"
+                                dangerouslySetInnerHTML={{
+                                    __html: t("privacy.intro"),
+                                }}
+                            ></p>
                             <p className="text-slate-600 leading-relaxed mt-4">
                                 {t("privacy.dataCollected")}
                             </p>
@@ -104,6 +108,8 @@ function Privacy() {
                                     <a
                                         href="https://www.cnil.fr/fr/webform/adresser-une-plainte"
                                         className="text-blue-500 font-semibold"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                     >
                                         https://www.cnil.fr/fr/webform/adresser-une-plainte
                                     </a>
@@ -113,6 +119,7 @@ function Privacy() {
                     </div>
                 </div>
             </Container>
+            <FloatingLanguageButton />
         </div>
     );
 }
