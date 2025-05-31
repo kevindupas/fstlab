@@ -450,6 +450,7 @@ class MyExperimentResource extends Resource
                                 }),
 
                             Forms\Components\ToggleButtons::make('experimentStatus')
+                                ->label(__('actions.manage_session.status'))
                                 ->options([
                                     'start' => __('actions.manage_session.options.start'),
                                     'pause' => __('actions.manage_session.options.pause'),
@@ -611,10 +612,12 @@ class MyExperimentResource extends Resource
                         ->icon('heroicon-o-eye')
                         ->url(fn(Experiment $record): string =>
                         ExperimentDetails::getUrl(['record' => $record])),
-                    Tables\Actions\EditAction::make()->color('warning'),
+                    Tables\Actions\EditAction::make()->color('warning')->label(__('actions.edit_experiment')),
                     Tables\Actions\DeleteAction::make()
+                        ->label(__('actions.delete_experiment'))
                         ->requiresConfirmation(false)
-                        ->modalSubmitActionLabel(__('actions.delete.heading'))
+                        ->modalHeading(__('actions.delete_experiment'))
+                        ->modalSubmitActionLabel(__('actions.delete_experiment'))
                         ->modalDescription(
                             fn($record) =>
                             $record->access_requests_count()->count() > 0 || $record->shared_links_count()->count() > 0

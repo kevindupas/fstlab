@@ -15,10 +15,17 @@ class EditMyExperiment extends EditRecord
 {
     protected static string $resource = MyExperimentResource::class;
 
+    public function getTitle(): string
+    {
+        return __('actions.edit_experiment');
+    }
+
     protected function getHeaderActions(): array
     {
         return [
             Actions\DeleteAction::make()
+                ->label(__('actions.delete_experiment'))
+                ->modalHeading(__('actions.delete_experiment'))
                 ->requiresConfirmation(false)
                 ->modalDescription(
                     fn($record) =>
@@ -26,7 +33,7 @@ class EditMyExperiment extends EditRecord
                         ? __('filament.resources.my_experiment.actions.delete.desc_issues_delete')
                         : __('filament.resources.my_experiment.actions.delete.confirm_delete')
                 )
-                ->modalSubmitActionLabel(__('actions.delete.heading'))
+                ->modalSubmitActionLabel(__('actions.delete_experiment'))
                 ->hidden(fn($record) => $record->access_requests_count()->count() > 0 || $record->shared_links_count()->count() > 0)
                 ->form([
                     TextInput::make('confirmation_code')

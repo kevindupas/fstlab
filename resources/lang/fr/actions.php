@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 return [
     'manage' => 'Gérer les sessions',
-    'results' => 'Voir les résultats',
-    'statistics' => 'Voir les statistiques',
+    'results' => 'Voir les résultats de l\'expérimentation',
+    'statistics' => 'Voir les statistiques de l\'expérimentation',
     'details_experiment' => 'Détails de l\'expérimentation',
     'edit_experiment' => 'Editer l\'expérimentation',
     'delete_experiment' => 'Supprimer l\'expérimentation',
@@ -15,12 +15,13 @@ return [
     'contact_principal' => 'Contacter l\'expérimentateur principal',
     'show_experiment' => 'Voir l\'expérimentation',
     'clearFilter' => 'Effacer le filtre',
-    'copy_link' => 'Copier le lien',
+    'copy_link' => 'Copier le lien de l\'expérimentation',
     'link_copied_to_clipboard' => 'Lien copié dans le presse-papier !',
     'no_link_available' => 'Aucun lien disponible.',
     'please_start_experiment' => 'Veuillez utiliser ":action" pour démarrer l\'expérimentation.',
     'manage_session' => [
-        'label' => 'Session',
+        'label' => 'Gérer la session de l\'expérimentation',
+        'status' => 'Statut de la session',
         'information' => 'Gestion de la session',
         'session_link' => 'Lien de l\'expérience',
         'no_session' => 'Aucune session active',

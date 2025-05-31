@@ -164,6 +164,7 @@ class AssignedExperimentsTableWidget extends BaseWidget
                                 }),
 
                             Forms\Components\ToggleButtons::make('experimentStatus')
+                                ->label(__('actions.manage_session.status'))
                                 ->options([
                                     'start' => __('actions.manage_session.options.start'),
                                     'pause' => __('actions.manage_session.options.pause'),
