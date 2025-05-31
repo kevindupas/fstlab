@@ -124,9 +124,27 @@ class AssignedExperimentsTableWidget extends BaseWidget
 
                             if ($experimentLink && $experimentLink->link) {
                                 $url = url("/experiment/{$experimentLink->link}");
+
                                 $livewire->js(<<<JS
-                        navigator.clipboard.writeText('{$url}').then(function() {});
-                    JS);
+            const textToCopy = '{$url}';
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = textToCopy;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            
+            textarea.select();
+            textarea.setSelectionRange(0, 99999);
+            
+            try {
+                document.execCommand('copy');
+            } catch (err) {
+                console.log('Erreur de copie:', err);
+            }
+            
+            document.body.removeChild(textarea);
+        JS);
 
                                 \Filament\Notifications\Notification::make()
                                     ->title(__('actions.copy_link'))
@@ -141,7 +159,6 @@ class AssignedExperimentsTableWidget extends BaseWidget
                                     ->send();
                             }
                         }),
-                    // Action pour lancer une session
                     Tables\Actions\Action::make('manageExperiment')
                         ->label(__('actions.manage_session.label'))
                         ->color('success')
