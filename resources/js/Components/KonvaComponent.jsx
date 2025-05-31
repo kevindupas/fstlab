@@ -190,11 +190,9 @@ function KonvaComponent({
             setMediaInteractions(newInteractions);
             onInteractionsUpdate(newInteractions);
 
-            // Trouver le nom du son
             const item = mediaItems.find((item) => item.url === url);
             if (item) {
-                const index = mediaItems.indexOf(item);
-                setCurrentSoundName(`s${index + 1}`);
+                setCurrentSoundName(`s${item.displayIndex + 1}`);
 
                 onAction({
                     id: item.id,
