@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Pages\Experiments\Details\ExperimentDetails;
-use App\Filament\Pages\Experiments\Sessions\ExperimentSessions;
 use App\Filament\Pages\Experiments\Statistics\ExperimentStatistics;
 use App\Filament\Resources\BorrowedExperimentsResource\Pages;
 use App\Models\Experiment;
@@ -260,7 +259,7 @@ class BorrowedExperimentsResource extends Resource
 
                                     // Gestion du howitwork_page
                                     if ($state !== 'test') {
-                                        $record->experiment->howitwork_page = false;  // Correction ici aussi
+                                        $record->experiment->howitwork_page = false;
                                         $record->experiment->save();
                                     }
                                 }),

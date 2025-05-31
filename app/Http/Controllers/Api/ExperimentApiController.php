@@ -107,6 +107,7 @@ class ExperimentApiController extends Controller
                     'original_creator_name' => $experiment->originalCreator ? $experiment->originalCreator->name : null,
                     'hasFullAccess' => $hasFullAccess,
                     'hasResultsAccess' => $hasResultsAccess,
+                    'language' => $experiment->language,
                 ];
             })
             ->values()

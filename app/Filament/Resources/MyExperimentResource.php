@@ -161,7 +161,17 @@ class MyExperimentResource extends Resource
                         ->columnSpan('full'),
                     Forms\Components\Toggle::make('is_public')
                         ->label(__('filament.resources.my_experiment.form.is_public'))
-                        ->helperText(__('filament.resources.my_experiment.form.is_public_helper'))
+                        ->helperText(__('filament.resources.my_experiment.form.is_public_helper')),
+
+                    Forms\Components\Select::make('language')
+                        ->label(__('filament.resources.my_experiment.form.language'))
+                        ->helperText(__('filament.resources.my_experiment.form.language_helper'))
+                        ->native(false)
+                        ->default('fr')
+                        ->options([
+                            'fr' => 'Français',
+                            'en' => 'English',
+                        ])
                 ])->collapsible(),
 
             Forms\Components\Section::make(__('filament.resources.my_experiment.general_section.heading'))

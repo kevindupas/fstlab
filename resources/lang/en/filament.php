@@ -352,6 +352,8 @@ return [
                 'howitworks_helper' => 'If enabled, the experiment in "test" mode will be visible on the How it Works? page. Automatically disabled if the status changes.',
                 'is_public' => 'Make it public',
                 'is_public_helper' => 'Make your experiment public so that it can be seen by all users',
+                'language' => 'Language',
+                'language_helper' => 'Choose the language of your experiment, when the participants will access the experiment, the language will be automatically set to this one and not by the browser.',
                 'status' => [
                     'label' => 'Start the experiment?',
                     'helper_text' => 'Use "test" mode to try without saving results. Use "start" mode to officially launch the experiment.',

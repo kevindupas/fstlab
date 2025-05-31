@@ -4,10 +4,22 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { XCircle } from "lucide-react";
 
 function ExperimentError() {
-    const { t } = useTranslation();
+    const { t, restoreOriginalLanguage } = useTranslation();
     const navigate = useNavigate();
     const location = useLocation();
     const { status } = location.state || { status: "unknown" };
+
+    // Restaurer la langue originale quand on arrive sur la page d'erreur
+    useEffect(() => {
+        restoreOriginalLanguage();
+    }, [restoreOriginalLanguage]);
+
+    // Cleanup au démontage du composant
+    useEffect(() => {
+        return () => {
+            restoreOriginalLanguage();
+        };
+    }, [restoreOriginalLanguage]);
 
     const getErrorContent = () => {
         switch (status) {

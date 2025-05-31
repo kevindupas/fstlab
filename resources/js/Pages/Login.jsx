@@ -8,7 +8,7 @@ import { useExperimentStatus } from "../Contexts/ExperimentStatusContext";
 import { getSystemInfo } from "../Utils/getSystemInfo.js";
 
 function Login() {
-    const { t } = useTranslation();
+    const { t, changeLanguageTemporary } = useTranslation();
     const { checkExperimentStatus } = useExperimentStatus();
     const { checkExistingSession } = useSession();
     const { sessionId } = useParams();
@@ -29,6 +29,20 @@ function Login() {
                     return;
                 }
 
+                // Récupérer les informations de l'expérimentation pour changer la langue
+                try {
+                    const response = await fetch(
+                        `/api/experiment/session/${sessionId}`
+                    );
+                    const data = await response.json();
+
+                    if (data.experiment && data.experiment.language) {
+                        changeLanguageTemporary(data.experiment.language);
+                    }
+                } catch (error) {
+                    console.error("Error getting experiment language:", error);
+                }
+
                 await checkExistingSession(sessionId);
                 // Generate participant ID automatically
                 const response = await fetch(
@@ -46,7 +60,13 @@ function Login() {
         };
 
         verifyExperimentStatus();
-    }, [sessionId, checkExperimentStatus, checkExistingSession, t]);
+    }, [
+        sessionId,
+        checkExperimentStatus,
+        checkExistingSession,
+        t,
+        changeLanguageTemporary,
+    ]);
 
     const handleRegistration = async (e) => {
         e.preventDefault();

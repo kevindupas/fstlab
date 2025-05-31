@@ -25,6 +25,7 @@ class Experiment extends Model
         'howitwork_page',
         'is_public',
         'is_random',
+        'language',
         'responsible_institution',
     ];
 

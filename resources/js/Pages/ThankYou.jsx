@@ -11,7 +11,7 @@ import {
 import Confetti from "../Components/ReactCanvasConfetti";
 
 function ThankYou() {
-    const { t } = useTranslation();
+    const { t, restoreOriginalLanguage } = useTranslation();
     const navigate = useNavigate();
     const location = useLocation();
     const isTestMode = location.state?.isTest;
@@ -34,7 +34,15 @@ function ThankYou() {
         };
 
         exitFullscreen();
-    }, []);
+        restoreOriginalLanguage();
+    }, [restoreOriginalLanguage]);
+
+    // Cleanup au démontage du composant
+    useEffect(() => {
+        return () => {
+            restoreOriginalLanguage();
+        };
+    }, [restoreOriginalLanguage]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">

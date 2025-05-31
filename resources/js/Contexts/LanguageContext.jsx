@@ -6,6 +6,7 @@ export const LanguageProvider = ({ children }) => {
     const [language, setLanguage] = useState(
         () => localStorage.getItem("language") || "fr"
     );
+    const [originalLanguage, setOriginalLanguage] = useState(null);
     const [translations, setTranslations] = useState({});
     const [loading, setLoading] = useState(true);
 
@@ -59,11 +60,31 @@ export const LanguageProvider = ({ children }) => {
         setLanguage(newLang);
     };
 
+    // Changer temporairement la langue pour une expérimentation
+    const changeLanguageTemporary = (experimentLang) => {
+        // Sauvegarder la langue actuelle si ce n'est pas déjà fait
+        if (!originalLanguage) {
+            setOriginalLanguage(language);
+        }
+        // Changer vers la langue de l'expérimentation
+        setLanguage(experimentLang);
+    };
+
+    // Restaurer la langue originale
+    const restoreOriginalLanguage = () => {
+        if (originalLanguage) {
+            setLanguage(originalLanguage);
+            setOriginalLanguage(null);
+        }
+    };
+
     return (
         <LanguageContext.Provider
             value={{
                 language,
                 changeLanguage,
+                changeLanguageTemporary,
+                restoreOriginalLanguage,
                 t,
                 isLoading: loading,
             }}
