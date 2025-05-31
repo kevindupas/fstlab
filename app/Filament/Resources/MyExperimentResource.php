@@ -403,47 +403,39 @@ class MyExperimentResource extends Resource
                     Tables\Actions\Action::make('copy_link')
                         ->label(__('actions.copy_link'))
                         ->icon('heroicon-o-link')
-                        ->action(function ($record, $livewire) {
+                        ->extraAttributes(function ($record) {
                             $experimentLink = \App\Models\ExperimentLink::where('experiment_id', $record->id)
                                 ->where('user_id', Auth::id())
                                 ->first();
 
                             if ($experimentLink && $experimentLink->link) {
                                 $url = url("/experiment/{$experimentLink->link}");
+                                return [
+                                    'x-on:click' => 'window.navigator.clipboard.writeText("' . $url . '"); $tooltip("' . __('actions.link_copied_to_clipboard') . '", { timeout: 1500 });',
+                                ];
+                            }
 
-                                $livewire->js(<<<JS
-                const textToCopy = '{$url}';
-                
-                const textarea = document.createElement('textarea');
-                textarea.value = textToCopy;
-                textarea.style.position = 'fixed';
-                textarea.style.opacity = '0';
-                document.body.appendChild(textarea);
-                
-                textarea.select();
-                textarea.setSelectionRange(0, 99999);
-                
-                try {
-                    document.execCommand('copy');
-                } catch (err) {
-                    console.log('Erreur de copie:', err);
-                }
-                
-                document.body.removeChild(textarea);
-            JS);
+                            return [];
+                        })
+                        ->action(function ($record) {
+                            $experimentLink = \App\Models\ExperimentLink::where('experiment_id', $record->id)
+                                ->where('user_id', Auth::id())
+                                ->first();
 
-                                \Filament\Notifications\Notification::make()
-                                    ->title(__('actions.copy_link'))
-                                    ->body(__('actions.link_copied_to_clipboard'))
-                                    ->success()
-                                    ->send();
-                            } else {
+                            if (!$experimentLink || !$experimentLink->link) {
                                 \Filament\Notifications\Notification::make()
                                     ->title(__('actions.copy_link'))
                                     ->body(__('actions.no_link_available') . ' ' . __('actions.please_start_experiment', ['action' => __('actions.manage_session.label')]))
                                     ->warning()
                                     ->send();
                             }
+                        })
+                        ->visible(function ($record) {
+                            $experimentLink = \App\Models\ExperimentLink::where('experiment_id', $record->id)
+                                ->where('user_id', Auth::id())
+                                ->first();
+
+                            return $experimentLink && $experimentLink->link;
                         }),
                     Tables\Actions\Action::make('manageExperiment')
                         ->label(__('actions.manage_session.label'))
