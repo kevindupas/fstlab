@@ -131,12 +131,19 @@ class MyExperimentResource extends Resource
                         ->helperText(__('filament.resources.my_experiment.form.link_helper'))
                         ->extraAttributes(function ($state) {
                             return [
-                                'x-on:click' => 'window.navigator.clipboard.writeText("' . $state . '"); $tooltip("' . __('filament.resources.my_experiment.form.link_copied') . '", { timeout: 1500 });',
+                                'x-on:click' => 'window.navigator.clipboard.writeText("' . $state . '"); $tooltip("' . __('filament.resources.my_experiment.form.link_copied') . '", { timeout: 1500 }); $wire.$dispatch("link-copied");',
                             ];
                         })
                         ->suffixAction(
                             Forms\Components\Actions\Action::make('copy')
                                 ->icon('heroicon-m-clipboard')
+                                ->action(function () {
+                                    \Filament\Notifications\Notification::make()
+                                        ->title(__('filament.resources.my_experiment.form.link_copied'))
+                                        ->body(__('filament.resources.my_experiment.form.link_copied_success'))
+                                        ->success()
+                                        ->send();
+                                })
                         )
                         ->visible(fn($get) => in_array($get('status'), ['start', 'test']))
                         ->afterStateHydrated(function ($component, $state, $record) {
@@ -411,10 +418,10 @@ class MyExperimentResource extends Resource
                             if ($experimentLink && $experimentLink->link) {
                                 $url = url("/experiment/{$experimentLink->link}");
                                 return [
-                                    'x-on:click' => 'window.navigator.clipboard.writeText("' . $url . '"); $tooltip("' . __('actions.link_copied_to_clipboard') . '", { timeout: 1500 });',
+                                    'data-copy-url' => $url,
+                                    'x-on:click' => 'window.navigator.clipboard.writeText($el.dataset.copyUrl);',
                                 ];
                             }
-
                             return [];
                         })
                         ->action(function ($record) {
@@ -422,20 +429,19 @@ class MyExperimentResource extends Resource
                                 ->where('user_id', Auth::id())
                                 ->first();
 
-                            if (!$experimentLink || !$experimentLink->link) {
+                            if ($experimentLink && $experimentLink->link) {
+                                \Filament\Notifications\Notification::make()
+                                    ->title(__('actions.copy_link'))
+                                    ->body(__('actions.link_copied_to_clipboard'))
+                                    ->success()
+                                    ->send();
+                            } else {
                                 \Filament\Notifications\Notification::make()
                                     ->title(__('actions.copy_link'))
                                     ->body(__('actions.no_link_available') . ' ' . __('actions.please_start_experiment', ['action' => __('actions.manage_session.label')]))
                                     ->warning()
                                     ->send();
                             }
-                        })
-                        ->visible(function ($record) {
-                            $experimentLink = \App\Models\ExperimentLink::where('experiment_id', $record->id)
-                                ->where('user_id', Auth::id())
-                                ->first();
-
-                            return $experimentLink && $experimentLink->link;
                         }),
                     Tables\Actions\Action::make('manageExperiment')
                         ->label(__('actions.manage_session.label'))
