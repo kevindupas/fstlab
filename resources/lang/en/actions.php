@@ -16,6 +16,10 @@ return [
     'contact_principal' => 'Contact the main experimenter',
     'show_experiment' => 'Show experiment',
     'clearFilter' => 'Clear filter',
+    'copy_link' => 'Copy link',
+    'link_copied_to_clipboard' => 'Link copied to clipboard!',
+    'no_link_available' => 'No link available.',
+    'please_start_experiment' => 'Please use ":action" to start the experiment.',
     'manage_session' => [
         'label' => 'Session',
         'information' => 'Session management',

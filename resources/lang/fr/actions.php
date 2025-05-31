@@ -15,6 +15,10 @@ return [
     'contact_principal' => 'Contacter l\'expérimentateur principal',
     'show_experiment' => 'Voir l\'expérimentation',
     'clearFilter' => 'Effacer le filtre',
+    'copy_link' => 'Copier le lien',
+    'link_copied_to_clipboard' => 'Lien copié dans le presse-papier !',
+    'no_link_available' => 'Aucun lien disponible.',
+    'please_start_experiment' => 'Veuillez utiliser ":action" pour démarrer l\'expérimentation.',
     'manage_session' => [
         'label' => 'Session',
         'information' => 'Gestion de la session',

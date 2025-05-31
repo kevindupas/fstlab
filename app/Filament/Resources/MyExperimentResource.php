@@ -400,6 +400,34 @@ class MyExperimentResource extends Resource
             ])
             ->actions([
                 ActionGroup::make([
+                    Tables\Actions\Action::make('copy_link')
+                        ->label(__('actions.copy_link'))
+                        ->icon('heroicon-o-link')
+                        ->action(function ($record, $livewire) {
+                            $experimentLink = \App\Models\ExperimentLink::where('experiment_id', $record->id)
+                                ->where('user_id', Auth::id())
+                                ->first();
+
+                            if ($experimentLink && $experimentLink->link) {
+                                $url = url("/experiment/{$experimentLink->link}");
+                                $livewire->js(<<<JS
+                                navigator.clipboard.writeText('{$url}').then(function() {});
+                            JS);
+
+                                \Filament\Notifications\Notification::make()
+                                    ->title(__('actions.copy_link'))
+                                    ->body(__('actions.link_copied_to_clipboard'))
+                                    ->success()
+                                    ->send();
+                            } else {
+                                \Filament\Notifications\Notification::make()
+                                    ->title(__('actions.copy_link'))
+                                    ->body(__('actions.no_link_available') . ' ' . __('actions.please_start_experiment', ['action' => __('actions.manage_session.label')]))
+                                    ->warning()
+                                    ->send();
+                            }
+                        }),
+                    // Le bouton est toujours visible, mais affiche un message d'aide si pas de lien
                     Tables\Actions\Action::make('manageExperiment')
                         ->label(__('actions.manage_session.label'))
                         ->color('success')
