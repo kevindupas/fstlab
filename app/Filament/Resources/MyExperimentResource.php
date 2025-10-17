@@ -246,7 +246,7 @@ class MyExperimentResource extends Resource
                         ->label(__('filament.resources.my_experiment.form.media'))
                         ->helperText(__('filament.resources.my_experiment.form.media_sound_helper'))
                         ->multiple()
-                        ->maxSize(20000)
+                        ->maxSize(60000)
                         ->disk('public')
                         ->visibility('public')
                         ->acceptedFileTypes([
@@ -267,7 +267,7 @@ class MyExperimentResource extends Resource
                         ->label(__('filament.resources.my_experiment.form.media'))
                         ->helperText(__('filament.resources.my_experiment.form.media_image_helper'))
                         ->multiple()
-                        ->maxSize(20000)
+                        ->maxSize(60000)
                         ->disk('public')
                         ->visibility('public')
                         ->acceptedFileTypes([
@@ -289,7 +289,7 @@ class MyExperimentResource extends Resource
                         ->label(__('filament.resources.my_experiment.form.media'))
                         ->helperText(__('filament.resources.my_experiment.form.media_image_sound_helper'))
                         ->multiple()
-                        ->maxSize(20000)
+                        ->maxSize(60000)
                         ->disk('public')
                         ->visibility('public')
                         ->acceptedFileTypes([
@@ -326,7 +326,7 @@ class MyExperimentResource extends Resource
                     Forms\Components\FileUpload::make('documents')
                         ->label(__('filament.resources.my_experiment.form.documents'))
                         ->helperText(__('filament.resources.my_experiment.form.documents_helper'))
-                        ->maxSize(20000) // 20Mo
+                        ->maxSize(60000) // 60Mo
                         ->multiple()
                         ->preserveFilenames()
                         ->directory('experiments/documents')
