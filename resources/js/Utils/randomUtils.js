@@ -43,17 +43,26 @@ export const shuffleWithSeed = (array, defaultSeed, isRandom = false) => {
         type: 'sound'
     }));
     
-    // Combiner les deux tableaux
-    const arrayWithIndices = [...imagesWithIndices, ...soundsWithIndices];
-    const shuffled = [...arrayWithIndices];
-    
-    // Mélanger le tableau
-    for (let i = shuffled.length - 1; i > 0; i--) {
+    // Mélanger séparément les images et les sons pour maintenir la cohérence
+    const shuffledImages = [...imagesWithIndices];
+    const shuffledSounds = [...soundsWithIndices];
+
+    // Mélanger les images
+    for (let i = shuffledImages.length - 1; i > 0; i--) {
         const rand = seededRandom(seed + i);
         const j = Math.floor(rand * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        [shuffledImages[i], shuffledImages[j]] = [shuffledImages[j], shuffledImages[i]];
         seed = Math.floor(rand * PRIME);
     }
-    
-    return shuffled;
+
+    // Mélanger les sons
+    for (let i = shuffledSounds.length - 1; i > 0; i--) {
+        const rand = seededRandom(seed + i);
+        const j = Math.floor(rand * (i + 1));
+        [shuffledSounds[i], shuffledSounds[j]] = [shuffledSounds[j], shuffledSounds[i]];
+        seed = Math.floor(rand * PRIME);
+    }
+
+    // Combiner les deux tableaux mélangés séparément
+    return [...shuffledImages, ...shuffledSounds];
 };
