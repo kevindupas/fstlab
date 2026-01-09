@@ -47,7 +47,9 @@ function KonvaComponent({
     useEffect(() => {
         if (!mediaArray.length) return;
 
-        const shuffledItems = shuffleWithSeed(mediaArray, 12213, isRandom);
+        // Si isRandom est true, générer une seed aléatoire, sinon utiliser une seed fixe
+        const seed = isRandom ? Math.floor(Math.random() * 2147483647) : 12213;
+        const shuffledItems = shuffleWithSeed(mediaArray, seed, isRandom);
 
         const arrangedItems = arrangeItemsInGrid(
             shuffledItems,
